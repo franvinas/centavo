@@ -1,3 +1,11 @@
+import fs from "fs";
+import path from "path";
+
+const EMAIL_LOGO_BASE64 = fs.readFileSync(
+  path.join(process.cwd(), "public/icons/email-logo-base64.txt"),
+  "utf-8",
+);
+
 interface OTPEmailParams {
   otp: string;
   email: string;
@@ -29,7 +37,7 @@ export function getOTPEmailHtml({ otp }: OTPEmailParams): string {
     <tr><td align="center">
       <table width="420" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;padding:40px;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
         <tr><td align="center" style="padding-bottom:24px;">
-          <div style="width:48px;height:48px;background:#3D8A5A;border-radius:12px;line-height:48px;text-align:center;color:#fff;font-size:22px;font-weight:bold;">C</div>
+          <img src="data:image/png;base64,${EMAIL_LOGO_BASE64}" alt="Centavo" width="48" height="48" style="display:block;border-radius:12px;" />
         </td></tr>
         <tr><td align="center" style="font-size:20px;font-weight:600;color:#1a1a1a;padding-bottom:8px;">
           Your verification code

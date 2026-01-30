@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -110,9 +111,13 @@ export default function SignInPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="bg-accent-primary flex h-14 w-14 items-center justify-center rounded-xl text-white">
-            <span className="text-2xl font-bold">C</span>
-          </div>
+          <Image
+            src="/icons/centavo-logo.svg"
+            alt="Centavo"
+            width={56}
+            height={56}
+            className="rounded-xl"
+          />
           <h1 className="text-text-primary mt-4 text-2xl font-semibold">
             Welcome to Centavo
           </h1>

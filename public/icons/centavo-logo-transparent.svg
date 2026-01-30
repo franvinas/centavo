@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 1024 1024">
-<rect width="1024" height="1024" fill="#F2EFDC"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
 <path fill="#BFCEA4" d="M479.182 101.000L538.938 135.500L538.938 204.500L479.182 239.000L419.426 204.500L419.426 135.500Z"/>
 <path fill="#BFCEA4" d="M610.818 101.000L670.574 135.500L670.574 204.500L610.818 239.000L551.062 204.500L551.062 135.500Z"/>
 <path fill="#BFCEA4" d="M281.728 215.000L341.484 249.500L341.484 318.500L281.728 353.000L221.973 318.500L221.973 249.500Z"/>

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { desktopNavItems, desktopBottomNavItems } from "@/lib/nav-config";
@@ -19,10 +20,16 @@ export function DesktopSidebar({ user }: DesktopSidebarProps) {
     <aside className="border-border-subtle bg-bg-surface fixed top-0 left-0 z-40 hidden h-screen w-[260px] flex-col border-r md:flex">
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-6 py-6">
-        <div className="bg-accent-primary flex h-9 w-9 items-center justify-center rounded-lg text-white">
-          <span className="text-lg font-bold">C</span>
-        </div>
-        <span className="text-text-primary text-xl font-semibold">Centavo</span>
+        <Image
+          src="/icons/centavo-logo.svg"
+          alt="Centavo"
+          width={36}
+          height={36}
+          className="rounded-lg"
+        />
+        <span className="text-text-primary text-xl font-semibold">
+          Centavo
+        </span>
       </div>
 
       {/* Nav items */}
