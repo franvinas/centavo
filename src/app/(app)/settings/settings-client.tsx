@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { updateUser } from "@/lib/actions/user";
 
-const CURRENCIES = ["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "MXN", "BRL"];
+const CURRENCIES = ["USD", "EUR", "ARS"];
 
 interface SettingsClientProps {
   user: {
