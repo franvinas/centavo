@@ -2,11 +2,22 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { X, Calendar, FileText, StickyNote, ChevronDown } from "lucide-react";
+import {
+  X,
+  Calendar,
+  FileText,
+  StickyNote,
+  ChevronDown,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CategoryChip } from "./category-chip";
-import { createExpense, updateExpense } from "@/lib/actions/expenses";
+import {
+  createExpense,
+  updateExpense,
+  deleteExpense,
+} from "@/lib/actions/expenses";
 import type { Category } from "@/types";
 
 interface ExpenseFormProps {
@@ -63,6 +74,17 @@ export function ExpenseForm({ expense, categories }: ExpenseFormProps) {
         await createExpense(data);
       }
       router.push("/dashboard");
+    });
+  }
+
+  function handleDelete() {
+    startTransition(async () => {
+      try {
+        await deleteExpense(expense!.id);
+        router.push("/expenses");
+      } catch (e) {
+        alert(e instanceof Error ? e.message : "Failed to delete expense");
+      }
     });
   }
 
@@ -178,6 +200,17 @@ export function ExpenseForm({ expense, categories }: ExpenseFormProps) {
               ? "Update Expense"
               : "Save Expense"}
         </Button>
+        {expense && (
+          <Button
+            variant="ghost"
+            onClick={handleDelete}
+            disabled={isPending}
+            className="mt-3 h-12 w-full text-base font-semibold text-status-negative hover:bg-status-negative/10 hover:text-status-negative"
+          >
+            <Trash2 className="mr-2 h-5 w-5" />
+            Delete Expense
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -4,9 +4,11 @@ import { ExpenseForm } from "../expense-form";
 import type { Category } from "@/types";
 
 // Mock server actions
+const mockDeleteExpense = vi.fn().mockResolvedValue(undefined);
 vi.mock("@/lib/actions/expenses", () => ({
   createExpense: vi.fn().mockResolvedValue(undefined),
   updateExpense: vi.fn().mockResolvedValue(undefined),
+  deleteExpense: (...args: unknown[]) => mockDeleteExpense(...args),
 }));
 
 const mockCategories: Category[] = [
@@ -142,5 +144,63 @@ describe("ExpenseForm", () => {
     const closeButton = container.querySelector('button[aria-label="Close"]')!;
     await user.click(closeButton);
     expect(mockRouter.back).toHaveBeenCalled();
+  });
+
+  it("does not show delete button in create mode", () => {
+    const { container } = render(<ExpenseForm categories={mockCategories} />);
+
+    const buttons = container.querySelectorAll("button");
+    const deleteButton = Array.from(buttons).find((b) =>
+      b.textContent?.includes("Delete Expense"),
+    );
+    expect(deleteButton).toBeUndefined();
+  });
+
+  it("shows delete button in edit mode", () => {
+    const { container } = render(
+      <ExpenseForm
+        categories={mockCategories}
+        expense={{
+          id: "exp-1",
+          amount: 25.5,
+          currency: "USD",
+          description: "Lunch",
+          date: "2025-01-15",
+          categoryId: "cat-1",
+        }}
+      />,
+    );
+
+    const buttons = container.querySelectorAll("button");
+    const deleteButton = Array.from(buttons).find((b) =>
+      b.textContent?.includes("Delete Expense"),
+    );
+    expect(deleteButton).toBeDefined();
+  });
+
+  it("calls deleteExpense and navigates to /expenses on delete", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <ExpenseForm
+        categories={mockCategories}
+        expense={{
+          id: "exp-1",
+          amount: 25.5,
+          currency: "USD",
+          description: "Lunch",
+          date: "2025-01-15",
+          categoryId: "cat-1",
+        }}
+      />,
+    );
+
+    const buttons = container.querySelectorAll("button");
+    const deleteButton = Array.from(buttons).find((b) =>
+      b.textContent?.includes("Delete Expense"),
+    )!;
+    await user.click(deleteButton);
+
+    expect(mockDeleteExpense).toHaveBeenCalledWith("exp-1");
+    expect(mockRouter.push).toHaveBeenCalledWith("/expenses");
   });
 });
