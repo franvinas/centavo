@@ -5,7 +5,10 @@ import { createPrismaCategory } from "@/test-utils/factories";
 import { PUT, DELETE } from "../route";
 import { NextRequest } from "next/server";
 
-function createRequest(url: string, init?: RequestInit) {
+function createRequest(
+  url: string,
+  init?: ConstructorParameters<typeof NextRequest>[1],
+) {
   return new NextRequest(new URL(url, "http://localhost:3000"), init);
 }
 

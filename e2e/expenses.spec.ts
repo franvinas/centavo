@@ -9,8 +9,8 @@ test.describe("Expenses", () => {
   test("add expense form has required fields", async ({ page }) => {
     await page.goto("/expenses/new");
 
-    await expect(page.getByPlaceholderText("0.00")).toBeVisible();
-    await expect(page.getByPlaceholderText("Description")).toBeVisible();
+    await expect(page.getByPlaceholder("0.00")).toBeVisible();
+    await expect(page.getByPlaceholder("Description")).toBeVisible();
     await expect(page.getByText("Category")).toBeVisible();
     await expect(page.getByText("Save Expense")).toBeVisible();
   });
@@ -26,10 +26,10 @@ test.describe("Expenses", () => {
     await page.goto("/expenses/new");
 
     // Fill amount
-    await page.getByPlaceholderText("0.00").fill("25.50");
+    await page.getByPlaceholder("0.00").fill("25.50");
 
     // Fill description
-    await page.getByPlaceholderText("Description").fill("Test Expense");
+    await page.getByPlaceholder("Description").fill("Test Expense");
 
     // Select a category (click first category button)
     const categoryButtons = page
@@ -52,7 +52,7 @@ test.describe("Expenses", () => {
   test("can filter expenses by search", async ({ page }) => {
     await page.goto("/dashboard");
 
-    const searchInput = page.getByPlaceholderText("Search expenses...");
+    const searchInput = page.getByPlaceholder("Search expenses...");
     if (await searchInput.isVisible()) {
       await searchInput.fill("test");
       // Filter should apply
