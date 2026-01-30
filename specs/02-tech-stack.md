@@ -12,6 +12,7 @@
 | Styling | Tailwind CSS | Utility-first, fast to build minimal/clean UIs |
 | UI components | shadcn/ui | Copy-paste components built on Radix, no heavy dependency |
 | PWA | next-pwa / Serwist | Service worker generation for installability and offline shell |
+| Testing | Vitest + React Testing Library + Playwright | Unit/integration with Vitest, component tests with RTL, E2E with Playwright |
 | Deployment | TBD | Vercel, self-hosted, or Docker — to be decided |
 
 ## Why this stack?
@@ -53,3 +54,11 @@ If the app grows beyond what API routes can handle, we can extract a separate se
 - **ESLint** — linting with Next.js recommended config
 - **Prettier** — code formatting
 - **TypeScript strict mode** — enabled
+
+## Testing
+
+- **Vitest** — unit and integration tests (jsdom environment)
+- **React Testing Library** — component tests with user-event
+- **Playwright** — E2E browser tests (Chromium + mobile viewport)
+- **vitest-mock-extended** — deep mocking for Prisma client
+- **Docker Compose** — containerized test execution with PostgreSQL service

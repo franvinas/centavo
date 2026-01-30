@@ -7,7 +7,7 @@ Automated pipeline using **GitHub Actions** that runs on every push and pull req
 ## Pipeline stages
 
 ```
-Push / PR --> Lint --> Type check --> Build --> Deploy (Vercel)
+Push / PR --> Lint --> Type check --> Test --> Build --> E2E --> Deploy (Vercel)
 ```
 
 ## GitHub Actions workflow
@@ -30,7 +30,25 @@ Runs on every push and PR:
 
 All steps must pass before a PR can be merged.
 
-#### 2. Database migrations (on merge to main)
+#### 2. Unit & integration tests
+
+- Runs on every push and PR
+- Spins up a **PostgreSQL 16** service container
+- Pushes Prisma schema to the test database
+- Runs `pnpm test` (Vitest — 155 tests covering validations, data access, API routes, server actions, and components)
+- Uploads coverage report as artifact
+
+#### 3. E2E tests
+
+- Runs on every push and PR
+- Spins up a **PostgreSQL 16** service container
+- Seeds the database with test data
+- Installs Playwright browsers
+- Builds and starts the Next.js app
+- Runs `pnpm test:e2e` (Playwright — Chromium + mobile viewport)
+- Uploads test report and results as artifacts
+
+#### 4. Database migrations (on merge to main)
 
 - Runs only on push to `main` (after merge)
 - Executes `pnpm prisma migrate deploy` against the production Neon database
@@ -63,7 +81,28 @@ All steps must pass before a PR can be merged.
 | `type-check` | `tsc --noEmit` | Type check without emitting |
 | `db:migrate` | `prisma migrate dev` | Run migrations (dev) |
 | `db:push` | `prisma db push` | Push schema changes (dev) |
+| `db:seed` | `pnpm exec tsx prisma/seed.ts` | Seed database with test data |
 | `db:studio` | `prisma studio` | Open Prisma Studio GUI |
+| `test` | `vitest run` | Run unit & integration tests |
+| `test:watch` | `vitest` | Run tests in watch mode |
+| `test:coverage` | `vitest run --coverage` | Run tests with coverage report |
+| `test:e2e` | `playwright test` | Run E2E tests |
+| `test:e2e:ui` | `playwright test --ui` | Run E2E tests with UI |
+| `docker:test` | `docker compose ... test` | Run unit tests in container |
+| `docker:coverage` | `docker compose ... coverage` | Run coverage in container |
+| `docker:e2e` | `docker compose ... e2e` | Run E2E tests in container |
+| `docker:down` | `docker compose ... down -v` | Tear down test containers |
+
+## Docker test environment
+
+A `docker-compose.test.yml` + `Dockerfile.test` setup allows running all tests in containers without local dependencies:
+
+- **Base image**: `mcr.microsoft.com/playwright:v1.58.0-noble` (includes all browser dependencies)
+- **Services**:
+  - `postgres` — PostgreSQL 16 Alpine with health check
+  - `test` — Unit & integration tests (`pnpm test`)
+  - `coverage` — Coverage report (mounts `./coverage` volume)
+  - `e2e` — Full E2E: pushes schema, seeds DB, builds app, runs Playwright (mounts report volumes)
 
 ## Protected branch rules (GitHub)
 
