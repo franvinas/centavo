@@ -14,7 +14,10 @@ export async function GET(request: NextRequest) {
   const categoryId = searchParams.get("categoryId");
   const search = searchParams.get("search");
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
-  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") ?? "50")));
+  const limit = Math.min(
+    100,
+    Math.max(1, parseInt(searchParams.get("limit") ?? "50")),
+  );
 
   const where: Record<string, unknown> = { userId: user.id };
 

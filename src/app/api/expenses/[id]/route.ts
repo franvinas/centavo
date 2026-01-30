@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getAuthUser, unauthorized, notFound, badRequest } from "@/lib/api-utils";
+import {
+  getAuthUser,
+  unauthorized,
+  notFound,
+  badRequest,
+} from "@/lib/api-utils";
 import { updateExpenseSchema } from "@/lib/validations/expense";
 import { getExchangeRate } from "@/lib/exchange-rate";
 

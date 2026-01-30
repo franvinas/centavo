@@ -20,9 +20,11 @@ test.describe("Dashboard", () => {
     // Category breakdown bars should render
     const bars = page.locator(".rounded-full.h-2");
     // May or may not have data, but section should be present
-    await expect(page.locator("text=Category")).toBeVisible().catch(() => {
-      // Category section may not exist if no expenses
-    });
+    await expect(page.locator("text=Category"))
+      .toBeVisible()
+      .catch(() => {
+        // Category section may not exist if no expenses
+      });
   });
 
   test("FAB navigates to add expense", async ({ page }) => {

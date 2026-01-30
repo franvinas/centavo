@@ -24,10 +24,10 @@ export function ExpenseList({ expenses }: ExpenseListProps) {
     <div className="space-y-4">
       {Array.from(grouped.entries()).map(([dateKey, group]) => (
         <div key={dateKey}>
-          <p className="mb-1 text-xs font-medium text-text-tertiary">
+          <p className="text-text-tertiary mb-1 text-xs font-medium">
             {formatDateGroup(group[0].date)}
           </p>
-          <div className="divide-y divide-border-subtle">
+          <div className="divide-border-subtle divide-y">
             {group.map((expense) => (
               <ExpenseCard key={expense.id} expense={expense} />
             ))}

@@ -9,7 +9,10 @@ beforeEach(() => {
 
 describe("getExpenses", () => {
   it("returns paginated expenses for a user", async () => {
-    const expenses = [createPrismaExpense(), createPrismaExpense({ description: "Dinner" })];
+    const expenses = [
+      createPrismaExpense(),
+      createPrismaExpense({ description: "Dinner" }),
+    ];
     prismaMock.expense.findMany.mockResolvedValue(expenses as never);
     prismaMock.expense.count.mockResolvedValue(2 as never);
 
@@ -33,7 +36,11 @@ describe("getExpenses", () => {
     prismaMock.expense.findMany.mockResolvedValue([] as never);
     prismaMock.expense.count.mockResolvedValue(0 as never);
 
-    await getExpenses({ userId: "user-1", from: "2025-01-01", to: "2025-01-31" });
+    await getExpenses({
+      userId: "user-1",
+      from: "2025-01-01",
+      to: "2025-01-31",
+    });
 
     expect(prismaMock.expense.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -116,9 +123,7 @@ describe("getExpenseSummary", () => {
       createPrismaExpense({ baseAmount: 100 }),
       createPrismaExpense({ baseAmount: 50 }),
     ];
-    const lastMonthExpenses = [
-      createPrismaExpense({ baseAmount: 200 }),
-    ];
+    const lastMonthExpenses = [createPrismaExpense({ baseAmount: 200 })];
 
     prismaMock.expense.findMany
       .mockResolvedValueOnce(currentExpenses as never)

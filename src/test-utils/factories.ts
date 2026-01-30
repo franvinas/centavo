@@ -15,7 +15,9 @@ export function createMockUser(overrides: Partial<User> = {}): User {
   };
 }
 
-export function createMockCategory(overrides: Partial<Category> = {}): Category {
+export function createMockCategory(
+  overrides: Partial<Category> = {},
+): Category {
   const id = nextId();
   return {
     id,

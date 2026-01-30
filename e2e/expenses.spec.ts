@@ -32,7 +32,9 @@ test.describe("Expenses", () => {
     await page.getByPlaceholderText("Description").fill("Test Expense");
 
     // Select a category (click first category button)
-    const categoryButtons = page.locator("button[type='button']").filter({ hasText: /Food|Transport|Shopping/ });
+    const categoryButtons = page
+      .locator("button[type='button']")
+      .filter({ hasText: /Food|Transport|Shopping/ });
     if (await categoryButtons.first().isVisible()) {
       await categoryButtons.first().click();
     }

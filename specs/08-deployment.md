@@ -16,6 +16,7 @@
 - **Domains**: custom domain TBD (e.g. centavo.app or similar)
 
 ### Vercel configuration
+
 - Framework preset: Next.js (auto-detected)
 - Build command: `pnpm build`
 - Output: `.next`
@@ -30,6 +31,7 @@
 - **Connection**: Use Neon's serverless driver (`@neondatabase/serverless`) for edge compatibility, or standard connection string with Prisma
 
 ### Connection pooling
+
 - Use Neon's built-in connection pooler (PgBouncer)
 - Prisma `datasource` uses the pooled connection string
 - Direct connection string used only for migrations
@@ -49,15 +51,15 @@
 
 ## Environment variables
 
-| Variable | Description | Where set |
-|----------|-------------|-----------|
-| `DATABASE_URL` | Neon pooled connection string | Vercel env |
-| `DIRECT_DATABASE_URL` | Neon direct connection (for migrations) | Vercel env |
-| `NEXTAUTH_SECRET` | Random secret for JWT signing | Vercel env |
-| `NEXTAUTH_URL` | App URL (e.g. https://centavo.app) | Vercel env |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID | Vercel env |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | Vercel env |
-| `RESEND_API_KEY` | Resend API key for sending emails | Vercel env |
+| Variable               | Description                             | Where set  |
+| ---------------------- | --------------------------------------- | ---------- |
+| `DATABASE_URL`         | Neon pooled connection string           | Vercel env |
+| `DIRECT_DATABASE_URL`  | Neon direct connection (for migrations) | Vercel env |
+| `NEXTAUTH_SECRET`      | Random secret for JWT signing           | Vercel env |
+| `NEXTAUTH_URL`         | App URL (e.g. https://centavo.app)      | Vercel env |
+| `GOOGLE_CLIENT_ID`     | Google OAuth client ID                  | Vercel env |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret              | Vercel env |
+| `RESEND_API_KEY`       | Resend API key for sending emails       | Vercel env |
 
 ## Local development
 

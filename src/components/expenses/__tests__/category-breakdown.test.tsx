@@ -21,9 +21,21 @@ describe("CategoryBreakdown", () => {
     };
 
     const expenses = [
-      createMockExpense({ categoryId: "cat-1", category: foodCategory, baseAmount: 100 }),
-      createMockExpense({ categoryId: "cat-1", category: foodCategory, baseAmount: 50 }),
-      createMockExpense({ categoryId: "cat-2", category: transportCategory, baseAmount: 75 }),
+      createMockExpense({
+        categoryId: "cat-1",
+        category: foodCategory,
+        baseAmount: 100,
+      }),
+      createMockExpense({
+        categoryId: "cat-1",
+        category: foodCategory,
+        baseAmount: 50,
+      }),
+      createMockExpense({
+        categoryId: "cat-2",
+        category: transportCategory,
+        baseAmount: 75,
+      }),
     ];
 
     render(<CategoryBreakdown expenses={expenses} />);
@@ -49,8 +61,16 @@ describe("CategoryBreakdown", () => {
     };
 
     const expenses = [
-      createMockExpense({ categoryId: "cat-1", category: food, baseAmount: 50 }),
-      createMockExpense({ categoryId: "cat-2", category: transport, baseAmount: 200 }),
+      createMockExpense({
+        categoryId: "cat-1",
+        category: food,
+        baseAmount: 50,
+      }),
+      createMockExpense({
+        categoryId: "cat-2",
+        category: transport,
+        baseAmount: 200,
+      }),
     ];
 
     const { container } = render(<CategoryBreakdown expenses={expenses} />);
@@ -77,8 +97,16 @@ describe("CategoryBreakdown", () => {
     };
 
     const expenses = [
-      createMockExpense({ categoryId: "cat-1", category: food, baseAmount: 100 }),
-      createMockExpense({ categoryId: "cat-2", category: transport, baseAmount: 50 }),
+      createMockExpense({
+        categoryId: "cat-1",
+        category: food,
+        baseAmount: 100,
+      }),
+      createMockExpense({
+        categoryId: "cat-2",
+        category: transport,
+        baseAmount: 50,
+      }),
     ];
 
     const { container } = render(<CategoryBreakdown expenses={expenses} />);

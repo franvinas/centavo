@@ -13,6 +13,7 @@ Push / PR --> Lint --> Type check --> Test --> Build --> E2E --> Deploy (Vercel)
 ## GitHub Actions workflow
 
 ### Trigger
+
 - On push to `main` branch
 - On pull request to `main` branch
 
@@ -70,28 +71,28 @@ All steps must pass before a PR can be merged.
 
 ## npm scripts
 
-| Script | Command | Purpose |
-|--------|---------|---------|
-| `dev` | `next dev` | Local development server |
-| `build` | `next build` | Production build |
-| `start` | `next start` | Start production server |
-| `lint` | `next lint` | Run ESLint |
-| `format` | `prettier --write .` | Format all files |
-| `format:check` | `prettier --check .` | Check formatting (CI) |
-| `type-check` | `tsc --noEmit` | Type check without emitting |
-| `db:migrate` | `prisma migrate dev` | Run migrations (dev) |
-| `db:push` | `prisma db push` | Push schema changes (dev) |
-| `db:seed` | `pnpm exec tsx prisma/seed.ts` | Seed database with test data |
-| `db:studio` | `prisma studio` | Open Prisma Studio GUI |
-| `test` | `vitest run` | Run unit & integration tests |
-| `test:watch` | `vitest` | Run tests in watch mode |
-| `test:coverage` | `vitest run --coverage` | Run tests with coverage report |
-| `test:e2e` | `playwright test` | Run E2E tests |
-| `test:e2e:ui` | `playwright test --ui` | Run E2E tests with UI |
-| `docker:test` | `docker compose ... test` | Run unit tests in container |
-| `docker:coverage` | `docker compose ... coverage` | Run coverage in container |
-| `docker:e2e` | `docker compose ... e2e` | Run E2E tests in container |
-| `docker:down` | `docker compose ... down -v` | Tear down test containers |
+| Script            | Command                        | Purpose                        |
+| ----------------- | ------------------------------ | ------------------------------ |
+| `dev`             | `next dev`                     | Local development server       |
+| `build`           | `next build`                   | Production build               |
+| `start`           | `next start`                   | Start production server        |
+| `lint`            | `next lint`                    | Run ESLint                     |
+| `format`          | `prettier --write .`           | Format all files               |
+| `format:check`    | `prettier --check .`           | Check formatting (CI)          |
+| `type-check`      | `tsc --noEmit`                 | Type check without emitting    |
+| `db:migrate`      | `prisma migrate dev`           | Run migrations (dev)           |
+| `db:push`         | `prisma db push`               | Push schema changes (dev)      |
+| `db:seed`         | `pnpm exec tsx prisma/seed.ts` | Seed database with test data   |
+| `db:studio`       | `prisma studio`                | Open Prisma Studio GUI         |
+| `test`            | `vitest run`                   | Run unit & integration tests   |
+| `test:watch`      | `vitest`                       | Run tests in watch mode        |
+| `test:coverage`   | `vitest run --coverage`        | Run tests with coverage report |
+| `test:e2e`        | `playwright test`              | Run E2E tests                  |
+| `test:e2e:ui`     | `playwright test --ui`         | Run E2E tests with UI          |
+| `docker:test`     | `docker compose ... test`      | Run unit tests in container    |
+| `docker:coverage` | `docker compose ... coverage`  | Run coverage in container      |
+| `docker:e2e`      | `docker compose ... e2e`       | Run E2E tests in container     |
+| `docker:down`     | `docker compose ... down -v`   | Tear down test containers      |
 
 ## Docker test environment
 

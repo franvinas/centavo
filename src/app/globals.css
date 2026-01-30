@@ -5,53 +5,53 @@
 
 :root {
   /* Centavo design tokens */
-  --bg-primary: #F5F4F1;
-  --bg-surface: #FFFFFF;
-  --bg-muted: #EDECEA;
-  --text-primary: #1A1918;
-  --text-secondary: #6D6C6A;
-  --text-tertiary: #9C9B99;
-  --border-subtle: #E5E4E1;
-  --accent-primary: #3D8A5A;
-  --accent-light: #C8F0D8;
-  --accent-warm: #D89575;
-  --status-positive: #4D9B6A;
-  --status-negative: #D08068;
-  --status-warning: #D4A64A;
+  --bg-primary: #f5f4f1;
+  --bg-surface: #ffffff;
+  --bg-muted: #edecea;
+  --text-primary: #1a1918;
+  --text-secondary: #6d6c6a;
+  --text-tertiary: #9c9b99;
+  --border-subtle: #e5e4e1;
+  --accent-primary: #3d8a5a;
+  --accent-light: #c8f0d8;
+  --accent-warm: #d89575;
+  --status-positive: #4d9b6a;
+  --status-negative: #d08068;
+  --status-warning: #d4a64a;
 
   /* shadcn/ui variables */
   --radius: 0.625rem;
-  --background: #F5F4F1;
-  --foreground: #1A1918;
-  --card: #FFFFFF;
-  --card-foreground: #1A1918;
-  --popover: #FFFFFF;
-  --popover-foreground: #1A1918;
-  --primary: #3D8A5A;
-  --primary-foreground: #FFFFFF;
-  --secondary: #EDECEA;
-  --secondary-foreground: #1A1918;
-  --muted: #EDECEA;
-  --muted-foreground: #6D6C6A;
-  --accent: #EDECEA;
-  --accent-foreground: #1A1918;
-  --destructive: #D08068;
-  --border: #E5E4E1;
-  --input: #E5E4E1;
-  --ring: #3D8A5A;
+  --background: #f5f4f1;
+  --foreground: #1a1918;
+  --card: #ffffff;
+  --card-foreground: #1a1918;
+  --popover: #ffffff;
+  --popover-foreground: #1a1918;
+  --primary: #3d8a5a;
+  --primary-foreground: #ffffff;
+  --secondary: #edecea;
+  --secondary-foreground: #1a1918;
+  --muted: #edecea;
+  --muted-foreground: #6d6c6a;
+  --accent: #edecea;
+  --accent-foreground: #1a1918;
+  --destructive: #d08068;
+  --border: #e5e4e1;
+  --input: #e5e4e1;
+  --ring: #3d8a5a;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #1A1918;
-  --sidebar-primary: #3D8A5A;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #EDECEA;
-  --sidebar-accent-foreground: #1A1918;
-  --sidebar-border: #E5E4E1;
-  --sidebar-ring: #3D8A5A;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1918;
+  --sidebar-primary: #3d8a5a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #edecea;
+  --sidebar-accent-foreground: #1a1918;
+  --sidebar-border: #e5e4e1;
+  --sidebar-ring: #3d8a5a;
 }
 
 @theme inline {
@@ -77,9 +77,9 @@
   --radius-lg: 16px;
   --radius-full: 9999px;
 
-  --shadow-card: 0 2px 12px #1A191808;
-  --shadow-elevated: 0 2px 8px #1A191808;
-  --shadow-subtle: 0 1px 6px #1A191808;
+  --shadow-card: 0 2px 12px #1a191808;
+  --shadow-elevated: 0 2px 8px #1a191808;
+  --shadow-subtle: 0 1px 6px #1a191808;
 
   /* shadcn/ui theme mappings */
   --color-background: var(--background);

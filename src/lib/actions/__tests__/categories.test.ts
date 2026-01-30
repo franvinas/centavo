@@ -19,13 +19,17 @@ const validCategoryData = {
 describe("createCategory", () => {
   it("throws when unauthenticated", async () => {
     mockUnauthenticated();
-    await expect(createCategory(validCategoryData)).rejects.toThrow("Not authenticated");
+    await expect(createCategory(validCategoryData)).rejects.toThrow(
+      "Not authenticated",
+    );
   });
 
   it("creates a category", async () => {
     mockAuth();
     prismaMock.category.findUnique.mockResolvedValue(null as never);
-    prismaMock.category.create.mockResolvedValue(createPrismaCategory() as never);
+    prismaMock.category.create.mockResolvedValue(
+      createPrismaCategory() as never,
+    );
 
     await createCategory(validCategoryData);
 
@@ -41,9 +45,13 @@ describe("createCategory", () => {
 
   it("throws for duplicate name", async () => {
     mockAuth();
-    prismaMock.category.findUnique.mockResolvedValue(createPrismaCategory() as never);
+    prismaMock.category.findUnique.mockResolvedValue(
+      createPrismaCategory() as never,
+    );
 
-    await expect(createCategory(validCategoryData)).rejects.toThrow("Category already exists");
+    await expect(createCategory(validCategoryData)).rejects.toThrow(
+      "Category already exists",
+    );
   });
 });
 
@@ -57,7 +65,9 @@ describe("updateCategory", () => {
 
   it("updates a category", async () => {
     mockAuth();
-    prismaMock.category.findFirst.mockResolvedValue(createPrismaCategory() as never);
+    prismaMock.category.findFirst.mockResolvedValue(
+      createPrismaCategory() as never,
+    );
     prismaMock.category.update.mockResolvedValue({} as never);
 
     await updateCategory("cat-1", { name: "Updated" });
@@ -84,9 +94,9 @@ describe("updateCategory", () => {
       createPrismaCategory({ name: "Transport" }) as never,
     );
 
-    await expect(updateCategory("cat-1", { name: "Transport" })).rejects.toThrow(
-      "Category name already exists",
-    );
+    await expect(
+      updateCategory("cat-1", { name: "Transport" }),
+    ).rejects.toThrow("Category name already exists");
   });
 });
 
@@ -98,18 +108,24 @@ describe("deleteCategory", () => {
 
   it("deletes a category with no expenses", async () => {
     mockAuth();
-    prismaMock.category.findFirst.mockResolvedValue(createPrismaCategory() as never);
+    prismaMock.category.findFirst.mockResolvedValue(
+      createPrismaCategory() as never,
+    );
     prismaMock.expense.count.mockResolvedValue(0 as never);
     prismaMock.category.delete.mockResolvedValue({} as never);
 
     await deleteCategory("cat-1");
 
-    expect(prismaMock.category.delete).toHaveBeenCalledWith({ where: { id: "cat-1" } });
+    expect(prismaMock.category.delete).toHaveBeenCalledWith({
+      where: { id: "cat-1" },
+    });
   });
 
   it("throws when category has expenses", async () => {
     mockAuth();
-    prismaMock.category.findFirst.mockResolvedValue(createPrismaCategory() as never);
+    prismaMock.category.findFirst.mockResolvedValue(
+      createPrismaCategory() as never,
+    );
     prismaMock.expense.count.mockResolvedValue(3 as never);
 
     await expect(deleteCategory("cat-1")).rejects.toThrow("3 expenses");
@@ -119,6 +135,8 @@ describe("deleteCategory", () => {
     mockAuth();
     prismaMock.category.findFirst.mockResolvedValue(null as never);
 
-    await expect(deleteCategory("nonexistent")).rejects.toThrow("Category not found");
+    await expect(deleteCategory("nonexistent")).rejects.toThrow(
+      "Category not found",
+    );
   });
 });

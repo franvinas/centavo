@@ -80,10 +80,10 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-text-primary">
+          <h1 className="text-text-primary text-2xl font-semibold">
             Categories
           </h1>
-          <p className="mt-1 text-sm text-text-secondary">
+          <p className="text-text-secondary mt-1 text-sm">
             Manage your expense categories
           </p>
         </div>
@@ -91,7 +91,7 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
           <DialogTrigger asChild>
             <Button
               onClick={openCreate}
-              className="bg-accent-primary text-white hover:bg-accent-primary/90"
+              className="bg-accent-primary hover:bg-accent-primary/90 text-white"
             >
               <Plus className="mr-1.5 h-4 w-4" />
               Add
@@ -110,13 +110,13 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
                 onChange={(e) => setName(e.target.value)}
               />
               <div>
-                <p className="mb-2 text-sm font-medium text-text-secondary">
+                <p className="text-text-secondary mb-2 text-sm font-medium">
                   Color
                 </p>
                 <ColorPicker value={color} onChange={setColor} />
               </div>
               <div>
-                <p className="mb-2 text-sm font-medium text-text-secondary">
+                <p className="text-text-secondary mb-2 text-sm font-medium">
                   Icon
                 </p>
                 <IconPicker value={icon} onChange={setIcon} color={color} />
@@ -124,13 +124,9 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
               <Button
                 onClick={handleSave}
                 disabled={!name.trim() || isPending}
-                className="w-full bg-accent-primary text-white hover:bg-accent-primary/90"
+                className="bg-accent-primary hover:bg-accent-primary/90 w-full text-white"
               >
-                {isPending
-                  ? "Saving..."
-                  : editing
-                    ? "Update"
-                    : "Create"}
+                {isPending ? "Saving..." : editing ? "Update" : "Create"}
               </Button>
             </div>
           </DialogContent>
@@ -143,7 +139,7 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
           return (
             <div
               key={cat.id}
-              className="flex items-center gap-3 rounded-lg bg-bg-surface p-4 shadow-subtle"
+              className="bg-bg-surface shadow-subtle flex items-center gap-3 rounded-lg p-4"
             >
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-lg"
@@ -153,12 +149,12 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
                   <Icon className="h-5 w-5" style={{ color: cat.color }} />
                 )}
               </div>
-              <span className="flex-1 text-sm font-medium text-text-primary">
+              <span className="text-text-primary flex-1 text-sm font-medium">
                 {cat.name}
               </span>
               <button
                 onClick={() => openEdit(cat)}
-                className="p-1.5 text-text-tertiary hover:text-text-secondary"
+                className="text-text-tertiary hover:text-text-secondary p-1.5"
                 aria-label={`Edit ${cat.name}`}
               >
                 <Pencil className="h-4 w-4" />
@@ -166,7 +162,7 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
               <button
                 onClick={() => handleDelete(cat.id)}
                 disabled={isPending}
-                className="p-1.5 text-text-tertiary hover:text-status-negative"
+                className="text-text-tertiary hover:text-status-negative p-1.5"
                 aria-label={`Delete ${cat.name}`}
               >
                 <Trash2 className="h-4 w-4" />

@@ -11,15 +11,15 @@ export default function Error({
 }) {
   return (
     <div className="flex min-h-[400px] flex-col items-center justify-center space-y-4">
-      <h2 className="text-xl font-semibold text-text-primary">
+      <h2 className="text-text-primary text-xl font-semibold">
         Something went wrong
       </h2>
-      <p className="text-sm text-text-secondary">
+      <p className="text-text-secondary text-sm">
         {error.message || "An unexpected error occurred"}
       </p>
       <Button
         onClick={reset}
-        className="bg-accent-primary text-white hover:bg-accent-primary/90"
+        className="bg-accent-primary hover:bg-accent-primary/90 text-white"
       >
         Try again
       </Button>

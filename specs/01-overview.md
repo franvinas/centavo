@@ -26,6 +26,7 @@ Centavo is a personal expense tracker. It helps a single user record, categorize
 ## MVP scope
 
 The first version focuses on **basic expense tracking**:
+
 - Add, edit, delete expenses
 - Categorize expenses
 - Multi-currency support with a base currency
@@ -35,6 +36,7 @@ The first version focuses on **basic expense tracking**:
 ## Future roadmap (post-MVP)
 
 These are not part of the initial build:
+
 - Monthly budgets per category with alerts
 - Analytics: charts, spending trends, category breakdowns
 - Recurring expenses (rent, subscriptions)

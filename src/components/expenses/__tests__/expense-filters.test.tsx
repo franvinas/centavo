@@ -4,8 +4,20 @@ import { ExpenseFilters } from "../expense-filters";
 import type { Category } from "@/types";
 
 const mockCategories: Category[] = [
-  { id: "cat-1", name: "Food", icon: "UtensilsCrossed", color: "#E8855B", userId: "user-1" },
-  { id: "cat-2", name: "Transport", icon: "Car", color: "#5B8CE8", userId: "user-1" },
+  {
+    id: "cat-1",
+    name: "Food",
+    icon: "UtensilsCrossed",
+    color: "#E8855B",
+    userId: "user-1",
+  },
+  {
+    id: "cat-2",
+    name: "Transport",
+    icon: "Car",
+    color: "#5B8CE8",
+    userId: "user-1",
+  },
 ];
 
 function renderFilters(overrides = {}) {
@@ -27,7 +39,9 @@ function renderFilters(overrides = {}) {
 describe("ExpenseFilters", () => {
   it("renders search input", () => {
     const { container } = renderFilters();
-    const search = container.querySelector('input[placeholder="Search expenses..."]');
+    const search = container.querySelector(
+      'input[placeholder="Search expenses..."]',
+    );
     expect(search).toBeInTheDocument();
   });
 
@@ -35,7 +49,9 @@ describe("ExpenseFilters", () => {
     const user = userEvent.setup();
     const { container, props } = renderFilters();
 
-    const search = container.querySelector('input[placeholder="Search expenses..."]')!;
+    const search = container.querySelector(
+      'input[placeholder="Search expenses..."]',
+    )!;
     await user.type(search, "l");
     expect(props.onSearchChange).toHaveBeenCalled();
   });

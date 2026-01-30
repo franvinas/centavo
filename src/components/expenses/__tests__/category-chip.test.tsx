@@ -13,14 +13,24 @@ const mockCategory: Category = {
 
 describe("CategoryChip", () => {
   it("renders category name", () => {
-    render(<CategoryChip category={mockCategory} selected={false} onSelect={vi.fn()} />);
+    render(
+      <CategoryChip
+        category={mockCategory}
+        selected={false}
+        onSelect={vi.fn()}
+      />,
+    );
 
     expect(screen.getByText("Food")).toBeInTheDocument();
   });
 
   it("applies selected styling", () => {
     const { container } = render(
-      <CategoryChip category={mockCategory} selected={true} onSelect={vi.fn()} />,
+      <CategoryChip
+        category={mockCategory}
+        selected={true}
+        onSelect={vi.fn()}
+      />,
     );
 
     const button = container.querySelector("button")!;
@@ -29,7 +39,11 @@ describe("CategoryChip", () => {
 
   it("applies unselected styling", () => {
     const { container } = render(
-      <CategoryChip category={mockCategory} selected={false} onSelect={vi.fn()} />,
+      <CategoryChip
+        category={mockCategory}
+        selected={false}
+        onSelect={vi.fn()}
+      />,
     );
 
     const button = container.querySelector("button")!;
@@ -40,7 +54,11 @@ describe("CategoryChip", () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     const { container } = render(
-      <CategoryChip category={mockCategory} selected={false} onSelect={onSelect} />,
+      <CategoryChip
+        category={mockCategory}
+        selected={false}
+        onSelect={onSelect}
+      />,
     );
 
     const button = container.querySelector("button")!;

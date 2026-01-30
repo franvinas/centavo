@@ -40,10 +40,7 @@ export async function updateUser(formData: {
     });
 
     for (const expense of expenses) {
-      const rate = await getExchangeRate(
-        expense.currency,
-        parsed.baseCurrency,
-      );
+      const rate = await getExchangeRate(expense.currency, parsed.baseCurrency);
       await prisma.expense.update({
         where: { id: expense.id },
         data: {

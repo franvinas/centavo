@@ -10,12 +10,14 @@
 ## Layout
 
 ### Mobile (< 768px)
+
 - Bottom navigation bar with 3-4 tabs: Dashboard, Add (+), Categories, Settings
 - The "Add" button is prominent (center, larger, accent color)
 - Full-screen pages, no sidebars
 - Pull-to-refresh on expense list
 
 ### Desktop (>= 768px)
+
 - Left sidebar navigation
 - Main content area
 - No right sidebar (keep it simple)
@@ -38,15 +40,18 @@
 ## Components
 
 ### Expense card (list item)
+
 ```
 [Category dot] Description            $12.50
                Category name     Jan 15, 2025
 ```
+
 - Left: colored dot for category
 - Middle: description (primary), category + date (secondary)
 - Right: amount in original currency, bold
 
 ### Quick add form
+
 - Amount input (large, auto-focused, numeric keyboard on mobile)
 - Description input
 - Category selector (grid of colored chips)
@@ -55,6 +60,7 @@
 - Save button
 
 ### Dashboard summary
+
 - Total spent this month (in base currency)
 - Expense count
 - Below: scrollable expense list with date grouping

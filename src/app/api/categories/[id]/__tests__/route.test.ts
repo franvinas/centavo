@@ -32,7 +32,10 @@ describe("PUT /api/categories/[id]", () => {
     mockAuth();
     const existing = createPrismaCategory();
     prismaMock.category.findFirst.mockResolvedValue(existing as never);
-    prismaMock.category.update.mockResolvedValue({ ...existing, name: "Updated" } as never);
+    prismaMock.category.update.mockResolvedValue({
+      ...existing,
+      name: "Updated",
+    } as never);
 
     const res = await PUT(
       createRequest("/api/categories/cat-1", {
@@ -64,7 +67,9 @@ describe("PUT /api/categories/[id]", () => {
     mockAuth();
     const existing = createPrismaCategory({ name: "Food" });
     prismaMock.category.findFirst.mockResolvedValue(existing as never);
-    prismaMock.category.findUnique.mockResolvedValue(createPrismaCategory({ name: "Transport" }) as never);
+    prismaMock.category.findUnique.mockResolvedValue(
+      createPrismaCategory({ name: "Transport" }) as never,
+    );
 
     const res = await PUT(
       createRequest("/api/categories/cat-1", {
@@ -80,17 +85,25 @@ describe("PUT /api/categories/[id]", () => {
 describe("DELETE /api/categories/[id]", () => {
   it("returns 401 when unauthenticated", async () => {
     mockUnauthenticated();
-    const res = await DELETE(createRequest("/api/categories/cat-1"), routeParams);
+    const res = await DELETE(
+      createRequest("/api/categories/cat-1"),
+      routeParams,
+    );
     expect(res.status).toBe(401);
   });
 
   it("deletes a category with no expenses", async () => {
     mockAuth();
-    prismaMock.category.findFirst.mockResolvedValue(createPrismaCategory() as never);
+    prismaMock.category.findFirst.mockResolvedValue(
+      createPrismaCategory() as never,
+    );
     prismaMock.expense.count.mockResolvedValue(0 as never);
     prismaMock.category.delete.mockResolvedValue({} as never);
 
-    const res = await DELETE(createRequest("/api/categories/cat-1"), routeParams);
+    const res = await DELETE(
+      createRequest("/api/categories/cat-1"),
+      routeParams,
+    );
     const body = await res.json();
 
     expect(res.status).toBe(200);
@@ -99,10 +112,15 @@ describe("DELETE /api/categories/[id]", () => {
 
   it("returns 400 when category has expenses", async () => {
     mockAuth();
-    prismaMock.category.findFirst.mockResolvedValue(createPrismaCategory() as never);
+    prismaMock.category.findFirst.mockResolvedValue(
+      createPrismaCategory() as never,
+    );
     prismaMock.expense.count.mockResolvedValue(5 as never);
 
-    const res = await DELETE(createRequest("/api/categories/cat-1"), routeParams);
+    const res = await DELETE(
+      createRequest("/api/categories/cat-1"),
+      routeParams,
+    );
     const body = await res.json();
 
     expect(res.status).toBe(400);
@@ -113,7 +131,10 @@ describe("DELETE /api/categories/[id]", () => {
     mockAuth();
     prismaMock.category.findFirst.mockResolvedValue(null as never);
 
-    const res = await DELETE(createRequest("/api/categories/cat-1"), routeParams);
+    const res = await DELETE(
+      createRequest("/api/categories/cat-1"),
+      routeParams,
+    );
     expect(res.status).toBe(404);
   });
 });

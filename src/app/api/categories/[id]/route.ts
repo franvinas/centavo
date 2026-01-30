@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getAuthUser, unauthorized, notFound, badRequest } from "@/lib/api-utils";
+import {
+  getAuthUser,
+  unauthorized,
+  notFound,
+  badRequest,
+} from "@/lib/api-utils";
 import { updateCategorySchema } from "@/lib/validations/category";
 
 type RouteParams = { params: Promise<{ id: string }> };

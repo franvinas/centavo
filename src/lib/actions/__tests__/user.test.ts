@@ -17,14 +17,19 @@ beforeEach(() => {
 describe("updateUser", () => {
   it("throws when unauthenticated", async () => {
     mockUnauthenticated();
-    await expect(updateUser({ name: "New Name" })).rejects.toThrow("Not authenticated");
+    await expect(updateUser({ name: "New Name" })).rejects.toThrow(
+      "Not authenticated",
+    );
   });
 
   it("updates user name", async () => {
     mockAuth();
     const user = createPrismaUser();
     prismaMock.user.findUnique.mockResolvedValue(user as never);
-    prismaMock.user.update.mockResolvedValue({ ...user, name: "New Name" } as never);
+    prismaMock.user.update.mockResolvedValue({
+      ...user,
+      name: "New Name",
+    } as never);
 
     await updateUser({ name: "New Name" });
 
@@ -39,7 +44,10 @@ describe("updateUser", () => {
     mockAuth();
     const user = createPrismaUser({ baseCurrency: "USD" });
     prismaMock.user.findUnique.mockResolvedValue(user as never);
-    prismaMock.user.update.mockResolvedValue({ ...user, baseCurrency: "EUR" } as never);
+    prismaMock.user.update.mockResolvedValue({
+      ...user,
+      baseCurrency: "EUR",
+    } as never);
 
     const expenses = [
       createPrismaExpense({ id: "e1", amount: 100, currency: "USD" }),

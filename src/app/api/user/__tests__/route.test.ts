@@ -54,7 +54,10 @@ describe("PUT /api/user", () => {
     mockAuth();
     const user = createPrismaUser();
     prismaMock.user.findUnique.mockResolvedValue(user as never);
-    prismaMock.user.update.mockResolvedValue({ ...user, name: "New Name" } as never);
+    prismaMock.user.update.mockResolvedValue({
+      ...user,
+      name: "New Name",
+    } as never);
 
     const res = await PUT(
       createRequest("/api/user", {
@@ -71,11 +74,12 @@ describe("PUT /api/user", () => {
     mockAuth();
     const user = createPrismaUser({ baseCurrency: "USD" });
     prismaMock.user.findUnique.mockResolvedValue(user as never);
-    prismaMock.user.update.mockResolvedValue({ ...user, baseCurrency: "EUR" } as never);
+    prismaMock.user.update.mockResolvedValue({
+      ...user,
+      baseCurrency: "EUR",
+    } as never);
 
-    const expenses = [
-      createPrismaExpense({ amount: 100, currency: "USD" }),
-    ];
+    const expenses = [createPrismaExpense({ amount: 100, currency: "USD" })];
     prismaMock.expense.findMany.mockResolvedValue(expenses as never);
     prismaMock.expense.update.mockResolvedValue({} as never);
 

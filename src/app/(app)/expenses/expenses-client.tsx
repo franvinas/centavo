@@ -41,10 +41,10 @@ export function ExpensesClient({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-text-primary">
+        <h1 className="text-text-primary text-2xl font-semibold">
           All Expenses
         </h1>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="text-text-secondary mt-1 text-sm">
           {total} expense{total !== 1 ? "s" : ""} found
         </p>
       </div>
@@ -61,9 +61,9 @@ export function ExpensesClient({
         categories={categories}
       />
 
-      <div className="rounded-lg bg-bg-surface p-5 shadow-card">
+      <div className="bg-bg-surface shadow-card rounded-lg p-5">
         {expenses.length === 0 ? (
-          <p className="py-8 text-center text-sm text-text-tertiary">
+          <p className="text-text-tertiary py-8 text-center text-sm">
             No expenses found
           </p>
         ) : (
@@ -80,11 +80,11 @@ export function ExpensesClient({
               router.push(`/expenses?${params.toString()}`);
             }}
             disabled={page <= 1}
-            className="text-sm font-medium text-accent-primary disabled:text-text-tertiary"
+            className="text-accent-primary disabled:text-text-tertiary text-sm font-medium"
           >
             Previous
           </button>
-          <span className="text-sm text-text-secondary">
+          <span className="text-text-secondary text-sm">
             Page {page} of {totalPages}
           </span>
           <button
@@ -94,7 +94,7 @@ export function ExpensesClient({
               router.push(`/expenses?${params.toString()}`);
             }}
             disabled={page >= totalPages}
-            className="text-sm font-medium text-accent-primary disabled:text-text-tertiary"
+            className="text-accent-primary disabled:text-text-tertiary text-sm font-medium"
           >
             Next
           </button>

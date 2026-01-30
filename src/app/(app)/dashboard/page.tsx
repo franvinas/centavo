@@ -42,10 +42,10 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-text-primary">
+        <h1 className="text-text-primary text-2xl font-semibold">
           Good morning, {user.name ?? "there"}
         </h1>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="text-text-secondary mt-1 text-sm">
           Here&apos;s your expense overview
         </p>
       </div>
@@ -81,14 +81,14 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-lg bg-bg-surface p-5 shadow-card">
+        <div className="bg-bg-surface shadow-card rounded-lg p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-text-primary">
+            <h2 className="text-text-primary text-base font-semibold">
               By Category
             </h2>
             <Link
               href="/categories"
-              className="text-xs font-medium text-accent-primary"
+              className="text-accent-primary text-xs font-medium"
             >
               All categories
             </Link>
@@ -96,20 +96,20 @@ export default async function DashboardPage() {
           <CategoryBreakdown expenses={expenses} />
         </div>
 
-        <div className="rounded-lg bg-bg-surface p-5 shadow-card">
+        <div className="bg-bg-surface shadow-card rounded-lg p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-text-primary">
+            <h2 className="text-text-primary text-base font-semibold">
               Recent Expenses
             </h2>
             <Link
               href="/expenses"
-              className="text-xs font-medium text-accent-primary"
+              className="text-accent-primary text-xs font-medium"
             >
               View all
             </Link>
           </div>
           {expenses.length === 0 ? (
-            <p className="py-8 text-center text-sm text-text-tertiary">
+            <p className="text-text-tertiary py-8 text-center text-sm">
               No expenses this month. Tap + to add one.
             </p>
           ) : (

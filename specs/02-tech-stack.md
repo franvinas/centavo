@@ -2,24 +2,25 @@
 
 ## Decision summary
 
-| Layer | Technology | Rationale |
-|-------|-----------|-----------|
-| Language | TypeScript | Single language across the entire stack |
-| Framework | Next.js (App Router) | Fullstack React framework, API routes built in |
-| Database | PostgreSQL | Robust relational DB, great for financial data |
-| ORM | Prisma | Type-safe database access, excellent DX with TypeScript |
-| Auth | NextAuth.js (Auth.js) | Supports Google OAuth + email OTP out of the box |
-| Styling | Tailwind CSS | Utility-first, fast to build minimal/clean UIs |
-| UI components | shadcn/ui | Copy-paste components built on Radix, no heavy dependency |
-| PWA | next-pwa / Serwist | Service worker generation for installability and offline shell |
-| Testing | Vitest + React Testing Library + Playwright | Unit/integration with Vitest, component tests with RTL, E2E with Playwright |
-| Deployment | TBD | Vercel, self-hosted, or Docker — to be decided |
+| Layer         | Technology                                  | Rationale                                                                   |
+| ------------- | ------------------------------------------- | --------------------------------------------------------------------------- |
+| Language      | TypeScript                                  | Single language across the entire stack                                     |
+| Framework     | Next.js (App Router)                        | Fullstack React framework, API routes built in                              |
+| Database      | PostgreSQL                                  | Robust relational DB, great for financial data                              |
+| ORM           | Prisma                                      | Type-safe database access, excellent DX with TypeScript                     |
+| Auth          | NextAuth.js (Auth.js)                       | Supports Google OAuth + email OTP out of the box                            |
+| Styling       | Tailwind CSS                                | Utility-first, fast to build minimal/clean UIs                              |
+| UI components | shadcn/ui                                   | Copy-paste components built on Radix, no heavy dependency                   |
+| PWA           | next-pwa / Serwist                          | Service worker generation for installability and offline shell              |
+| Testing       | Vitest + React Testing Library + Playwright | Unit/integration with Vitest, component tests with RTL, E2E with Playwright |
+| Deployment    | TBD                                         | Vercel, self-hosted, or Docker — to be decided                              |
 
 ## Why this stack?
 
 ### Next.js + API routes (no separate backend)
 
 For a personal expense tracker, a separate backend service adds unnecessary complexity. Next.js API routes (Route Handlers in App Router) provide:
+
 - Server-side logic co-located with the frontend
 - Built-in request handling, middleware, and auth integration
 - Easy deployment as a single unit

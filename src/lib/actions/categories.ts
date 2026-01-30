@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
-import { createCategorySchema, updateCategorySchema } from "@/lib/validations/category";
+import {
+  createCategorySchema,
+  updateCategorySchema,
+} from "@/lib/validations/category";
 
 async function requireAuth() {
   const session = await auth();

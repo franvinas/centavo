@@ -52,8 +52,7 @@ export function ExpenseForm({ expense, categories }: ExpenseFormProps) {
     ? categories
     : categories.slice(0, 8);
 
-  const isValid =
-    amount && parseFloat(amount) > 0 && description && categoryId;
+  const isValid = amount && parseFloat(amount) > 0 && description && categoryId;
 
   function handleSave() {
     if (!isValid) return;
@@ -89,13 +88,13 @@ export function ExpenseForm({ expense, categories }: ExpenseFormProps) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg-surface">
+    <div className="bg-bg-surface flex min-h-screen flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <button onClick={() => router.back()} aria-label="Close">
-          <X className="h-6 w-6 text-text-primary" />
+          <X className="text-text-primary h-6 w-6" />
         </button>
-        <h1 className="text-base font-semibold text-text-primary">
+        <h1 className="text-text-primary text-base font-semibold">
           {expense ? "Edit Expense" : "Add Expense"}
         </h1>
         <div className="w-6" />
@@ -105,7 +104,7 @@ export function ExpenseForm({ expense, categories }: ExpenseFormProps) {
         {/* Amount hero */}
         <div className="flex flex-col items-center py-8">
           <div className="flex items-baseline">
-            <span className="text-lg text-text-tertiary">$</span>
+            <span className="text-text-tertiary text-lg">$</span>
             <input
               type="text"
               inputMode="decimal"
@@ -115,54 +114,54 @@ export function ExpenseForm({ expense, categories }: ExpenseFormProps) {
                 if (/^\d*\.?\d{0,2}$/.test(val)) setAmount(val);
               }}
               placeholder="0.00"
-              className="w-48 bg-transparent text-center text-5xl font-bold text-text-primary outline-none placeholder:text-text-tertiary"
+              className="text-text-primary placeholder:text-text-tertiary w-48 bg-transparent text-center text-5xl font-bold outline-none"
             />
           </div>
           <button
             type="button"
-            className="mt-2 flex items-center gap-1 rounded-full bg-bg-muted px-3 py-1"
+            className="bg-bg-muted mt-2 flex items-center gap-1 rounded-full px-3 py-1"
           >
-            <span className="text-sm font-medium text-text-secondary">
+            <span className="text-text-secondary text-sm font-medium">
               {currency}
             </span>
-            <ChevronDown className="h-3.5 w-3.5 text-text-tertiary" />
+            <ChevronDown className="text-text-tertiary h-3.5 w-3.5" />
           </button>
         </div>
 
         {/* Form fields */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <FileText className="h-5 w-5 shrink-0 text-text-tertiary" />
+            <FileText className="text-text-tertiary h-5 w-5 shrink-0" />
             <Input
               placeholder="Description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="border-0 border-b border-border-subtle bg-transparent px-0 shadow-none focus-visible:ring-0"
+              className="border-border-subtle border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
             />
           </div>
           <div className="flex items-center gap-3">
-            <Calendar className="h-5 w-5 shrink-0 text-text-tertiary" />
+            <Calendar className="text-text-tertiary h-5 w-5 shrink-0" />
             <Input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="border-0 border-b border-border-subtle bg-transparent px-0 shadow-none focus-visible:ring-0"
+              className="border-border-subtle border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
             />
           </div>
           <div className="flex items-center gap-3">
-            <StickyNote className="h-5 w-5 shrink-0 text-text-tertiary" />
+            <StickyNote className="text-text-tertiary h-5 w-5 shrink-0" />
             <Input
               placeholder="Notes (optional)"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="border-0 border-b border-border-subtle bg-transparent px-0 shadow-none focus-visible:ring-0"
+              className="border-border-subtle border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
             />
           </div>
         </div>
 
         {/* Category selector */}
         <div className="mt-6">
-          <p className="mb-3 text-sm font-medium text-text-secondary">
+          <p className="text-text-secondary mb-3 text-sm font-medium">
             Category
           </p>
           <div className="grid grid-cols-4 gap-2">
@@ -179,7 +178,7 @@ export function ExpenseForm({ expense, categories }: ExpenseFormProps) {
             <button
               type="button"
               onClick={() => setShowAllCategories(true)}
-              className="mt-2 text-sm font-medium text-accent-primary"
+              className="text-accent-primary mt-2 text-sm font-medium"
             >
               More
             </button>
@@ -188,11 +187,11 @@ export function ExpenseForm({ expense, categories }: ExpenseFormProps) {
       </div>
 
       {/* Save button */}
-      <div className="px-6 pb-8 pt-4">
+      <div className="px-6 pt-4 pb-8">
         <Button
           onClick={handleSave}
           disabled={!isValid || isPending}
-          className="h-14 w-full rounded-md bg-accent-primary text-base font-semibold text-white hover:bg-accent-primary/90 disabled:opacity-50"
+          className="bg-accent-primary hover:bg-accent-primary/90 h-14 w-full rounded-md text-base font-semibold text-white disabled:opacity-50"
         >
           {isPending
             ? "Saving..."
@@ -205,7 +204,7 @@ export function ExpenseForm({ expense, categories }: ExpenseFormProps) {
             variant="ghost"
             onClick={handleDelete}
             disabled={isPending}
-            className="mt-3 h-12 w-full text-base font-semibold text-status-negative hover:bg-status-negative/10 hover:text-status-negative"
+            className="text-status-negative hover:bg-status-negative/10 hover:text-status-negative mt-3 h-12 w-full text-base font-semibold"
           >
             <Trash2 className="mr-2 h-5 w-5" />
             Delete Expense

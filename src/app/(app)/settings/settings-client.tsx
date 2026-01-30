@@ -40,17 +40,15 @@ export function SettingsClient({ user }: SettingsClientProps) {
   return (
     <div className="mx-auto max-w-lg space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-text-primary">Settings</h1>
-        <p className="mt-1 text-sm text-text-secondary">
-          Manage your account
-        </p>
+        <h1 className="text-text-primary text-2xl font-semibold">Settings</h1>
+        <p className="text-text-secondary mt-1 text-sm">Manage your account</p>
       </div>
 
       {/* Profile */}
-      <div className="rounded-lg bg-bg-surface p-6 shadow-card">
+      <div className="bg-bg-surface shadow-card rounded-lg p-6">
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16">
-            <AvatarFallback className="bg-accent-light text-lg font-semibold text-accent-primary">
+            <AvatarFallback className="bg-accent-light text-accent-primary text-lg font-semibold">
               {(name || "U").charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -61,17 +59,17 @@ export function SettingsClient({ user }: SettingsClientProps) {
               className="text-base font-medium"
               aria-label="Display name"
             />
-            <p className="mt-1 text-sm text-text-tertiary">{user.email}</p>
+            <p className="text-text-tertiary mt-1 text-sm">{user.email}</p>
           </div>
         </div>
       </div>
 
       {/* Currency */}
-      <div className="rounded-lg bg-bg-surface p-6 shadow-card">
-        <h2 className="mb-3 text-base font-semibold text-text-primary">
+      <div className="bg-bg-surface shadow-card rounded-lg p-6">
+        <h2 className="text-text-primary mb-3 text-base font-semibold">
           Base Currency
         </h2>
-        <p className="mb-4 text-sm text-text-secondary">
+        <p className="text-text-secondary mb-4 text-sm">
           All expenses are converted to this currency for totals.
         </p>
         <div className="flex flex-wrap gap-2">
@@ -96,7 +94,7 @@ export function SettingsClient({ user }: SettingsClientProps) {
         <Button
           onClick={handleSave}
           disabled={isPending}
-          className="w-full bg-accent-primary text-white hover:bg-accent-primary/90"
+          className="bg-accent-primary hover:bg-accent-primary/90 w-full text-white"
         >
           {isPending ? "Saving..." : saved ? "Saved!" : "Save Changes"}
         </Button>
@@ -107,7 +105,7 @@ export function SettingsClient({ user }: SettingsClientProps) {
       {/* Sign out */}
       <Button
         variant="outline"
-        className="w-full border-status-negative text-status-negative hover:bg-status-negative/10"
+        className="border-status-negative text-status-negative hover:bg-status-negative/10 w-full"
       >
         <LogOut className="mr-2 h-4 w-4" />
         Sign Out

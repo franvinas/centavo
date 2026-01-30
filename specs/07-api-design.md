@@ -9,9 +9,11 @@ All API endpoints are Next.js Route Handlers under `/app/api/`. They return JSON
 ### Expenses
 
 #### `GET /api/expenses`
+
 List expenses for the authenticated user.
 
 Query parameters:
+
 - `from` (date, optional) — start of date range
 - `to` (date, optional) — end of date range
 - `categoryId` (UUID, optional) — filter by category
@@ -23,12 +25,14 @@ Query parameters:
 Response: `{ expenses: Expense[], total: number, page: number, totalPages: number }`
 
 #### `POST /api/expenses`
+
 Create a new expense.
 
 Body:
+
 ```json
 {
-  "amount": 12.50,
+  "amount": 12.5,
   "currency": "USD",
   "description": "Lunch",
   "categoryId": "uuid",
@@ -42,11 +46,13 @@ The server calculates `baseAmount` and `exchangeRate`.
 Response: `{ expense: Expense }`
 
 #### `GET /api/expenses/:id`
+
 Get a single expense.
 
 Response: `{ expense: Expense }`
 
 #### `PUT /api/expenses/:id`
+
 Update an expense. Partial updates allowed.
 
 Body: any subset of the POST fields.
@@ -54,6 +60,7 @@ Body: any subset of the POST fields.
 Response: `{ expense: Expense }`
 
 #### `DELETE /api/expenses/:id`
+
 Delete an expense.
 
 Response: `{ success: true }`
@@ -61,14 +68,17 @@ Response: `{ success: true }`
 ### Categories
 
 #### `GET /api/categories`
+
 List all categories for the user.
 
 Response: `{ categories: Category[] }`
 
 #### `POST /api/categories`
+
 Create a category.
 
 Body:
+
 ```json
 {
   "name": "Groceries",
@@ -80,11 +90,13 @@ Body:
 Response: `{ category: Category }`
 
 #### `PUT /api/categories/:id`
+
 Update a category.
 
 Response: `{ category: Category }`
 
 #### `DELETE /api/categories/:id`
+
 Delete a category. Fails if expenses reference it (400 error with message).
 
 Response: `{ success: true }` or `{ error: "Category has N expenses. Reassign them first." }`
@@ -92,14 +104,17 @@ Response: `{ success: true }` or `{ error: "Category has N expenses. Reassign th
 ### User / Settings
 
 #### `GET /api/user`
+
 Get the authenticated user's profile.
 
 Response: `{ user: User }`
 
 #### `PUT /api/user`
+
 Update profile (name, baseCurrency).
 
 Body:
+
 ```json
 {
   "name": "Fran",
@@ -114,6 +129,7 @@ Response: `{ user: User }`
 ### Exchange Rates
 
 #### `GET /api/exchange-rate?from=USD&to=EUR`
+
 Get the current exchange rate between two currencies. Used by the frontend when the user selects a non-base currency.
 
 Response: `{ from: "USD", to: "EUR", rate: 0.92, timestamp: "..." }`
@@ -121,6 +137,7 @@ Response: `{ from: "USD", to: "EUR", rate: 0.92, timestamp: "..." }`
 ## Error format
 
 All errors return:
+
 ```json
 {
   "error": "Human-readable message",
@@ -129,6 +146,7 @@ All errors return:
 ```
 
 Standard HTTP status codes:
+
 - 400: Bad request (validation error)
 - 401: Not authenticated
 - 403: Not authorized (accessing another user's data)

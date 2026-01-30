@@ -16,15 +16,13 @@ export function DesktopSidebar({ user }: DesktopSidebarProps) {
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[260px] flex-col border-r border-border-subtle bg-bg-surface md:flex">
+    <aside className="border-border-subtle bg-bg-surface fixed top-0 left-0 z-40 hidden h-screen w-[260px] flex-col border-r md:flex">
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-6 py-6">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-primary text-white">
+        <div className="bg-accent-primary flex h-9 w-9 items-center justify-center rounded-lg text-white">
           <span className="text-lg font-bold">C</span>
         </div>
-        <span className="text-xl font-semibold text-text-primary">
-          Centavo
-        </span>
+        <span className="text-text-primary text-xl font-semibold">Centavo</span>
       </div>
 
       {/* Nav items */}
@@ -68,16 +66,16 @@ export function DesktopSidebar({ user }: DesktopSidebarProps) {
           );
         })}
 
-        <Separator className="my-3 bg-border-subtle" />
+        <Separator className="bg-border-subtle my-3" />
 
         {/* User row */}
         <div className="flex items-center gap-3 px-3">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-accent-light text-sm font-medium text-accent-primary">
+            <AvatarFallback className="bg-accent-light text-accent-primary text-sm font-medium">
               {initial}
             </AvatarFallback>
           </Avatar>
-          <span className="text-sm font-medium text-text-primary">
+          <span className="text-text-primary text-sm font-medium">
             {displayName}
           </span>
         </div>

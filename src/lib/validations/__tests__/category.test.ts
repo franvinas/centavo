@@ -13,7 +13,10 @@ describe("createCategorySchema", () => {
   });
 
   it("accepts optional icon", () => {
-    const result = createCategorySchema.parse({ ...validInput, icon: "UtensilsCrossed" });
+    const result = createCategorySchema.parse({
+      ...validInput,
+      icon: "UtensilsCrossed",
+    });
     expect(result.icon).toBe("UtensilsCrossed");
   });
 
@@ -31,17 +34,26 @@ describe("createCategorySchema", () => {
   });
 
   it("rejects invalid hex color", () => {
-    const result = createCategorySchema.safeParse({ ...validInput, color: "red" });
+    const result = createCategorySchema.safeParse({
+      ...validInput,
+      color: "red",
+    });
     expect(result.success).toBe(false);
   });
 
   it("rejects hex color without hash", () => {
-    const result = createCategorySchema.safeParse({ ...validInput, color: "E8855B" });
+    const result = createCategorySchema.safeParse({
+      ...validInput,
+      color: "E8855B",
+    });
     expect(result.success).toBe(false);
   });
 
   it("rejects short hex color", () => {
-    const result = createCategorySchema.safeParse({ ...validInput, color: "#E88" });
+    const result = createCategorySchema.safeParse({
+      ...validInput,
+      color: "#E88",
+    });
     expect(result.success).toBe(false);
   });
 });

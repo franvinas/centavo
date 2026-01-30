@@ -22,7 +22,10 @@ describe("GET /api/categories", () => {
 
   it("returns categories", async () => {
     mockAuth();
-    const categories = [createPrismaCategory(), createPrismaCategory({ name: "Transport" })];
+    const categories = [
+      createPrismaCategory(),
+      createPrismaCategory({ name: "Transport" }),
+    ];
     prismaMock.category.findMany.mockResolvedValue(categories as never);
 
     const res = await GET();
@@ -54,7 +57,9 @@ describe("POST /api/categories", () => {
   it("creates a category", async () => {
     mockAuth();
     prismaMock.category.findUnique.mockResolvedValue(null as never);
-    prismaMock.category.create.mockResolvedValue(createPrismaCategory() as never);
+    prismaMock.category.create.mockResolvedValue(
+      createPrismaCategory() as never,
+    );
 
     const res = await POST(
       createRequest("/api/categories", {
@@ -70,7 +75,9 @@ describe("POST /api/categories", () => {
 
   it("returns 400 for duplicate name", async () => {
     mockAuth();
-    prismaMock.category.findUnique.mockResolvedValue(createPrismaCategory() as never);
+    prismaMock.category.findUnique.mockResolvedValue(
+      createPrismaCategory() as never,
+    );
 
     const res = await POST(
       createRequest("/api/categories", {

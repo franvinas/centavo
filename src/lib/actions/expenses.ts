@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
-import { createExpenseSchema, updateExpenseSchema } from "@/lib/validations/expense";
+import {
+  createExpenseSchema,
+  updateExpenseSchema,
+} from "@/lib/validations/expense";
 import { getExchangeRate } from "@/lib/exchange-rate";
 
 async function requireAuth() {
@@ -70,8 +73,10 @@ export async function updateExpense(
   if (!existing) throw new Error("Expense not found");
 
   const updateData: Record<string, unknown> = {};
-  if (parsed.description !== undefined) updateData.description = parsed.description;
-  if (parsed.categoryId !== undefined) updateData.categoryId = parsed.categoryId;
+  if (parsed.description !== undefined)
+    updateData.description = parsed.description;
+  if (parsed.categoryId !== undefined)
+    updateData.categoryId = parsed.categoryId;
   if (parsed.date !== undefined) updateData.date = new Date(parsed.date);
   if (parsed.notes !== undefined) updateData.notes = parsed.notes;
 

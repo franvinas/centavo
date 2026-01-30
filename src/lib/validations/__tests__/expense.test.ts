@@ -21,7 +21,10 @@ describe("createExpenseSchema", () => {
   });
 
   it("accepts optional notes", () => {
-    const result = createExpenseSchema.parse({ ...validInput, notes: "Extra info" });
+    const result = createExpenseSchema.parse({
+      ...validInput,
+      notes: "Extra info",
+    });
     expect(result.notes).toBe("Extra info");
   });
 
@@ -36,12 +39,18 @@ describe("createExpenseSchema", () => {
   });
 
   it("rejects invalid currency length", () => {
-    const result = createExpenseSchema.safeParse({ ...validInput, currency: "US" });
+    const result = createExpenseSchema.safeParse({
+      ...validInput,
+      currency: "US",
+    });
     expect(result.success).toBe(false);
   });
 
   it("rejects empty description", () => {
-    const result = createExpenseSchema.safeParse({ ...validInput, description: "" });
+    const result = createExpenseSchema.safeParse({
+      ...validInput,
+      description: "",
+    });
     expect(result.success).toBe(false);
   });
 
@@ -54,12 +63,18 @@ describe("createExpenseSchema", () => {
   });
 
   it("rejects empty categoryId", () => {
-    const result = createExpenseSchema.safeParse({ ...validInput, categoryId: "" });
+    const result = createExpenseSchema.safeParse({
+      ...validInput,
+      categoryId: "",
+    });
     expect(result.success).toBe(false);
   });
 
   it("rejects invalid date format", () => {
-    const result = createExpenseSchema.safeParse({ ...validInput, date: "not-a-date" });
+    const result = createExpenseSchema.safeParse({
+      ...validInput,
+      date: "not-a-date",
+    });
     expect(result.success).toBe(false);
   });
 

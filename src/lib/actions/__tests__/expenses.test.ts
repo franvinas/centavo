@@ -25,12 +25,16 @@ const validExpenseData = {
 describe("createExpense", () => {
   it("throws when unauthenticated", async () => {
     mockUnauthenticated();
-    await expect(createExpense(validExpenseData)).rejects.toThrow("Not authenticated");
+    await expect(createExpense(validExpenseData)).rejects.toThrow(
+      "Not authenticated",
+    );
   });
 
   it("creates expense with exchange rate calculation", async () => {
     mockAuth();
-    prismaMock.user.findUnique.mockResolvedValue({ baseCurrency: "USD" } as never);
+    prismaMock.user.findUnique.mockResolvedValue({
+      baseCurrency: "USD",
+    } as never);
     prismaMock.expense.create.mockResolvedValue(createPrismaExpense() as never);
 
     await createExpense(validExpenseData);
@@ -61,14 +65,16 @@ describe("createExpense", () => {
 describe("updateExpense", () => {
   it("throws when unauthenticated", async () => {
     mockUnauthenticated();
-    await expect(updateExpense("exp-1", { description: "Updated" })).rejects.toThrow(
-      "Not authenticated",
-    );
+    await expect(
+      updateExpense("exp-1", { description: "Updated" }),
+    ).rejects.toThrow("Not authenticated");
   });
 
   it("updates expense description", async () => {
     mockAuth();
-    prismaMock.expense.findFirst.mockResolvedValue(createPrismaExpense() as never);
+    prismaMock.expense.findFirst.mockResolvedValue(
+      createPrismaExpense() as never,
+    );
     prismaMock.expense.update.mockResolvedValue({} as never);
 
     await updateExpense("exp-1", { description: "Updated" });
@@ -84,16 +90,18 @@ describe("updateExpense", () => {
     mockAuth();
     prismaMock.expense.findFirst.mockResolvedValue(null as never);
 
-    await expect(updateExpense("nonexistent", { description: "X" })).rejects.toThrow(
-      "Expense not found",
-    );
+    await expect(
+      updateExpense("nonexistent", { description: "X" }),
+    ).rejects.toThrow("Expense not found");
   });
 
   it("recalculates on amount change", async () => {
     mockAuth();
     const existing = createPrismaExpense();
     prismaMock.expense.findFirst.mockResolvedValue(existing as never);
-    prismaMock.user.findUnique.mockResolvedValue({ baseCurrency: "USD" } as never);
+    prismaMock.user.findUnique.mockResolvedValue({
+      baseCurrency: "USD",
+    } as never);
     prismaMock.expense.update.mockResolvedValue({} as never);
 
     await updateExpense("exp-1", { amount: 100 });
@@ -117,12 +125,16 @@ describe("deleteExpense", () => {
 
   it("deletes expense", async () => {
     mockAuth();
-    prismaMock.expense.findFirst.mockResolvedValue(createPrismaExpense() as never);
+    prismaMock.expense.findFirst.mockResolvedValue(
+      createPrismaExpense() as never,
+    );
     prismaMock.expense.delete.mockResolvedValue({} as never);
 
     await deleteExpense("exp-1");
 
-    expect(prismaMock.expense.delete).toHaveBeenCalledWith({ where: { id: "exp-1" } });
+    expect(prismaMock.expense.delete).toHaveBeenCalledWith({
+      where: { id: "exp-1" },
+    });
     expect(revalidatePath).toHaveBeenCalledWith("/dashboard");
     expect(revalidatePath).toHaveBeenCalledWith("/expenses");
   });
@@ -131,6 +143,8 @@ describe("deleteExpense", () => {
     mockAuth();
     prismaMock.expense.findFirst.mockResolvedValue(null as never);
 
-    await expect(deleteExpense("nonexistent")).rejects.toThrow("Expense not found");
+    await expect(deleteExpense("nonexistent")).rejects.toThrow(
+      "Expense not found",
+    );
   });
 });

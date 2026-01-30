@@ -9,7 +9,7 @@ export function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border-subtle bg-bg-surface md:hidden">
+    <nav className="border-border-subtle bg-bg-surface fixed right-0 bottom-0 left-0 z-50 border-t md:hidden">
       <div className="flex h-[84px] items-end justify-around pb-[34px]">
         {/* First tab */}
         <NavTab
@@ -23,7 +23,7 @@ export function MobileNav() {
         <div className="-mt-4 flex flex-col items-center">
           <Link
             href="/expenses/new"
-            className="flex h-[60px] w-[60px] items-center justify-center rounded-full bg-accent-primary shadow-[0_4px_12px_rgba(61,138,90,0.25),0_2px_6px_rgba(61,138,90,0.19)]"
+            className="bg-accent-primary flex h-[60px] w-[60px] items-center justify-center rounded-full shadow-[0_4px_12px_rgba(61,138,90,0.25),0_2px_6px_rgba(61,138,90,0.19)]"
           >
             <Plus className="h-7 w-7 text-white" />
           </Link>

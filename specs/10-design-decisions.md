@@ -6,21 +6,21 @@ Design decisions made during the Pencil prototyping phase that impact future imp
 
 The accent color was undecided. We chose a **warm, nature-inspired palette** over cool tones:
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--bg-primary` | `#F5F4F1` | Warm cream page background |
-| `--bg-surface` | `#FFFFFF` | Card surfaces |
-| `--bg-muted` | `#EDECEA` | Muted controls/backgrounds |
-| `--text-primary` | `#1A1918` | Headlines, primary content |
-| `--text-secondary` | `#6D6C6A` | Body text, descriptions |
-| `--text-tertiary` | `#9C9B99` | Labels, placeholders |
-| `--border-subtle` | `#E5E4E1` | Card strokes, dividers |
-| `--accent-primary` | `#3D8A5A` | Primary accent (forest green) — active states, CTAs |
-| `--accent-light` | `#C8F0D8` | Light green for badges/progress backgrounds |
-| `--accent-warm` | `#D89575` | Secondary accent (terracotta) — schedule markers, secondary highlights |
-| `--status-positive` | `#4D9B6A` | Positive trends, income |
-| `--status-negative` | `#D08068` | Negative trends, overspend |
-| `--status-warning` | `#D4A64A` | Warning states |
+| Token               | Value     | Usage                                                                  |
+| ------------------- | --------- | ---------------------------------------------------------------------- |
+| `--bg-primary`      | `#F5F4F1` | Warm cream page background                                             |
+| `--bg-surface`      | `#FFFFFF` | Card surfaces                                                          |
+| `--bg-muted`        | `#EDECEA` | Muted controls/backgrounds                                             |
+| `--text-primary`    | `#1A1918` | Headlines, primary content                                             |
+| `--text-secondary`  | `#6D6C6A` | Body text, descriptions                                                |
+| `--text-tertiary`   | `#9C9B99` | Labels, placeholders                                                   |
+| `--border-subtle`   | `#E5E4E1` | Card strokes, dividers                                                 |
+| `--accent-primary`  | `#3D8A5A` | Primary accent (forest green) — active states, CTAs                    |
+| `--accent-light`    | `#C8F0D8` | Light green for badges/progress backgrounds                            |
+| `--accent-warm`     | `#D89575` | Secondary accent (terracotta) — schedule markers, secondary highlights |
+| `--status-positive` | `#4D9B6A` | Positive trends, income                                                |
+| `--status-negative` | `#D08068` | Negative trends, overspend                                             |
+| `--status-warning`  | `#D4A64A` | Warning states                                                         |
 
 **Rationale**: Green as primary accent reinforces the "money/finance" association. Warm cream background feels approachable and reduces eye strain vs. pure white. Terracotta as secondary accent provides contrast without clashing.
 
@@ -41,11 +41,11 @@ We chose **Outfit** (Google Fonts, geometric sans-serif) instead of the system f
 
 All UI elements use rounded corners:
 
-| Element | Radius |
-|---------|--------|
-| Cards, containers | 16px |
-| Inputs, buttons, search | 12px |
-| Small badges/tags | 4-6px |
+| Element                          | Radius       |
+| -------------------------------- | ------------ |
+| Cards, containers                | 16px         |
+| Inputs, buttons, search          | 12px         |
+| Small badges/tags                | 4-6px        |
 | Pills, avatars, circular buttons | 100px (full) |
 
 **Rationale**: Rounded corners create a softer, more approachable feel that aligns with the warm palette.
@@ -57,9 +57,9 @@ All UI elements use rounded corners:
 Cards and elevated elements use subtle warm-toned shadows:
 
 ```css
---shadow-card: 0 2px 12px #1A191808;     /* 8% opacity */
---shadow-elevated: 0 2px 8px #1A191808;
---shadow-subtle: 0 1px 6px #1A191808;
+--shadow-card: 0 2px 12px #1a191808; /* 8% opacity */
+--shadow-elevated: 0 2px 8px #1a191808;
+--shadow-subtle: 0 1px 6px #1a191808;
 ```
 
 **Rationale**: Low-opacity warm shadows create gentle depth without harsh edges. Cards "float" above the cream background.
@@ -91,6 +91,7 @@ Tabs: **Home** | **[+ Add FAB]** | **Settings**
 **Rationale**: The Add action is the single most important interaction in the app. A visually distinct FAB ensures it's always one tap/click away on both platforms. Reducing mobile nav to 3 items prevents crowding and gives the FAB breathing room.
 
 **Impact**:
+
 - Mobile nav component renders 3 items with a special center slot for the FAB
 - Desktop FAB uses `position: fixed; bottom: 24px; right: 24px;` with `z-index` above content
 - Categories page is accessed from dashboard links or can be added as a sub-route
@@ -135,6 +136,7 @@ The "Add Expense" screen is a **full-screen modal** (not a bottom sheet or inlin
 **Rationale**: Full-screen gives the amount input maximum prominence and avoids keyboard-overlap issues on mobile. The category grid (vs. dropdown) minimizes taps — most users will have ≤8 frequent categories.
 
 **Impact**:
+
 - The category grid needs a "More" action that opens an expanded view (modal or separate screen) for additional categories
 - Amount input should trigger the numeric keyboard on mobile (`inputmode="decimal"`)
 - Currency selector is a separate interaction — likely a bottom sheet with search
@@ -144,15 +146,15 @@ The "Add Expense" screen is a **full-screen modal** (not a bottom sheet or inlin
 
 Predefined colors used for category identification across the app:
 
-| Category | Color | Hex |
-|----------|-------|-----|
-| Food & Dining | Orange | `#E67E22` |
-| Transport | Blue | `#3498DB` |
-| Groceries | Green (accent) | `#3D8A5A` |
-| Entertainment | Purple | `#9B59B6` |
-| Health | Red | `#E74C3C` |
-| Housing | Emerald | `#2ECC71` |
-| Shopping | Teal | `#1ABC9C` |
+| Category      | Color          | Hex       |
+| ------------- | -------------- | --------- |
+| Food & Dining | Orange         | `#E67E22` |
+| Transport     | Blue           | `#3498DB` |
+| Groceries     | Green (accent) | `#3D8A5A` |
+| Entertainment | Purple         | `#9B59B6` |
+| Health        | Red            | `#E74C3C` |
+| Housing       | Emerald        | `#2ECC71` |
+| Shopping      | Teal           | `#1ABC9C` |
 
 Additional colors for user-created categories: `#F39C12` (amber), `#34495E` (dark slate), `#E91E63` (pink), `#607D8B` (blue-gray), `#795548` (brown).
 
@@ -174,6 +176,7 @@ Desktop (≥768px) uses a **fixed sidebar + scrollable main content** pattern:
 **Rationale**: Sidebar navigation is standard for desktop dashboards. The extra horizontal space allows a third metric card and side-by-side panels that would stack vertically on mobile.
 
 **Impact**:
+
 - Navigation component must render as bottom tabs (<768px) or sidebar (≥768px) — use a shared nav config, different layout components
 - Desktop adds "All Expenses" as a dedicated nav item (on mobile, accessed via "View all" links)
 - Search is persistent on desktop (top bar) vs. hidden/toggle on mobile

@@ -30,8 +30,8 @@ export function ExpenseFilters({
   return (
     <div className="flex flex-wrap gap-3">
       {/* Search */}
-      <div className="relative flex-1 min-w-[180px]">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+      <div className="relative min-w-[180px] flex-1">
+        <Search className="text-text-tertiary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
           placeholder="Search expenses..."
           value={search}
@@ -44,7 +44,7 @@ export function ExpenseFilters({
       <select
         value={categoryId}
         onChange={(e) => onCategoryChange(e.target.value)}
-        className="h-9 rounded-md border border-input bg-bg-surface px-3 text-sm text-text-primary"
+        className="border-input bg-bg-surface text-text-primary h-9 rounded-md border px-3 text-sm"
       >
         <option value="">All categories</option>
         {categories.map((cat) => (

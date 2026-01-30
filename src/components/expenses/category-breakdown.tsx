@@ -27,9 +27,7 @@ export function CategoryBreakdown({ expenses }: CategoryBreakdownProps) {
     }
   }
 
-  const sorted = Array.from(totals.values()).sort(
-    (a, b) => b.total - a.total,
-  );
+  const sorted = Array.from(totals.values()).sort((a, b) => b.total - a.total);
   const maxTotal = sorted[0]?.total ?? 1;
 
   return (
@@ -37,14 +35,14 @@ export function CategoryBreakdown({ expenses }: CategoryBreakdownProps) {
       {sorted.map((cat) => (
         <div key={cat.name}>
           <div className="mb-1 flex items-center justify-between">
-            <span className="text-sm font-medium text-text-primary">
+            <span className="text-text-primary text-sm font-medium">
               {cat.name}
             </span>
-            <span className="text-sm text-text-secondary">
+            <span className="text-text-secondary text-sm">
               {formatCurrency(cat.total)}
             </span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-bg-muted">
+          <div className="bg-bg-muted h-2 overflow-hidden rounded-full">
             <div
               className="h-full rounded-full transition-all"
               style={{

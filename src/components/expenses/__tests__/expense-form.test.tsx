@@ -12,19 +12,84 @@ vi.mock("@/lib/actions/expenses", () => ({
 }));
 
 const mockCategories: Category[] = [
-  { id: "cat-1", name: "Food", icon: "UtensilsCrossed", color: "#E8855B", userId: "user-1" },
-  { id: "cat-2", name: "Transport", icon: "Car", color: "#5B8CE8", userId: "user-1" },
-  { id: "cat-3", name: "Shopping", icon: "ShoppingCart", color: "#9B59B6", userId: "user-1" },
-  { id: "cat-4", name: "Health", icon: "Heart", color: "#E74C3C", userId: "user-1" },
-  { id: "cat-5", name: "Home", icon: "Home", color: "#2ECC71", userId: "user-1" },
-  { id: "cat-6", name: "Bills", icon: "Zap", color: "#F39C12", userId: "user-1" },
-  { id: "cat-7", name: "Education", icon: "GraduationCap", color: "#1ABC9C", userId: "user-1" },
-  { id: "cat-8", name: "Entertainment", icon: "Film", color: "#3498DB", userId: "user-1" },
-  { id: "cat-9", name: "Travel", icon: "Plane", color: "#E67E22", userId: "user-1" },
-  { id: "cat-10", name: "Coffee", icon: "Coffee", color: "#795548", userId: "user-1" },
+  {
+    id: "cat-1",
+    name: "Food",
+    icon: "UtensilsCrossed",
+    color: "#E8855B",
+    userId: "user-1",
+  },
+  {
+    id: "cat-2",
+    name: "Transport",
+    icon: "Car",
+    color: "#5B8CE8",
+    userId: "user-1",
+  },
+  {
+    id: "cat-3",
+    name: "Shopping",
+    icon: "ShoppingCart",
+    color: "#9B59B6",
+    userId: "user-1",
+  },
+  {
+    id: "cat-4",
+    name: "Health",
+    icon: "Heart",
+    color: "#E74C3C",
+    userId: "user-1",
+  },
+  {
+    id: "cat-5",
+    name: "Home",
+    icon: "Home",
+    color: "#2ECC71",
+    userId: "user-1",
+  },
+  {
+    id: "cat-6",
+    name: "Bills",
+    icon: "Zap",
+    color: "#F39C12",
+    userId: "user-1",
+  },
+  {
+    id: "cat-7",
+    name: "Education",
+    icon: "GraduationCap",
+    color: "#1ABC9C",
+    userId: "user-1",
+  },
+  {
+    id: "cat-8",
+    name: "Entertainment",
+    icon: "Film",
+    color: "#3498DB",
+    userId: "user-1",
+  },
+  {
+    id: "cat-9",
+    name: "Travel",
+    icon: "Plane",
+    color: "#E67E22",
+    userId: "user-1",
+  },
+  {
+    id: "cat-10",
+    name: "Coffee",
+    icon: "Coffee",
+    color: "#795548",
+    userId: "user-1",
+  },
 ];
 
-const mockRouter = { push: vi.fn(), back: vi.fn(), replace: vi.fn(), refresh: vi.fn() };
+const mockRouter = {
+  push: vi.fn(),
+  back: vi.fn(),
+  replace: vi.fn(),
+  refresh: vi.fn(),
+};
 vi.mock("next/navigation", () => ({
   useRouter: () => mockRouter,
   usePathname: () => "/",
@@ -78,13 +143,19 @@ describe("ExpenseForm", () => {
       />,
     );
 
-    const amountInput = container.querySelector('input[placeholder="0.00"]') as HTMLInputElement;
+    const amountInput = container.querySelector(
+      'input[placeholder="0.00"]',
+    ) as HTMLInputElement;
     expect(amountInput?.value).toBe("25.50");
 
-    const descInput = container.querySelector('input[placeholder="Description"]') as HTMLInputElement;
+    const descInput = container.querySelector(
+      'input[placeholder="Description"]',
+    ) as HTMLInputElement;
     expect(descInput?.value).toBe("Lunch");
 
-    const notesInput = container.querySelector('input[placeholder="Notes (optional)"]') as HTMLInputElement;
+    const notesInput = container.querySelector(
+      'input[placeholder="Notes (optional)"]',
+    ) as HTMLInputElement;
     expect(notesInput?.value).toBe("Some notes");
   });
 
@@ -102,7 +173,9 @@ describe("ExpenseForm", () => {
 
     // Find the button containing "Save Expense"
     const buttons = container.querySelectorAll("button");
-    const saveButton = Array.from(buttons).find((b) => b.textContent?.includes("Save Expense"));
+    const saveButton = Array.from(buttons).find((b) =>
+      b.textContent?.includes("Save Expense"),
+    );
     expect(saveButton).toBeDefined();
     expect(saveButton!.disabled).toBe(true);
   });
@@ -121,7 +194,9 @@ describe("ExpenseForm", () => {
     const { container } = render(<ExpenseForm categories={mockCategories} />);
 
     const buttons = container.querySelectorAll("button");
-    const moreButton = Array.from(buttons).find((b) => b.textContent === "More");
+    const moreButton = Array.from(buttons).find(
+      (b) => b.textContent === "More",
+    );
     expect(moreButton).toBeDefined();
   });
 
@@ -130,7 +205,9 @@ describe("ExpenseForm", () => {
     const { container } = render(<ExpenseForm categories={mockCategories} />);
 
     const buttons = container.querySelectorAll("button");
-    const moreButton = Array.from(buttons).find((b) => b.textContent === "More")!;
+    const moreButton = Array.from(buttons).find(
+      (b) => b.textContent === "More",
+    )!;
     await user.click(moreButton);
 
     expect(container.textContent).toContain("Travel");

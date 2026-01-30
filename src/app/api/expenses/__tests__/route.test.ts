@@ -45,7 +45,9 @@ describe("GET /api/expenses", () => {
     prismaMock.expense.count.mockResolvedValue(0 as never);
 
     await GET(
-      createRequest("/api/expenses?search=lunch&categoryId=cat-1&from=2025-01-01&to=2025-01-31"),
+      createRequest(
+        "/api/expenses?search=lunch&categoryId=cat-1&from=2025-01-01&to=2025-01-31",
+      ),
     );
 
     expect(prismaMock.expense.findMany).toHaveBeenCalledWith(
@@ -96,7 +98,9 @@ describe("POST /api/expenses", () => {
   it("creates an expense", async () => {
     mockAuth();
     const expense = createPrismaExpense();
-    prismaMock.user.findUnique.mockResolvedValue({ baseCurrency: "USD" } as never);
+    prismaMock.user.findUnique.mockResolvedValue({
+      baseCurrency: "USD",
+    } as never);
     prismaMock.expense.create.mockResolvedValue(expense as never);
 
     const res = await POST(

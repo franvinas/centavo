@@ -5,7 +5,10 @@ function AllProviders({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function customRender(ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) {
+function customRender(
+  ui: ReactElement,
+  options?: Omit<RenderOptions, "wrapper">,
+) {
   return render(ui, { wrapper: AllProviders, ...options });
 }
 

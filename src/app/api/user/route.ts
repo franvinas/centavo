@@ -54,9 +54,7 @@ export async function PUT(request: NextRequest) {
       await prisma.expense.update({
         where: { id: expense.id },
         data: {
-          baseAmount: parseFloat(
-            (Number(expense.amount) * rate).toFixed(2),
-          ),
+          baseAmount: parseFloat((Number(expense.amount) * rate).toFixed(2)),
           exchangeRate: rate,
         },
       });

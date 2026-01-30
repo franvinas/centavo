@@ -31,11 +31,7 @@ export function formatDateGroup(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const target = new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-  );
+  const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const diffDays = Math.floor(
     (today.getTime() - target.getTime()) / (1000 * 60 * 60 * 24),
   );

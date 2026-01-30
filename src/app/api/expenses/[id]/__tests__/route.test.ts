@@ -64,7 +64,10 @@ describe("PUT /api/expenses/[id]", () => {
     mockAuth();
     const existing = createPrismaExpense();
     prismaMock.expense.findFirst.mockResolvedValue(existing as never);
-    prismaMock.expense.update.mockResolvedValue({ ...existing, description: "Updated" } as never);
+    prismaMock.expense.update.mockResolvedValue({
+      ...existing,
+      description: "Updated",
+    } as never);
 
     const res = await PUT(
       createRequest("/api/expenses/exp-1", {
@@ -96,7 +99,9 @@ describe("PUT /api/expenses/[id]", () => {
     mockAuth();
     const existing = createPrismaExpense();
     prismaMock.expense.findFirst.mockResolvedValue(existing as never);
-    prismaMock.user.findUnique.mockResolvedValue({ baseCurrency: "USD" } as never);
+    prismaMock.user.findUnique.mockResolvedValue({
+      baseCurrency: "USD",
+    } as never);
     prismaMock.expense.update.mockResolvedValue(existing as never);
 
     await PUT(
@@ -128,7 +133,9 @@ describe("DELETE /api/expenses/[id]", () => {
 
   it("deletes an expense", async () => {
     mockAuth();
-    prismaMock.expense.findFirst.mockResolvedValue(createPrismaExpense() as never);
+    prismaMock.expense.findFirst.mockResolvedValue(
+      createPrismaExpense() as never,
+    );
     prismaMock.expense.delete.mockResolvedValue({} as never);
 
     const res = await DELETE(createRequest("/api/expenses/exp-1"), routeParams);
