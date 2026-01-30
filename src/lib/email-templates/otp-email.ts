@@ -1,10 +1,11 @@
-import fs from "fs";
-import path from "path";
-
-const EMAIL_LOGO_BASE64 = fs.readFileSync(
-  path.join(process.cwd(), "public/icons/email-logo-base64.txt"),
-  "utf-8",
-);
+function getBaseUrl(): string {
+  if (process.env.NEXTAUTH_URL) return process.env.NEXTAUTH_URL;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  if (process.env.VERCEL_URL)
+    return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3000";
+}
 
 interface OTPEmailParams {
   otp: string;
@@ -37,7 +38,7 @@ export function getOTPEmailHtml({ otp }: OTPEmailParams): string {
     <tr><td align="center">
       <table width="420" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;padding:40px;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
         <tr><td align="center" style="padding-bottom:24px;">
-          <img src="data:image/png;base64,${EMAIL_LOGO_BASE64}" alt="Centavo" width="48" height="48" style="display:block;border-radius:12px;" />
+          <img src="${getBaseUrl()}/icons/icon-192.png" alt="Centavo" width="48" height="48" style="display:block;border-radius:12px;" />
         </td></tr>
         <tr><td align="center" style="font-size:20px;font-weight:600;color:#1a1a1a;padding-bottom:8px;">
           Your verification code
