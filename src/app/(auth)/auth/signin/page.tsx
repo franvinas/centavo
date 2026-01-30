@@ -1,15 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Mail } from "lucide-react";
+import { OTPInput } from "@/components/ui/otp-input";
+import { Mail, ArrowLeft, Loader2 } from "lucide-react";
+
+const RESEND_COOLDOWN = 60;
 
 const ERROR_MESSAGES: Record<string, string> = {
-  Verification: "That sign-in link is invalid or has expired. Please try again.",
+  Verification:
+    "That code is invalid or has expired. Please request a new one.",
   OAuthAccountNotLinked:
     "This email is already associated with another sign-in method.",
   Default: "Something went wrong. Please try again.",
@@ -17,6 +21,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 export default function SignInPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const errorType = searchParams.get("error");
   const errorMessage = errorType
     ? (ERROR_MESSAGES[errorType] ?? ERROR_MESSAGES.Default)
@@ -25,6 +30,16 @@ export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [otpError, setOtpError] = useState<string | null>(null);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setInterval(() => setCooldown((c) => c - 1), 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
 
   async function handleGoogle() {
     setLoading(true);
@@ -38,40 +53,128 @@ export default function SignInPage() {
     await signIn("resend", { email, redirect: false });
     setEmailSent(true);
     setLoading(false);
+    setCooldown(RESEND_COOLDOWN);
+  }
+
+  const handleVerify = useCallback(
+    async (code: string) => {
+      if (code.length !== 6) return;
+      setVerifying(true);
+      setOtpError(null);
+
+      try {
+        const callbackUrl = `/api/auth/callback/resend?token=${encodeURIComponent(code)}&email=${encodeURIComponent(email)}`;
+        const res = await fetch(callbackUrl, { redirect: "follow" });
+
+        if (res.ok || res.redirected) {
+          router.push("/dashboard");
+          router.refresh();
+        } else {
+          setOtpError("Invalid or expired code. Please try again.");
+          setVerifying(false);
+        }
+      } catch {
+        setOtpError("Something went wrong. Please try again.");
+        setVerifying(false);
+      }
+    },
+    [email, router],
+  );
+
+  function handleOtpChange(value: string) {
+    setOtp(value);
+    setOtpError(null);
+    const trimmed = value.replace(/\s/g, "");
+    if (trimmed.length === 6) {
+      handleVerify(trimmed);
+    }
+  }
+
+  async function handleResend() {
+    if (cooldown > 0) return;
+    setCooldown(RESEND_COOLDOWN);
+    setOtp("");
+    setOtpError(null);
+    await signIn("resend", { email, redirect: false });
+  }
+
+  function handleBack() {
+    setEmailSent(false);
+    setOtp("");
+    setOtpError(null);
+    setCooldown(0);
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg-primary px-6">
+    <div className="bg-bg-primary flex min-h-screen items-center justify-center px-6">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-accent-primary text-white">
+          <div className="bg-accent-primary flex h-14 w-14 items-center justify-center rounded-xl text-white">
             <span className="text-2xl font-bold">C</span>
           </div>
-          <h1 className="mt-4 text-2xl font-semibold text-text-primary">
+          <h1 className="text-text-primary mt-4 text-2xl font-semibold">
             Welcome to Centavo
           </h1>
-          <p className="mt-1 text-sm text-text-secondary">
+          <p className="text-text-secondary mt-1 text-sm">
             Track your expenses with ease
           </p>
         </div>
 
-        {errorMessage && (
+        {errorMessage && !emailSent && (
           <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {errorMessage}
           </div>
         )}
 
-        <div className="rounded-lg bg-bg-surface p-6 shadow-card">
+        <div className="bg-bg-surface shadow-card rounded-lg p-6">
           {emailSent ? (
             <div className="text-center">
-              <Mail className="mx-auto h-10 w-10 text-accent-primary" />
-              <h2 className="mt-3 text-lg font-semibold text-text-primary">
-                Check your email
+              <Mail className="text-accent-primary mx-auto h-10 w-10" />
+              <h2 className="text-text-primary mt-3 text-lg font-semibold">
+                Enter verification code
               </h2>
-              <p className="mt-1 text-sm text-text-secondary">
-                We sent a sign-in link to {email}
+              <p className="text-text-secondary mt-1 text-sm">
+                We sent a 6-digit code to {email}
               </p>
+
+              <div className="mt-6">
+                <OTPInput
+                  value={otp}
+                  onChange={handleOtpChange}
+                  disabled={verifying}
+                />
+              </div>
+
+              {verifying && (
+                <div className="text-text-secondary mt-4 flex items-center justify-center gap-2 text-sm">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Verifying...
+                </div>
+              )}
+
+              {otpError && (
+                <p className="mt-4 text-sm text-red-600">{otpError}</p>
+              )}
+
+              <div className="mt-6 space-y-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleResend}
+                  disabled={cooldown > 0}
+                  className="w-full text-sm"
+                >
+                  {cooldown > 0 ? `Resend code in ${cooldown}s` : "Resend code"}
+                </Button>
+                <button
+                  onClick={handleBack}
+                  className="text-text-secondary hover:text-text-primary inline-flex items-center gap-1 text-sm"
+                >
+                  <ArrowLeft className="h-3 w-3" />
+                  Use a different email
+                </button>
+              </div>
             </div>
           ) : (
             <>
@@ -104,9 +207,9 @@ export default function SignInPage() {
               </Button>
 
               <div className="my-4 flex items-center gap-3">
-                <Separator className="flex-1 bg-border-subtle" />
-                <span className="text-xs text-text-tertiary">or</span>
-                <Separator className="flex-1 bg-border-subtle" />
+                <Separator className="bg-border-subtle flex-1" />
+                <span className="text-text-tertiary text-xs">or</span>
+                <Separator className="bg-border-subtle flex-1" />
               </div>
 
               {/* Email */}
@@ -121,7 +224,7 @@ export default function SignInPage() {
                 <Button
                   type="submit"
                   disabled={loading || !email}
-                  className="w-full bg-accent-primary text-white hover:bg-accent-primary/90"
+                  className="bg-accent-primary hover:bg-accent-primary/90 w-full text-white"
                 >
                   Continue with Email
                 </Button>

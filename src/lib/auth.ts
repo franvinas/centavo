@@ -1,8 +1,16 @@
+import crypto from "node:crypto";
 import NextAuth from "next-auth";
 import Resend from "next-auth/providers/resend";
+import { Resend as ResendClient } from "resend";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/db";
 import { authConfig } from "./auth.config";
+import {
+  getOTPEmailHtml,
+  getOTPEmailText,
+} from "@/lib/email-templates/otp-email";
+
+const resend = new ResendClient(process.env.RESEND_API_KEY);
 
 const DEFAULT_CATEGORIES = [
   { name: "Food & Dining", color: "#E67E22", icon: "UtensilsCrossed" },
@@ -22,6 +30,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Resend({
       apiKey: process.env.RESEND_API_KEY,
       from: process.env.EMAIL_FROM ?? "Centavo <onboarding@resend.dev>",
+      maxAge: 5 * 60,
+      async generateVerificationToken() {
+        return crypto.randomInt(100000, 999999).toString();
+      },
+      async sendVerificationRequest({ identifier: email, token, provider }) {
+        await resend.emails.send({
+          from: provider.from as string,
+          to: email,
+          subject: `${token} is your Centavo verification code`,
+          html: getOTPEmailHtml({ otp: token, email }),
+          text: getOTPEmailText({ otp: token, email }),
+        });
+      },
     }),
   ],
   adapter: PrismaAdapter(prisma),
