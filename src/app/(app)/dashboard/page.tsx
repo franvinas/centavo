@@ -24,18 +24,13 @@ export default async function DashboardPage() {
   const summary = await getExpenseSummary(user.id);
 
   const totalSpent = summary.totalSpent;
-  const expenseCount = summary.expenseCount;
   const lastMonthTotal = summary.lastMonthTotal;
-  const lastMonthCount = summary.lastMonthCount;
 
   // Calculate trend
   const spendDiff =
     lastMonthTotal > 0
       ? Math.round(((totalSpent - lastMonthTotal) / lastMonthTotal) * 100)
       : 0;
-  const countDiff = expenseCount - lastMonthCount;
-  const topCategory = getTopCategory(summary.recentExpenses);
-
   // Map Prisma results to our UI types
   const expenses: Expense[] = summary.recentExpenses.map(mapExpense);
 
@@ -50,35 +45,18 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        <MetricCard
-          label="Total Spent"
-          value={formatCurrency(totalSpent, user.baseCurrency)}
-          trend={
-            lastMonthTotal > 0
-              ? {
-                  value: `${Math.abs(spendDiff)}% ${spendDiff <= 0 ? "less" : "more"} than last month`,
-                  positive: spendDiff <= 0,
-                }
-              : undefined
-          }
-        />
-        <MetricCard
-          label="Expenses"
-          value={String(expenseCount)}
-          trend={
-            lastMonthCount > 0
-              ? {
-                  value: `${Math.abs(countDiff)} ${countDiff <= 0 ? "fewer" : "more"} than last month`,
-                  positive: countDiff <= 0,
-                }
-              : undefined
-          }
-        />
-        <div className="col-span-2 md:col-span-1">
-          <MetricCard label="Top Category" value={topCategory} />
-        </div>
-      </div>
+      <MetricCard
+        label="Total Spent"
+        value={formatCurrency(totalSpent, user.baseCurrency)}
+        trend={
+          lastMonthTotal > 0
+            ? {
+                value: `${Math.abs(spendDiff)}% ${spendDiff <= 0 ? "less" : "more"} than last month`,
+                positive: spendDiff <= 0,
+              }
+            : undefined
+        }
+      />
 
       <div className="grid gap-6 md:grid-cols-2">
         <div className="bg-bg-surface shadow-card rounded-lg p-5">
@@ -140,23 +118,3 @@ function mapExpense(e: any): Expense {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getTopCategory(expenses: any[]): string {
-  const totals = new Map<string, { name: string; total: number }>();
-  for (const expense of expenses) {
-    const existing = totals.get(expense.categoryId);
-    if (existing) {
-      existing.total += Number(expense.baseAmount);
-    } else {
-      totals.set(expense.categoryId, {
-        name: expense.category?.name ?? "Unknown",
-        total: Number(expense.baseAmount),
-      });
-    }
-  }
-  let top = { name: "None", total: 0 };
-  for (const cat of totals.values()) {
-    if (cat.total > top.total) top = cat;
-  }
-  return top.name;
-}
