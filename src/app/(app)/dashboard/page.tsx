@@ -3,8 +3,10 @@ import { formatCurrency } from "@/lib/format";
 import { MetricCard } from "@/components/expenses/metric-card";
 import { ExpenseList } from "@/components/expenses/expense-list";
 import { CategoryBreakdown } from "@/components/expenses/category-breakdown";
+import { EmptyStateDashboard } from "@/components/dashboard/empty-state";
 import { getCurrentUser } from "@/lib/data/user";
 import { getExpenseSummary } from "@/lib/data/expenses";
+import { hasAnyExpenses } from "@/lib/data/onboarding";
 import Link from "next/link";
 import type { Expense, Category } from "@/types";
 
@@ -13,6 +15,11 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/signin");
+
+  const hasExpenses = await hasAnyExpenses(user.id);
+  if (!hasExpenses) {
+    return <EmptyStateDashboard userName={user.name ?? "there"} />;
+  }
 
   const summary = await getExpenseSummary(user.id);
 
