@@ -13,6 +13,8 @@ export const authConfig = {
   },
   pages: {
     signIn: "/auth/signin",
+    error: "/auth/signin",
+    verifyRequest: "/auth/signin",
   },
   callbacks: {
     jwt({ token, user }) {

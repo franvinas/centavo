@@ -1,13 +1,27 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Mail } from "lucide-react";
 
+const ERROR_MESSAGES: Record<string, string> = {
+  Verification: "That sign-in link is invalid or has expired. Please try again.",
+  OAuthAccountNotLinked:
+    "This email is already associated with another sign-in method.",
+  Default: "Something went wrong. Please try again.",
+};
+
 export default function SignInPage() {
+  const searchParams = useSearchParams();
+  const errorType = searchParams.get("error");
+  const errorMessage = errorType
+    ? (ERROR_MESSAGES[errorType] ?? ERROR_MESSAGES.Default)
+    : null;
+
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
@@ -41,6 +55,12 @@ export default function SignInPage() {
             Track your expenses with ease
           </p>
         </div>
+
+        {errorMessage && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {errorMessage}
+          </div>
+        )}
 
         <div className="rounded-lg bg-bg-surface p-6 shadow-card">
           {emailSent ? (
