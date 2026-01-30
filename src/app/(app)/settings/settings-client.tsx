@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { signOut } from "next-auth/react";
 import { updateUser } from "@/lib/actions/user";
 
 const CURRENCIES = ["USD", "EUR", "ARS"];
@@ -106,6 +107,7 @@ export function SettingsClient({ user }: SettingsClientProps) {
       <Button
         variant="outline"
         className="border-status-negative text-status-negative hover:bg-status-negative/10 w-full"
+        onClick={() => signOut({ callbackUrl: "/auth/signin" })}
       >
         <LogOut className="mr-2 h-4 w-4" />
         Sign Out
