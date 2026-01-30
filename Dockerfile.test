@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/playwright:v1.58.0-noble
+
+WORKDIR /app
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@10 --activate
+
+# Copy dependency files first for caching
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the project
+COPY . .
+
+# Generate Prisma client
+RUN pnpm db:generate
