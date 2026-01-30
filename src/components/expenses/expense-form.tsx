@@ -19,6 +19,7 @@ import {
   deleteExpense,
 } from "@/lib/actions/expenses";
 import type { Category } from "@/types";
+import { CURRENCIES } from "@/lib/constants";
 
 interface ExpenseFormProps {
   expense?: {
@@ -31,13 +32,21 @@ interface ExpenseFormProps {
     categoryId: string;
   };
   categories: Category[];
+  defaultCurrency?: string;
 }
 
-export function ExpenseForm({ expense, categories }: ExpenseFormProps) {
+export function ExpenseForm({
+  expense,
+  categories,
+  defaultCurrency = "USD",
+}: ExpenseFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [amount, setAmount] = useState(expense?.amount.toFixed(2) ?? "");
-  const [currency] = useState(expense?.currency ?? "USD");
+  const [currency, setCurrency] = useState(
+    expense?.currency ?? defaultCurrency,
+  );
+  const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
   const [description, setDescription] = useState(expense?.description ?? "");
   const [date, setDate] = useState(
     expense?.date
@@ -117,15 +126,39 @@ export function ExpenseForm({ expense, categories }: ExpenseFormProps) {
               className="text-text-primary placeholder:text-text-tertiary w-48 bg-transparent text-center text-5xl font-bold outline-none"
             />
           </div>
-          <button
-            type="button"
-            className="bg-bg-muted mt-2 flex items-center gap-1 rounded-full px-3 py-1"
-          >
-            <span className="text-text-secondary text-sm font-medium">
-              {currency}
-            </span>
-            <ChevronDown className="text-text-tertiary h-3.5 w-3.5" />
-          </button>
+          <div className="relative mt-2">
+            <button
+              type="button"
+              onClick={() => setShowCurrencyPicker((v) => !v)}
+              className="bg-bg-muted flex items-center gap-1 rounded-full px-3 py-1"
+            >
+              <span className="text-text-secondary text-sm font-medium">
+                {currency}
+              </span>
+              <ChevronDown className="text-text-tertiary h-3.5 w-3.5" />
+            </button>
+            {showCurrencyPicker && (
+              <div className="bg-bg-surface border-border-subtle absolute top-full z-10 mt-1 flex flex-wrap gap-1.5 rounded-xl border p-3 shadow-lg">
+                {CURRENCIES.map((code) => (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => {
+                      setCurrency(code);
+                      setShowCurrencyPicker(false);
+                    }}
+                    className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                      currency === code
+                        ? "bg-accent-primary text-white"
+                        : "bg-bg-muted text-text-secondary hover:bg-border-subtle"
+                    }`}
+                  >
+                    {code}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Form fields */}

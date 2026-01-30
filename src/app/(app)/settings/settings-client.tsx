@@ -9,8 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { signOut } from "next-auth/react";
 import { updateUser } from "@/lib/actions/user";
-
-const CURRENCIES = ["USD", "EUR", "ARS"];
+import { CURRENCIES } from "@/lib/constants";
 
 interface SettingsClientProps {
   user: {

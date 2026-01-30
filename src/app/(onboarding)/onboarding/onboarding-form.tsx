@@ -3,8 +3,7 @@
 import { useState, useTransition } from "react";
 import { Wallet } from "lucide-react";
 import { completeOnboarding } from "@/lib/actions/onboarding";
-
-const CURRENCIES = ["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "MXN", "BRL"];
+import { CURRENCIES } from "@/lib/constants";
 
 export function OnboardingForm() {
   const [name, setName] = useState("");

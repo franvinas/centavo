@@ -40,6 +40,7 @@ export default async function ExpenseDetailPage({
         categoryId: expense.categoryId,
       }}
       categories={mapped}
+      defaultCurrency={user.baseCurrency}
     />
   );
 }
