@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
@@ -44,6 +44,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "resend": "^6.9.1",
+    "serwist": "^9.5.3",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.3.6"
   },
