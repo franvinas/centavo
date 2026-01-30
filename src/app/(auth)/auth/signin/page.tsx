@@ -21,7 +21,7 @@ export default function SignInPage() {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    await signIn("resend", { email, callbackUrl: "/dashboard" });
+    await signIn("resend", { email, redirect: false });
     setEmailSent(true);
     setLoading(false);
   }

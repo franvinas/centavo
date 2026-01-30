@@ -22,32 +22,11 @@ describe("getCurrentUser", () => {
     });
   });
 
-  it("falls back to first user in development", async () => {
+  it("returns null when unauthenticated", async () => {
     mockUnauthenticated();
-    const originalEnv = process.env.NODE_ENV;
-    vi.stubEnv("NODE_ENV", "development");
-
-    const user = createPrismaUser();
-    prismaMock.user.findFirst.mockResolvedValue(user as never);
-
-    const result = await getCurrentUser();
-
-    expect(result).toEqual(user);
-    expect(prismaMock.user.findFirst).toHaveBeenCalledWith({
-      orderBy: { createdAt: "asc" },
-    });
-
-    vi.stubEnv("NODE_ENV", originalEnv!);
-  });
-
-  it("returns null when unauthenticated in production", async () => {
-    mockUnauthenticated();
-    vi.stubEnv("NODE_ENV", "production");
 
     const result = await getCurrentUser();
 
     expect(result).toBeNull();
-
-    vi.stubEnv("NODE_ENV", "test");
   });
 });
