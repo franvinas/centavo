@@ -55,22 +55,24 @@ export function ExpenseFilters({
       </select>
 
       {/* Date range */}
-      <Input
-        type="date"
-        value={dateFrom}
-        onChange={(e) => onDateFromChange(e.target.value)}
-        className="md:w-36"
-        aria-label="From date"
-        placeholder="From"
-      />
-      <Input
-        type="date"
-        value={dateTo}
-        onChange={(e) => onDateToChange(e.target.value)}
-        className="md:w-36"
-        aria-label="To date"
-        placeholder="To"
-      />
+      <label className="grid gap-1">
+        <span className="text-text-secondary text-xs">From</span>
+        <Input
+          type="date"
+          value={dateFrom}
+          onChange={(e) => onDateFromChange(e.target.value)}
+          className="md:w-36"
+        />
+      </label>
+      <label className="grid gap-1">
+        <span className="text-text-secondary text-xs">To</span>
+        <Input
+          type="date"
+          value={dateTo}
+          onChange={(e) => onDateToChange(e.target.value)}
+          className="md:w-36"
+        />
+      </label>
     </div>
   );
 }
