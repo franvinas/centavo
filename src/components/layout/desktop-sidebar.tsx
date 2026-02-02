@@ -27,9 +27,7 @@ export function DesktopSidebar({ user }: DesktopSidebarProps) {
           height={36}
           className="rounded-lg"
         />
-        <span className="text-text-primary text-xl font-semibold">
-          Centavo
-        </span>
+        <span className="text-text-primary text-xl font-semibold">Centavo</span>
       </div>
 
       {/* Nav items */}

@@ -117,4 +117,3 @@ function mapExpense(e: any): Expense {
     updatedAt: e.updatedAt.toISOString(),
   };
 }
-

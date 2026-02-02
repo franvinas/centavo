@@ -19,5 +19,7 @@ export default async function NewExpensePage() {
     userId: c.userId,
   }));
 
-  return <ExpenseForm categories={mapped} defaultCurrency={user.baseCurrency} />;
+  return (
+    <ExpenseForm categories={mapped} defaultCurrency={user.baseCurrency} />
+  );
 }
