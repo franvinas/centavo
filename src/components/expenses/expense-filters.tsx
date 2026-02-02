@@ -28,9 +28,9 @@ export function ExpenseFilters({
   categories,
 }: ExpenseFiltersProps) {
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap">
       {/* Search */}
-      <div className="relative min-w-[180px] flex-1">
+      <div className="relative col-span-2 min-w-[180px] md:flex-1">
         <Search className="text-text-tertiary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
           placeholder="Search expenses..."
@@ -44,7 +44,7 @@ export function ExpenseFilters({
       <select
         value={categoryId}
         onChange={(e) => onCategoryChange(e.target.value)}
-        className="border-input bg-bg-surface text-text-primary h-9 rounded-md border px-3 text-sm"
+        className="border-input bg-bg-surface text-text-primary col-span-2 h-9 rounded-md border px-3 text-sm"
       >
         <option value="">All categories</option>
         {categories.map((cat) => (
@@ -59,15 +59,17 @@ export function ExpenseFilters({
         type="date"
         value={dateFrom}
         onChange={(e) => onDateFromChange(e.target.value)}
-        className="w-36"
+        className="md:w-36"
         aria-label="From date"
+        placeholder="From"
       />
       <Input
         type="date"
         value={dateTo}
         onChange={(e) => onDateToChange(e.target.value)}
-        className="w-36"
+        className="md:w-36"
         aria-label="To date"
+        placeholder="To"
       />
     </div>
   );
