@@ -25,7 +25,7 @@ describe("getExpenses", () => {
     expect(prismaMock.expense.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { userId: "user-1" },
-        orderBy: { date: "desc" },
+        orderBy: [{ date: "desc" }, { createdAt: "desc" }],
         skip: 0,
         take: 50,
       }),

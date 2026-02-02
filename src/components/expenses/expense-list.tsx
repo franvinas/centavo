@@ -1,6 +1,6 @@
 import type { Expense } from "@/types";
 import { ExpenseCard } from "./expense-card";
-import { formatDateGroup } from "@/lib/format";
+import { formatDateGroup, parseLocalDate } from "@/lib/format";
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -9,7 +9,7 @@ interface ExpenseListProps {
 function groupByDate(expenses: Expense[]): Map<string, Expense[]> {
   const groups = new Map<string, Expense[]>();
   for (const expense of expenses) {
-    const dateKey = new Date(expense.date).toDateString();
+    const dateKey = parseLocalDate(expense.date).toDateString();
     const existing = groups.get(dateKey) ?? [];
     existing.push(expense);
     groups.set(dateKey, existing);
