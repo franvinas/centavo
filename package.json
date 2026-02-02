@@ -20,7 +20,8 @@
     "test:coverage": "vitest run --coverage",
     "docker:test": "docker compose -f docker-compose.test.yml run --rm --build test",
     "docker:coverage": "docker compose -f docker-compose.test.yml run --rm --build coverage",
-    "docker:down": "docker compose -f docker-compose.test.yml down -v"
+    "docker:down": "docker compose -f docker-compose.test.yml down -v",
+    "prepare": "husky"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -59,7 +60,9 @@
     "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "husky": "^9.1.7",
     "jsdom": "^27.4.0",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "prisma": "^7.3.0",
@@ -69,6 +72,9 @@
     "typescript": "^5",
     "vitest": "^4.0.18",
     "vitest-mock-extended": "^3.1.0"
+  },
+  "lint-staged": {
+    "*": "prettier --write --ignore-unknown"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
