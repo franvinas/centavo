@@ -34,7 +34,7 @@ export async function getExpenses({
     prisma.expense.findMany({
       where,
       include: { category: true },
-      orderBy: { date: "desc" },
+      orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       skip: (page - 1) * limit,
       take: limit,
     }),
@@ -61,6 +61,7 @@ export async function getExpenseSummary(userId: string) {
     prisma.expense.findMany({
       where: { userId, date: { gte: startOfMonth } },
       include: { category: true },
+      orderBy: [{ date: "desc" }, { createdAt: "desc" }],
     }),
     prisma.expense.findMany({
       where: {

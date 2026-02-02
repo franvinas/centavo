@@ -7,6 +7,8 @@ const withSerwist = withSerwistInit({
   disable: process.env.NODE_ENV !== "production",
 });
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  turbopack: {},
+};
 
 export default withSerwist(nextConfig);
