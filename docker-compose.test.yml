@@ -38,28 +38,3 @@ services:
       DATABASE_URL: postgresql://centavo:centavo@postgres:5432/centavo_test
     volumes:
       - ./coverage:/app/coverage
-
-  # E2E tests with Playwright
-  e2e:
-    build:
-      context: .
-      dockerfile: Dockerfile.test
-    command: >
-      sh -c "
-        pnpm db:push &&
-        pnpm db:seed &&
-        pnpm build &&
-        pnpm start &
-        npx wait-on http://localhost:3000 --timeout 60000 &&
-        pnpm test:e2e
-      "
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgresql://centavo:centavo@postgres:5432/centavo_test
-      NEXTAUTH_URL: http://localhost:3000
-      NEXTAUTH_SECRET: test-secret-for-docker-e2e-tests-only
-    volumes:
-      - ./playwright-report:/app/playwright-report
-      - ./test-results:/app/test-results

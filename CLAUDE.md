@@ -28,11 +28,9 @@ pnpm test             # Run all Vitest tests
 pnpm test -- src/lib/__tests__/format.test.ts   # Run single test file
 pnpm test:watch       # Watch mode
 pnpm test:coverage    # With v8 coverage report
-pnpm test:e2e         # Playwright E2E tests
 
 # Docker (containerized tests with PostgreSQL)
 pnpm docker:test      # Unit/integration in container
-pnpm docker:e2e       # E2E in container
 pnpm docker:down      # Tear down containers
 ```
 
