@@ -37,15 +37,15 @@ Personal expense tracker with multi-currency support. Track spending across curr
 
    Required variables:
 
-   | Variable | Description |
-   |---|---|
-   | `DATABASE_URL` | PostgreSQL connection string |
-   | `NEXTAUTH_URL` | App URL (e.g. `http://localhost:3000`) |
-   | `NEXTAUTH_SECRET` | Random secret for JWT signing |
-   | `GOOGLE_CLIENT_ID` | Google OAuth client ID |
-   | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
-   | `RESEND_API_KEY` | Resend API key for email OTP |
-   | `OPEN_EXCHANGE_RATES_APP_ID` | Open Exchange Rates API key |
+   | Variable                     | Description                            |
+   | ---------------------------- | -------------------------------------- |
+   | `DATABASE_URL`               | PostgreSQL connection string           |
+   | `NEXTAUTH_URL`               | App URL (e.g. `http://localhost:3000`) |
+   | `NEXTAUTH_SECRET`            | Random secret for JWT signing          |
+   | `GOOGLE_CLIENT_ID`           | Google OAuth client ID                 |
+   | `GOOGLE_CLIENT_SECRET`       | Google OAuth client secret             |
+   | `RESEND_API_KEY`             | Resend API key for email OTP           |
+   | `OPEN_EXCHANGE_RATES_APP_ID` | Open Exchange Rates API key            |
 
 3. Set up the database:
 
