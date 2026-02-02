@@ -10,7 +10,13 @@ import {
   getOTPEmailText,
 } from "@/lib/email-templates/otp-email";
 
-const resend = new ResendClient(process.env.RESEND_API_KEY);
+let _resend: ResendClient | undefined;
+function getResend() {
+  if (!_resend) {
+    _resend = new ResendClient(process.env.RESEND_API_KEY);
+  }
+  return _resend;
+}
 
 const DEFAULT_CATEGORIES = [
   { name: "Food & Dining", color: "#E67E22", icon: "UtensilsCrossed" },
@@ -35,7 +41,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return crypto.randomInt(100000, 999999).toString();
       },
       async sendVerificationRequest({ identifier: email, token, provider }) {
-        await resend.emails.send({
+        await getResend().emails.send({
           from: provider.from as string,
           to: email,
           subject: `${token} is your Centavo verification code`,
