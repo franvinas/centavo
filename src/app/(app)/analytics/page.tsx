@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getCurrentUser } from "@/lib/data/user";
@@ -10,6 +11,7 @@ import {
   getSpendingByCurrency,
 } from "@/lib/data/analytics";
 import { AnalyticsClient } from "./analytics-client";
+import AnalyticsLoading from "./loading";
 
 export const dynamic = "force-dynamic";
 
@@ -54,6 +56,41 @@ export default async function AnalyticsPage({
     typeof params.timeFrom === "string" ? params.timeFrom : undefined;
   const timeTo = typeof params.timeTo === "string" ? params.timeTo : undefined;
 
+  return (
+    <Suspense fallback={<AnalyticsLoading />}>
+      <AnalyticsContent
+        userId={user.id}
+        baseCurrency={user.baseCurrency}
+        period={period}
+        customFrom={customFrom}
+        customTo={customTo}
+        timePeriod={timePeriod}
+        timeFrom={timeFrom}
+        timeTo={timeTo}
+      />
+    </Suspense>
+  );
+}
+
+async function AnalyticsContent({
+  userId,
+  baseCurrency,
+  period,
+  customFrom,
+  customTo,
+  timePeriod,
+  timeFrom,
+  timeTo,
+}: {
+  userId: string;
+  baseCurrency: string;
+  period: string;
+  customFrom: string | undefined;
+  customTo: string | undefined;
+  timePeriod: string;
+  timeFrom: string | undefined;
+  timeTo: string | undefined;
+}) {
   const { from, to, label } = getDateRange(period, customFrom, customTo);
   const {
     from: timeChartFrom,
@@ -62,14 +99,14 @@ export default async function AnalyticsPage({
   } = getDateRange(timePeriod, timeFrom, timeTo);
 
   const [summary, byCategory, overTime, byCurrency] = await Promise.all([
-    getAnalyticsSummary({ userId: user.id, from, to }),
-    getSpendingByCategory({ userId: user.id, from, to }),
+    getAnalyticsSummary({ userId, from, to }),
+    getSpendingByCategory({ userId, from, to }),
     getSpendingOverTime({
-      userId: user.id,
+      userId,
       from: timeChartFrom,
       to: timeChartTo,
     }),
-    getSpendingByCurrency({ userId: user.id, from, to }),
+    getSpendingByCurrency({ userId, from, to }),
   ]);
 
   return (
@@ -79,7 +116,7 @@ export default async function AnalyticsPage({
         byCategory,
         overTime,
         byCurrency,
-        baseCurrency: user.baseCurrency,
+        baseCurrency,
         periodLabel: label,
         timePeriodLabel,
       }}

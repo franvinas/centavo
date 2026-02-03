@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { formatCurrency } from "@/lib/format";
@@ -8,6 +9,7 @@ import { EmptyStateDashboard } from "@/components/dashboard/empty-state";
 import { getCurrentUser } from "@/lib/data/user";
 import { getExpenseSummary } from "@/lib/data/expenses";
 import { hasAnyExpenses } from "@/lib/data/onboarding";
+import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import type { Expense, Category } from "@/types";
 
@@ -23,7 +25,31 @@ export default async function DashboardPage() {
     return <EmptyStateDashboard userName={user.name ?? "there"} />;
   }
 
-  const summary = await getExpenseSummary(user.id);
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-text-primary text-2xl font-semibold">
+          {t("greeting", { name: user.name ?? "there" })}
+        </h1>
+        <p className="text-text-secondary mt-1 text-sm">{t("overview")}</p>
+      </div>
+
+      <Suspense fallback={<DashboardContentSkeleton />}>
+        <DashboardContent userId={user.id} baseCurrency={user.baseCurrency} />
+      </Suspense>
+    </div>
+  );
+}
+
+async function DashboardContent({
+  userId,
+  baseCurrency,
+}: {
+  userId: string;
+  baseCurrency: string;
+}) {
+  const t = await getTranslations("dashboard");
+  const summary = await getExpenseSummary(userId);
 
   const totalSpent = summary.totalSpent;
   const lastMonthTotal = summary.lastMonthTotal;
@@ -37,17 +63,10 @@ export default async function DashboardPage() {
   const expenses: Expense[] = summary.recentExpenses.map(mapExpense);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-text-primary text-2xl font-semibold">
-          {t("greeting", { name: user.name ?? "there" })}
-        </h1>
-        <p className="text-text-secondary mt-1 text-sm">{t("overview")}</p>
-      </div>
-
+    <>
       <MetricCard
         label={t("totalSpent")}
-        value={formatCurrency(totalSpent, user.baseCurrency)}
+        value={formatCurrency(totalSpent, baseCurrency)}
         trend={
           lastMonthTotal > 0
             ? {
@@ -98,7 +117,50 @@ export default async function DashboardPage() {
           )}
         </div>
       </div>
-    </div>
+    </>
+  );
+}
+
+function DashboardContentSkeleton() {
+  return (
+    <>
+      {/* Metric card */}
+      <div className="bg-bg-surface shadow-card rounded-lg p-5">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="mt-2 h-8 w-32" />
+      </div>
+
+      {/* Two-column grid */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="bg-bg-surface shadow-card rounded-lg p-5">
+          <Skeleton className="mb-4 h-5 w-28" />
+          <div className="space-y-3">
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <Skeleton className="h-3 w-3 rounded-full" />
+                <Skeleton className="h-4 flex-1" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="bg-bg-surface shadow-card rounded-lg p-5">
+          <Skeleton className="mb-4 h-5 w-36" />
+          <div className="space-y-3">
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <Skeleton className="h-8 w-8 rounded-full" />
+                <div className="flex-1 space-y-1">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+                <Skeleton className="h-4 w-16" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
