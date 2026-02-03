@@ -1,10 +1,4 @@
-import fs from "fs";
-import path from "path";
-
-const logoBase64 = fs.readFileSync(
-  path.join(process.cwd(), "public/icons/icon-192.png"),
-  "base64",
-);
+const logoUrl = `${process.env.NEXTAUTH_URL}/icons/icon-192.png`;
 
 interface OTPEmailParams {
   otp: string;
@@ -58,7 +52,7 @@ export function getOTPEmailHtml({ otp, locale }: OTPEmailParams): string {
     <tr><td align="center">
       <table width="420" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;padding:40px;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
         <tr><td align="center" style="padding-bottom:24px;">
-          <img src="data:image/png;base64,${logoBase64}" alt="Centavo" width="48" height="48" style="display:block;border-radius:12px;" />
+          <img src="${logoUrl}" alt="Centavo" width="48" height="48" style="display:block;border-radius:12px;" />
         </td></tr>
         <tr><td align="center" style="font-size:20px;font-weight:600;color:#1a1a1a;padding-bottom:8px;">
           ${t.heading}
