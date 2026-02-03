@@ -159,15 +159,13 @@ export function AnalyticsClient({
   );
 }
 
+const skeletonHeights = [58, 42, 75, 33, 67, 50, 83, 39];
+
 function ChartSkeleton() {
   return (
     <div className="flex h-[300px] items-end gap-2 px-8 pb-6">
-      {Array.from({ length: 8 }, (_, i) => (
-        <Skeleton
-          key={i}
-          className="flex-1"
-          style={{ height: `${30 + Math.random() * 60}%` }}
-        />
+      {skeletonHeights.map((h, i) => (
+        <Skeleton key={i} className="flex-1" style={{ height: `${h}%` }} />
       ))}
     </div>
   );
