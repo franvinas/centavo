@@ -1,3 +1,11 @@
+export type {
+  AnalyticsSummary,
+  CategorySpending,
+  TimeSeriesPoint,
+  CurrencySpending,
+  AnalyticsData,
+} from "./analytics";
+
 export interface User {
   id: string;
   name: string;

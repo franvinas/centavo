@@ -8,16 +8,23 @@ import { mobileNavItems } from "@/lib/nav-config";
 export function MobileNav() {
   const pathname = usePathname();
 
+  // Split items evenly around the center FAB
+  const half = Math.ceil(mobileNavItems.length / 2);
+  const leftItems = mobileNavItems.slice(0, half);
+  const rightItems = mobileNavItems.slice(half);
+
   return (
     <nav className="border-border-subtle bg-bg-surface fixed right-0 bottom-0 left-0 z-50 border-t md:hidden">
       <div className="flex h-[84px] items-end justify-around pb-[34px]">
-        {/* First tab */}
-        <NavTab
-          href={mobileNavItems[0].href}
-          label={mobileNavItems[0].label}
-          icon={mobileNavItems[0].icon}
-          active={pathname === mobileNavItems[0].href}
-        />
+        {leftItems.map((item) => (
+          <NavTab
+            key={item.href}
+            href={item.href}
+            label={item.label}
+            icon={item.icon}
+            active={pathname === item.href}
+          />
+        ))}
 
         {/* Center FAB */}
         <div className="-mt-4 flex flex-col items-center">
@@ -29,13 +36,15 @@ export function MobileNav() {
           </Link>
         </div>
 
-        {/* Second tab */}
-        <NavTab
-          href={mobileNavItems[1].href}
-          label={mobileNavItems[1].label}
-          icon={mobileNavItems[1].icon}
-          active={pathname === mobileNavItems[1].href}
-        />
+        {rightItems.map((item) => (
+          <NavTab
+            key={item.href}
+            href={item.href}
+            label={item.label}
+            icon={item.icon}
+            active={pathname === item.href}
+          />
+        ))}
       </div>
     </nav>
   );
