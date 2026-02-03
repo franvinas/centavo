@@ -17,7 +17,6 @@ Query parameters:
 - `from` (date, optional) — start of date range
 - `to` (date, optional) — end of date range
 - `categoryId` (UUID, optional) — filter by category
-- `currency` (string, optional) — filter by currency
 - `search` (string, optional) — search description text
 - `page` (int, default 1) — pagination
 - `limit` (int, default 50, max 100) — items per page

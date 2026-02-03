@@ -45,21 +45,22 @@
 
 ## Exchange rate API
 
-- **Primary**: [frankfurter.app](https://www.frankfurter.app/) — free, no API key, ECB data
-- **Fallback**: TBD if frankfurter proves unreliable
-- **Caching**: Cache rates for 1 hour server-side to reduce external calls
+- **Primary**: Open Exchange Rates API — requires `OPEN_EXCHANGE_RATES_APP_ID` env var
+- **Caching**: Cache rates for 1 hour in-memory server-side to reduce external calls
 
 ## Environment variables
 
-| Variable               | Description                             | Where set  |
-| ---------------------- | --------------------------------------- | ---------- |
-| `DATABASE_URL`         | Neon pooled connection string           | Vercel env |
-| `DIRECT_DATABASE_URL`  | Neon direct connection (for migrations) | Vercel env |
-| `NEXTAUTH_SECRET`      | Random secret for JWT signing           | Vercel env |
-| `NEXTAUTH_URL`         | App URL (e.g. https://centavo.app)      | Vercel env |
-| `GOOGLE_CLIENT_ID`     | Google OAuth client ID                  | Vercel env |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret              | Vercel env |
-| `RESEND_API_KEY`       | Resend API key for sending emails       | Vercel env |
+| Variable                     | Description                             | Where set  |
+| ---------------------------- | --------------------------------------- | ---------- |
+| `DATABASE_URL`               | Neon pooled connection string           | Vercel env |
+| `DIRECT_DATABASE_URL`        | Neon direct connection (for migrations) | Vercel env |
+| `NEXTAUTH_SECRET`            | Random secret for JWT signing           | Vercel env |
+| `NEXTAUTH_URL`               | App URL (e.g. https://centavo.app)      | Vercel env |
+| `GOOGLE_CLIENT_ID`           | Google OAuth client ID                  | Vercel env |
+| `GOOGLE_CLIENT_SECRET`       | Google OAuth client secret              | Vercel env |
+| `RESEND_API_KEY`             | Resend API key for sending emails       | Vercel env |
+| `OPEN_EXCHANGE_RATES_APP_ID` | Open Exchange Rates API app ID          | Vercel env |
+| `EMAIL_FROM`                 | From address for emails (optional)      | Vercel env |
 
 ## Local development
 

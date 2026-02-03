@@ -52,16 +52,16 @@ The data model is intentionally simple for the MVP. All monetary values use `Dec
 
 ### Default categories
 
-When a new user signs up, seed these categories:
+When a new user signs up, these categories are auto-created via the NextAuth `createUser` event in `src/lib/auth.ts`:
 
-- Food & Dining (#FF9800)
-- Transport (#2196F3)
-- Housing (#9C27B0)
-- Utilities (#607D8B)
-- Entertainment (#E91E63)
-- Shopping (#4CAF50)
-- Health (#F44336)
-- Other (#795548)
+- Food & Dining (#E67E22, UtensilsCrossed)
+- Transport (#3498DB, Car)
+- Groceries (#3D8A5A, ShoppingCart)
+- Entertainment (#9B59B6, Film)
+- Health (#E74C3C, Heart)
+- Housing (#2ECC71, Home)
+- Shopping (#1ABC9C, ShoppingBag)
+- Utilities (#F39C12, Zap)
 
 ## Relationships
 
@@ -79,7 +79,7 @@ Category 1 --- * Expense
   - `baseAmount` + `exchangeRate`: the converted value in the user's base currency
 - Exchange rates are fetched at the time of expense creation
 - If the expense currency equals the base currency, `exchangeRate = 1` and `baseAmount = amount`
-- Exchange rate source: TBD (frankfurter.app is free, or exchangerate.host)
+- Exchange rate source: Open Exchange Rates API (`OPEN_EXCHANGE_RATES_APP_ID` env var), cached 1 hour in-memory
 
 ## Indexes
 

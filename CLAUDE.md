@@ -39,6 +39,7 @@ pnpm docker:down      # Tear down containers
 ### Route Structure
 
 - `src/app/(auth)/` — Sign-in page (public)
+- `src/app/(onboarding)/` — First-time user setup (name + base currency selection)
 - `src/app/(app)/` — All authenticated pages (dashboard, expenses, categories, settings)
 - `src/app/api/` — REST API routes (expenses, categories, user, exchange-rate, auth)
 - `src/app/page.tsx` — Redirects to `/dashboard`
@@ -63,18 +64,20 @@ All three layers authenticate via `src/lib/auth.ts` (NextAuth). All data is scop
 - NextAuth v5 beta with JWT strategy (no database sessions)
 - Providers: Google OAuth + Resend (Email OTP)
 - Config: `src/lib/auth.ts`, route handler: `src/app/api/auth/[...nextauth]/route.ts`
-- `getCurrentUser()` in `src/lib/data/user.ts` has a dev-mode fallback that returns the first DB user when no session exists
+- `getCurrentUser()` in `src/lib/data/user.ts` returns the authenticated user from DB, or `null` if no session exists
+- On first sign-in, users without a name are redirected to `/onboarding` (see `src/lib/actions/onboarding.ts`, `src/lib/validations/onboarding.ts`)
 
 ### Multi-Currency
 
 - Each expense stores `amount` + `currency` (original) and `baseAmount` + `exchangeRate` (converted to user's `baseCurrency`)
-- Exchange rates from `frankfurter.app` (ECB data), cached 1 hour in-memory (`src/lib/exchange-rate.ts`)
+- Exchange rates from Open Exchange Rates API (`OPEN_EXCHANGE_RATES_APP_ID` env var), cached 1 hour in-memory (`src/lib/exchange-rate.ts`)
+- Supported currencies: `["USD", "EUR", "ARS"]` (defined in `src/lib/constants.ts`)
 - Changing user's base currency recalculates all expense `baseAmount` values
 
 ### Validation
 
 - Zod v4 schemas in `src/lib/validations/` — imported from `"zod/v4"` (not `"zod"`)
-- Schemas: `createExpenseSchema`, `updateExpenseSchema`, `createCategorySchema`, `updateCategorySchema`, `updateUserSchema`
+- Schemas: `createExpenseSchema`, `updateExpenseSchema`, `createCategorySchema`, `updateCategorySchema`, `updateUserSchema`, `completeOnboardingSchema`
 - Currency codes are uppercased via `.transform(v => v.toUpperCase())`
 
 ### UI

@@ -37,7 +37,8 @@ A user is uniquely identified by their email. Signing in with Google or email OT
 
 ## Email delivery (for OTP)
 
-- **Provider**: TBD (Resend, AWS SES, or SendGrid)
-- The OTP email should be simple: "Your Centavo code is: 123456. It expires in 10 minutes."
-- OTP codes expire after 10 minutes
-- Rate limit: max 5 OTP requests per email per hour
+- **Provider**: Resend (via `RESEND_API_KEY` env var)
+- From address: configurable via `EMAIL_FROM` env var, defaults to `Centavo <onboarding@resend.dev>`
+- HTML + plain text email templates in `src/lib/email-templates/otp-email.ts`
+- OTP codes expire after 5 minutes
+- Rate limit: max 5 OTP requests per email per hour (not yet implemented)

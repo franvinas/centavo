@@ -62,14 +62,24 @@
 - Select from supported ISO 4217 currencies
 - Changing base currency recalculates all existing `baseAmount` values
 
+## Onboarding
+
+On first sign-in, users who don't have a name set are redirected to `/onboarding`:
+
+- Collect display name (required)
+- Select base currency (grid of supported currencies, defaults to USD)
+- On submit, sets name + baseCurrency and redirects to `/dashboard`
+
 ## Pages / Routes
 
 | Route            | Description                                      |
 | ---------------- | ------------------------------------------------ |
 | `/`              | Landing / redirect to dashboard if logged in     |
 | `/auth/signin`   | Sign-in page (Google + email OTP)                |
+| `/onboarding`    | First-time setup (name + base currency)          |
 | `/dashboard`     | Main view: expense list with filters and summary |
 | `/expenses/new`  | Add new expense                                  |
 | `/expenses/[id]` | View/edit expense                                |
+| `/expenses`      | Full expense list with filters and pagination    |
 | `/categories`    | Manage categories                                |
 | `/settings`      | User profile and preferences                     |
