@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -34,6 +35,7 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
   const [name, setName] = useState("");
   const [color, setColor] = useState("#E67E22");
   const [icon, setIcon] = useState("UtensilsCrossed");
+  const t = useTranslations("categories");
 
   function openCreate() {
     setEditing(null);
@@ -81,11 +83,9 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-text-primary text-2xl font-semibold">
-            Categories
+            {t("title")}
           </h1>
-          <p className="text-text-secondary mt-1 text-sm">
-            Manage your expense categories
-          </p>
+          <p className="text-text-secondary mt-1 text-sm">{t("subtitle")}</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
@@ -94,30 +94,30 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
               className="bg-accent-primary hover:bg-accent-primary/90 text-white"
             >
               <Plus className="mr-1.5 h-4 w-4" />
-              Add
+              {t("add")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editing ? "Edit Category" : "New Category"}
+                {editing ? t("editCategory") : t("newCategory")}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-2">
               <Input
-                placeholder="Category name"
+                placeholder={t("namePlaceholder")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
               <div>
                 <p className="text-text-secondary mb-2 text-sm font-medium">
-                  Color
+                  {t("color")}
                 </p>
                 <ColorPicker value={color} onChange={setColor} />
               </div>
               <div>
                 <p className="text-text-secondary mb-2 text-sm font-medium">
-                  Icon
+                  {t("icon")}
                 </p>
                 <IconPicker value={icon} onChange={setIcon} color={color} />
               </div>
@@ -126,7 +126,7 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
                 disabled={!name.trim() || isPending}
                 className="bg-accent-primary hover:bg-accent-primary/90 w-full text-white"
               >
-                {isPending ? "Saving..." : editing ? "Update" : "Create"}
+                {isPending ? t("saving") : editing ? t("update") : t("create")}
               </Button>
             </div>
           </DialogContent>

@@ -3,19 +3,28 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { signOut } from "next-auth/react";
 import { updateUser } from "@/lib/actions/user";
+import { updateLocale } from "@/lib/actions/locale";
 import { CURRENCIES } from "@/lib/constants";
+import { locales, type Locale } from "@/i18n/config";
+
+const LOCALE_LABELS: Record<Locale, string> = {
+  en: "English",
+  es: "Español",
+};
 
 interface SettingsClientProps {
   user: {
     name: string;
     email: string;
     baseCurrency: string;
+    locale: string;
   };
 }
 
@@ -25,6 +34,7 @@ export function SettingsClient({ user }: SettingsClientProps) {
   const [name, setName] = useState(user.name);
   const [baseCurrency, setBaseCurrency] = useState(user.baseCurrency);
   const [saved, setSaved] = useState(false);
+  const t = useTranslations("settings");
 
   function handleSave() {
     startTransition(async () => {
@@ -35,13 +45,22 @@ export function SettingsClient({ user }: SettingsClientProps) {
     });
   }
 
+  function handleLocaleChange(locale: string) {
+    startTransition(async () => {
+      await updateLocale(locale);
+      router.refresh();
+    });
+  }
+
   const hasChanges = name !== user.name || baseCurrency !== user.baseCurrency;
 
   return (
     <div className="mx-auto max-w-lg space-y-6">
       <div>
-        <h1 className="text-text-primary text-2xl font-semibold">Settings</h1>
-        <p className="text-text-secondary mt-1 text-sm">Manage your account</p>
+        <h1 className="text-text-primary text-2xl font-semibold">
+          {t("title")}
+        </h1>
+        <p className="text-text-secondary mt-1 text-sm">{t("subtitle")}</p>
       </div>
 
       {/* Profile */}
@@ -67,11 +86,9 @@ export function SettingsClient({ user }: SettingsClientProps) {
       {/* Currency */}
       <div className="bg-bg-surface shadow-card rounded-lg p-6">
         <h2 className="text-text-primary mb-3 text-base font-semibold">
-          Base Currency
+          {t("baseCurrency")}
         </h2>
-        <p className="text-text-secondary mb-4 text-sm">
-          All expenses are converted to this currency for totals.
-        </p>
+        <p className="text-text-secondary mb-4 text-sm">{t("currencyHint")}</p>
         <div className="flex flex-wrap gap-2">
           {CURRENCIES.map((cur) => (
             <button
@@ -89,6 +106,30 @@ export function SettingsClient({ user }: SettingsClientProps) {
         </div>
       </div>
 
+      {/* Language */}
+      <div className="bg-bg-surface shadow-card rounded-lg p-6">
+        <h2 className="text-text-primary mb-3 text-base font-semibold">
+          {t("language")}
+        </h2>
+        <p className="text-text-secondary mb-4 text-sm">{t("languageHint")}</p>
+        <div className="flex flex-wrap gap-2">
+          {locales.map((loc) => (
+            <button
+              key={loc}
+              onClick={() => handleLocaleChange(loc)}
+              disabled={isPending}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                user.locale === loc
+                  ? "bg-accent-primary text-white"
+                  : "bg-bg-muted text-text-secondary hover:bg-border-subtle"
+              }`}
+            >
+              {LOCALE_LABELS[loc]}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Save */}
       {hasChanges && (
         <Button
@@ -96,7 +137,7 @@ export function SettingsClient({ user }: SettingsClientProps) {
           disabled={isPending}
           className="bg-accent-primary hover:bg-accent-primary/90 w-full text-white"
         >
-          {isPending ? "Saving..." : saved ? "Saved!" : "Save Changes"}
+          {isPending ? t("saving") : saved ? t("saved") : t("save")}
         </Button>
       )}
 
@@ -109,7 +150,7 @@ export function SettingsClient({ user }: SettingsClientProps) {
         onClick={() => signOut({ callbackUrl: "/auth/signin" })}
       >
         <LogOut className="mr-2 h-4 w-4" />
-        Sign Out
+        {t("signOut")}
       </Button>
     </div>
   );

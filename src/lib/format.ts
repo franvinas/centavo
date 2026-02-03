@@ -30,12 +30,27 @@ function diffInDays(dateString: string): number {
   );
 }
 
-export function formatRelativeDate(dateString: string): string {
+export interface DateLabels {
+  today: string;
+  yesterday: string;
+  daysAgo: (count: number) => string;
+}
+
+const defaultDateLabels: DateLabels = {
+  today: "Today",
+  yesterday: "Yesterday",
+  daysAgo: (count) => `${count} days ago`,
+};
+
+export function formatRelativeDate(
+  dateString: string,
+  labels: DateLabels = defaultDateLabels,
+): string {
   const days = diffInDays(dateString);
 
-  if (days === 0) return "Today";
-  if (days === 1) return "Yesterday";
-  if (days < 7) return `${days} days ago`;
+  if (days === 0) return labels.today;
+  if (days === 1) return labels.yesterday;
+  if (days < 7) return labels.daysAgo(days);
 
   const date = parseLocalDate(dateString);
   const now = new Date();
@@ -46,11 +61,14 @@ export function formatRelativeDate(dateString: string): string {
   });
 }
 
-export function formatDateGroup(dateString: string): string {
+export function formatDateGroup(
+  dateString: string,
+  labels: DateLabels = defaultDateLabels,
+): string {
   const days = diffInDays(dateString);
 
-  if (days === 0) return "Today";
-  if (days === 1) return "Yesterday";
+  if (days === 0) return labels.today;
+  if (days === 1) return labels.yesterday;
 
   const date = parseLocalDate(dateString);
   return date.toLocaleDateString("en-US", {

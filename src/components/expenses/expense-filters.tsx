@@ -1,6 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import type { Category } from "@/types";
 
@@ -27,13 +28,14 @@ export function ExpenseFilters({
   onDateToChange,
   categories,
 }: ExpenseFiltersProps) {
+  const t = useTranslations("expenses");
   return (
     <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap">
       {/* Search */}
       <div className="relative col-span-2 min-w-[180px] md:flex-1">
         <Search className="text-text-tertiary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
-          placeholder="Search expenses..."
+          placeholder={t("searchPlaceholder")}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pl-9"
@@ -46,7 +48,7 @@ export function ExpenseFilters({
         onChange={(e) => onCategoryChange(e.target.value)}
         className="border-input bg-bg-surface text-text-primary col-span-2 h-9 rounded-md border px-3 text-sm"
       >
-        <option value="">All categories</option>
+        <option value="">{t("allCategories")}</option>
         {categories.map((cat) => (
           <option key={cat.id} value={cat.id}>
             {cat.name}
@@ -56,7 +58,7 @@ export function ExpenseFilters({
 
       {/* Date range */}
       <label className="grid gap-1">
-        <span className="text-text-secondary text-xs">From</span>
+        <span className="text-text-secondary text-xs">{t("from")}</span>
         <Input
           type="date"
           value={dateFrom}
@@ -65,7 +67,7 @@ export function ExpenseFilters({
         />
       </label>
       <label className="grid gap-1">
-        <span className="text-text-secondary text-xs">To</span>
+        <span className="text-text-secondary text-xs">{t("to")}</span>
         <Input
           type="date"
           value={dateTo}

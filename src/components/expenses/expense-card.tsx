@@ -1,5 +1,12 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import type { Expense } from "@/types";
-import { formatCurrency, formatRelativeDate } from "@/lib/format";
+import {
+  formatCurrency,
+  formatRelativeDate,
+  type DateLabels,
+} from "@/lib/format";
 import Link from "next/link";
 
 interface ExpenseCardProps {
@@ -7,6 +14,14 @@ interface ExpenseCardProps {
 }
 
 export function ExpenseCard({ expense }: ExpenseCardProps) {
+  const t = useTranslations("dates");
+
+  const labels: DateLabels = {
+    today: t("today"),
+    yesterday: t("yesterday"),
+    daysAgo: (count: number) => t("daysAgo", { count }),
+  };
+
   return (
     <Link
       href={`/expenses/${expense.id}`}
@@ -24,7 +39,8 @@ export function ExpenseCard({ expense }: ExpenseCardProps) {
           {expense.description}
         </p>
         <p className="text-text-tertiary text-xs">
-          {expense.category.name} &middot; {formatRelativeDate(expense.date)}
+          {expense.category.name} &middot;{" "}
+          {formatRelativeDate(expense.date, labels)}
         </p>
       </div>
 

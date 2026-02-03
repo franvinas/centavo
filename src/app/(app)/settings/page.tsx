@@ -14,6 +14,7 @@ export default async function SettingsPage() {
         name: user.name ?? "",
         email: user.email,
         baseCurrency: user.baseCurrency,
+        locale: user.locale,
       }}
     />
   );

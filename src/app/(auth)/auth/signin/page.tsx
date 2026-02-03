@@ -1,23 +1,29 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useTransition,
+  Suspense,
+} from "react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { OTPInput } from "@/components/ui/otp-input";
-import { Mail, ArrowLeft, Loader2 } from "lucide-react";
+import { Mail, ArrowLeft, Loader2, Globe } from "lucide-react";
+import { updateLocale } from "@/lib/actions/locale";
+import { locales, type Locale } from "@/i18n/config";
 
 const RESEND_COOLDOWN = 60;
 
-const ERROR_MESSAGES: Record<string, string> = {
-  Verification:
-    "That code is invalid or has expired. Please request a new one.",
-  OAuthAccountNotLinked:
-    "This email is already associated with another sign-in method.",
-  Default: "Something went wrong. Please try again.",
+const LOCALE_LABELS: Record<Locale, string> = {
+  en: "EN",
+  es: "ES",
 };
 
 export default function SignInPage() {
@@ -31,7 +37,17 @@ export default function SignInPage() {
 function SignInContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const t = useTranslations("auth");
+  const currentLocale = useLocale();
+  const [isLocaleChanging, startLocaleTransition] = useTransition();
   const errorType = searchParams.get("error");
+
+  const ERROR_MESSAGES: Record<string, string> = {
+    Verification: t("errorVerification"),
+    OAuthAccountNotLinked: t("errorOAuthLinked"),
+    Default: t("errorDefault"),
+  };
+
   const errorMessage = errorType
     ? (ERROR_MESSAGES[errorType] ?? ERROR_MESSAGES.Default)
     : null;
@@ -79,15 +95,15 @@ function SignInContent() {
           router.push("/dashboard");
           router.refresh();
         } else {
-          setOtpError("Invalid or expired code. Please try again.");
+          setOtpError(t("errorInvalidCode"));
           setVerifying(false);
         }
       } catch {
-        setOtpError("Something went wrong. Please try again.");
+        setOtpError(t("errorDefault"));
         setVerifying(false);
       }
     },
-    [email, router],
+    [email, router, t],
   );
 
   function handleOtpChange(value: string) {
@@ -116,6 +132,32 @@ function SignInContent() {
 
   return (
     <div className="bg-bg-primary flex min-h-screen items-center justify-center px-6">
+      {/* Language switcher */}
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-1">
+        <Globe className="text-text-tertiary h-4 w-4" />
+        {locales.map((loc) => (
+          <button
+            key={loc}
+            onClick={() => {
+              if (loc !== currentLocale) {
+                startLocaleTransition(async () => {
+                  await updateLocale(loc);
+                  router.refresh();
+                });
+              }
+            }}
+            disabled={isLocaleChanging}
+            className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+              currentLocale === loc
+                ? "bg-accent-primary text-white"
+                : "text-text-secondary hover:bg-bg-muted hover:text-text-primary"
+            }`}
+          >
+            {LOCALE_LABELS[loc]}
+          </button>
+        ))}
+      </div>
+
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
@@ -127,11 +169,9 @@ function SignInContent() {
             className="rounded-xl"
           />
           <h1 className="text-text-primary mt-4 text-2xl font-semibold">
-            Welcome to Centavo
+            {t("welcome")}
           </h1>
-          <p className="text-text-secondary mt-1 text-sm">
-            Track your expenses with ease
-          </p>
+          <p className="text-text-secondary mt-1 text-sm">{t("tagline")}</p>
         </div>
 
         {errorMessage && !emailSent && (
@@ -145,10 +185,10 @@ function SignInContent() {
             <div className="text-center">
               <Mail className="text-accent-primary mx-auto h-10 w-10" />
               <h2 className="text-text-primary mt-3 text-lg font-semibold">
-                Enter verification code
+                {t("enterCode")}
               </h2>
               <p className="text-text-secondary mt-1 text-sm">
-                We sent a 6-digit code to {email}
+                {t("codeSent", { email })}
               </p>
 
               <div className="mt-6">
@@ -162,7 +202,7 @@ function SignInContent() {
               {verifying && (
                 <div className="text-text-secondary mt-4 flex items-center justify-center gap-2 text-sm">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Verifying...
+                  {t("verifying")}
                 </div>
               )}
 
@@ -178,14 +218,16 @@ function SignInContent() {
                   disabled={cooldown > 0}
                   className="w-full text-sm"
                 >
-                  {cooldown > 0 ? `Resend code in ${cooldown}s` : "Resend code"}
+                  {cooldown > 0
+                    ? t("resendIn", { seconds: cooldown })
+                    : t("resendCode")}
                 </Button>
                 <button
                   onClick={handleBack}
                   className="text-text-secondary hover:text-text-primary inline-flex items-center gap-1 text-sm"
                 >
                   <ArrowLeft className="h-3 w-3" />
-                  Use a different email
+                  {t("differentEmail")}
                 </button>
               </div>
             </div>
@@ -216,12 +258,12 @@ function SignInContent() {
                     fill="#EA4335"
                   />
                 </svg>
-                Continue with Google
+                {t("continueGoogle")}
               </Button>
 
               <div className="my-4 flex items-center gap-3">
                 <Separator className="bg-border-subtle flex-1" />
-                <span className="text-text-tertiary text-xs">or</span>
+                <span className="text-text-tertiary text-xs">{t("or")}</span>
                 <Separator className="bg-border-subtle flex-1" />
               </div>
 
@@ -229,7 +271,7 @@ function SignInContent() {
               <form onSubmit={handleEmail} className="space-y-3">
                 <Input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t("emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -239,7 +281,7 @@ function SignInContent() {
                   disabled={loading || !email}
                   className="bg-accent-primary hover:bg-accent-primary/90 w-full text-white"
                 >
-                  Continue with Email
+                  {t("continueEmail")}
                 </Button>
               </form>
             </>

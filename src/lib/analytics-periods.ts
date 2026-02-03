@@ -1,15 +1,15 @@
 export interface PeriodPreset {
   key: string;
-  label: string;
+  labelKey: string;
 }
 
 export const PERIOD_PRESETS: PeriodPreset[] = [
-  { key: "this-month", label: "This Month" },
-  { key: "last-3-months", label: "Last 3 Months" },
-  { key: "last-6-months", label: "Last 6 Months" },
-  { key: "last-12-months", label: "Last 12 Months" },
-  { key: "this-year", label: "This Year" },
-  { key: "custom", label: "Custom Range" },
+  { key: "this-month", labelKey: "periods.thisMonth" },
+  { key: "last-3-months", labelKey: "periods.last3Months" },
+  { key: "last-6-months", labelKey: "periods.last6Months" },
+  { key: "last-12-months", labelKey: "periods.last12Months" },
+  { key: "this-year", labelKey: "periods.thisYear" },
+  { key: "custom", labelKey: "periods.customRange" },
 ];
 
 export interface DateRange {

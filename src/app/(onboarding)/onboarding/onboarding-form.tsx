@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Wallet } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { completeOnboarding } from "@/lib/actions/onboarding";
 import { CURRENCIES } from "@/lib/constants";
 
@@ -9,6 +10,7 @@ export function OnboardingForm() {
   const [name, setName] = useState("");
   const [currency, setCurrency] = useState("USD");
   const [isPending, startTransition] = useTransition();
+  const t = useTranslations("onboarding");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,10 +27,10 @@ export function OnboardingForm() {
         </div>
 
         <h1 className="text-text-primary mt-4 text-center text-[28px] leading-tight font-bold">
-          Welcome to Centavo
+          {t("title")}
         </h1>
         <p className="text-text-secondary mt-1 text-center text-base">
-          Let&apos;s set up your account
+          {t("subtitle")}
         </p>
 
         <div className="bg-bg-surface shadow-card mt-6 w-full rounded-2xl p-6">
@@ -38,7 +40,7 @@ export function OnboardingForm() {
                 htmlFor="name"
                 className="text-text-primary text-sm font-semibold"
               >
-                What should we call you?
+                {t("nameLabel")}
               </label>
               <input
                 id="name"
@@ -46,17 +48,17 @@ export function OnboardingForm() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Your name"
+                placeholder={t("namePlaceholder")}
                 className="border-border-subtle bg-bg-primary text-text-primary placeholder:text-text-tertiary focus:border-accent-primary h-12 w-full rounded-xl border px-4 text-base focus:outline-none"
               />
             </div>
 
             <div className="space-y-2">
               <label className="text-text-primary text-sm font-semibold">
-                Base currency
+                {t("currencyLabel")}
               </label>
               <p className="text-text-tertiary text-[13px]">
-                All expenses will be converted to this currency
+                {t("currencyHint")}
               </p>
               <div className="grid grid-cols-4 gap-2">
                 {CURRENCIES.map((code) => (
@@ -83,7 +85,7 @@ export function OnboardingForm() {
           disabled={isPending || !name.trim()}
           className="bg-accent-primary shadow-fab mt-6 h-[52px] w-full rounded-[14px] text-base font-semibold text-white transition-opacity disabled:opacity-50"
         >
-          {isPending ? "Setting up..." : "Get Started"}
+          {isPending ? t("submitting") : t("submit")}
         </button>
       </div>
     </form>

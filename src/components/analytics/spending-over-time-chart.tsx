@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import { useTranslations } from "next-intl";
 import type { TimeSeriesPoint } from "@/types/analytics";
 import { formatCurrency } from "@/lib/format";
 
@@ -55,10 +56,12 @@ export function SpendingOverTimeChart({
   baseCurrency,
   onBarClick,
 }: SpendingOverTimeChartProps) {
+  const t = useTranslations("analytics");
+
   if (data.length === 0) {
     return (
       <p className="text-text-tertiary py-12 text-center text-sm">
-        No spending data for this period.
+        {t("noSpendingData")}
       </p>
     );
   }

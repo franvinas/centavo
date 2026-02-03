@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { formatCurrency } from "@/lib/format";
 import { MetricCard } from "@/components/expenses/metric-card";
 import { ExpenseList } from "@/components/expenses/expense-list";
@@ -15,6 +16,7 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/signin");
+  const t = await getTranslations("dashboard");
 
   const hasExpenses = await hasAnyExpenses(user.id);
   if (!hasExpenses) {
@@ -38,20 +40,21 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-text-primary text-2xl font-semibold">
-          Good morning, {user.name ?? "there"}
+          {t("greeting", { name: user.name ?? "there" })}
         </h1>
-        <p className="text-text-secondary mt-1 text-sm">
-          Here&apos;s your expense overview
-        </p>
+        <p className="text-text-secondary mt-1 text-sm">{t("overview")}</p>
       </div>
 
       <MetricCard
-        label="Total Spent"
+        label={t("totalSpent")}
         value={formatCurrency(totalSpent, user.baseCurrency)}
         trend={
           lastMonthTotal > 0
             ? {
-                value: `${Math.abs(spendDiff)}% ${spendDiff <= 0 ? "less" : "more"} than last month`,
+                value:
+                  spendDiff <= 0
+                    ? t("lessLastMonth", { value: Math.abs(spendDiff) })
+                    : t("moreLastMonth", { value: Math.abs(spendDiff) }),
                 positive: spendDiff <= 0,
               }
             : undefined
@@ -62,13 +65,13 @@ export default async function DashboardPage() {
         <div className="bg-bg-surface shadow-card rounded-lg p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-text-primary text-base font-semibold">
-              By Category
+              {t("byCategory")}
             </h2>
             <Link
               href="/categories"
               className="text-accent-primary text-xs font-medium"
             >
-              All categories
+              {t("allCategories")}
             </Link>
           </div>
           <CategoryBreakdown expenses={expenses} />
@@ -77,18 +80,18 @@ export default async function DashboardPage() {
         <div className="bg-bg-surface shadow-card rounded-lg p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-text-primary text-base font-semibold">
-              Recent Expenses
+              {t("recentExpenses")}
             </h2>
             <Link
               href="/expenses"
               className="text-accent-primary text-xs font-medium"
             >
-              View all
+              {t("viewAll")}
             </Link>
           </div>
           {expenses.length === 0 ? (
             <p className="text-text-tertiary py-8 text-center text-sm">
-              No expenses this month. Tap + to add one.
+              {t("noExpensesMonth")}
             </p>
           ) : (
             <ExpenseList expenses={expenses.slice(0, 8)} />

@@ -1,0 +1,135 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "allExpenses": "Todos los gastos",
+    "categories": "Categorías",
+    "analytics": "Análisis",
+    "settings": "Ajustes"
+  },
+  "auth": {
+    "welcome": "Bienvenido a Centavo",
+    "tagline": "Controla tus gastos con facilidad",
+    "continueGoogle": "Continuar con Google",
+    "continueEmail": "Continuar con Email",
+    "or": "o",
+    "emailPlaceholder": "Ingresa tu email",
+    "enterCode": "Ingresa el código de verificación",
+    "codeSent": "Enviamos un código de 6 dígitos a {email}",
+    "verifying": "Verificando...",
+    "resendCode": "Reenviar código",
+    "resendIn": "Reenviar código en {seconds}s",
+    "differentEmail": "Usar otro email",
+    "errorVerification": "Ese código es inválido o ha expirado. Por favor solicita uno nuevo.",
+    "errorOAuthLinked": "Este email ya está asociado con otro método de inicio de sesión.",
+    "errorDefault": "Algo salió mal. Por favor intenta de nuevo.",
+    "errorInvalidCode": "Código inválido o expirado. Por favor intenta de nuevo."
+  },
+  "onboarding": {
+    "title": "Bienvenido a Centavo",
+    "subtitle": "Configuremos tu cuenta",
+    "nameLabel": "¿Cómo te llamamos?",
+    "namePlaceholder": "Tu nombre",
+    "currencyLabel": "Moneda base",
+    "currencyHint": "Todos los gastos se convertirán a esta moneda",
+    "submit": "Comenzar",
+    "submitting": "Configurando..."
+  },
+  "dashboard": {
+    "greeting": "Buenos días, {name}",
+    "overview": "Resumen de tus gastos",
+    "totalSpent": "Total gastado",
+    "lessLastMonth": "{value}% menos que el mes pasado",
+    "moreLastMonth": "{value}% más que el mes pasado",
+    "byCategory": "Por categoría",
+    "allCategories": "Todas las categorías",
+    "recentExpenses": "Gastos recientes",
+    "viewAll": "Ver todos",
+    "noExpensesMonth": "Sin gastos este mes. Toca + para agregar uno.",
+    "emptyWelcome": "¡Bienvenido, {name}!",
+    "emptySubtitle": "Comienza a registrar tus gastos hoy",
+    "emptyTitle": "Agrega tu primer gasto",
+    "emptyDescription": "Toca el botón de abajo para empezar a registrar a dónde va tu dinero",
+    "addExpense": "Agregar gasto"
+  },
+  "expenses": {
+    "title": "Todos los gastos",
+    "found": "{count, plural, =1 {# gasto encontrado} other {# gastos encontrados}}",
+    "noExpenses": "No se encontraron gastos",
+    "searchPlaceholder": "Buscar gastos...",
+    "allCategories": "Todas las categorías",
+    "from": "Desde",
+    "to": "Hasta",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "page": "Página {page} de {totalPages}",
+    "addExpense": "Agregar gasto",
+    "editExpense": "Editar gasto",
+    "description": "Descripción",
+    "notesPlaceholder": "Notas (opcional)",
+    "category": "Categoría",
+    "more": "Más",
+    "saveExpense": "Guardar gasto",
+    "updateExpense": "Actualizar gasto",
+    "deleteExpense": "Eliminar gasto",
+    "saving": "Guardando..."
+  },
+  "categories": {
+    "title": "Categorías",
+    "subtitle": "Administra tus categorías de gastos",
+    "add": "Agregar",
+    "newCategory": "Nueva categoría",
+    "editCategory": "Editar categoría",
+    "namePlaceholder": "Nombre de categoría",
+    "color": "Color",
+    "icon": "Ícono",
+    "create": "Crear",
+    "update": "Actualizar",
+    "saving": "Guardando..."
+  },
+  "analytics": {
+    "title": "Análisis",
+    "subtitle": "Información y tendencias de gastos",
+    "noExpenses": "Aún no hay gastos. Agrega algunos gastos para ver tu análisis.",
+    "spendingOverTime": "Gastos en el tiempo",
+    "noSpendingData": "Sin datos de gastos para este período.",
+    "byCategory": "Por categoría",
+    "byCurrency": "Por moneda",
+    "totalSpent": "Total gastado",
+    "transactions": "Transacciones",
+    "dailyAverage": "Promedio diario",
+    "period": "Período"
+  },
+  "periods": {
+    "thisMonth": "Este mes",
+    "last3Months": "Últimos 3 meses",
+    "last6Months": "Últimos 6 meses",
+    "last12Months": "Últimos 12 meses",
+    "thisYear": "Este año",
+    "customRange": "Rango personalizado"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "subtitle": "Administra tu cuenta",
+    "baseCurrency": "Moneda base",
+    "currencyHint": "Todos los gastos se convierten a esta moneda para los totales.",
+    "language": "Idioma",
+    "languageHint": "Elige tu idioma preferido.",
+    "save": "Guardar cambios",
+    "saving": "Guardando...",
+    "saved": "¡Guardado!",
+    "signOut": "Cerrar sesión"
+  },
+  "dates": {
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "daysAgo": "hace {count} días"
+  },
+  "metadata": {
+    "description": "Rastreador personal de gastos"
+  },
+  "common": {
+    "expense": "gasto",
+    "expenses": "gastos"
+  }
+}

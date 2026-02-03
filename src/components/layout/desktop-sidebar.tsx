@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { desktopNavItems, desktopBottomNavItems } from "@/lib/nav-config";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -13,6 +14,7 @@ interface DesktopSidebarProps {
 
 export function DesktopSidebar({ user }: DesktopSidebarProps) {
   const pathname = usePathname();
+  const t = useTranslations();
   const displayName = user?.name || "User";
   const initial = displayName.charAt(0).toUpperCase();
 
@@ -45,7 +47,7 @@ export function DesktopSidebar({ user }: DesktopSidebarProps) {
               }`}
             >
               <item.icon className="h-5 w-5" />
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           );
         })}
@@ -66,7 +68,7 @@ export function DesktopSidebar({ user }: DesktopSidebarProps) {
               }`}
             >
               <item.icon className="h-5 w-5" />
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           );
         })}

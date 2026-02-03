@@ -9,7 +9,8 @@ import {
 
 // groupBy has complex overloaded types that don't work with mockDeep
 const mockExpenseGroupBy = vi.fn();
-(prismaMock.expense as never).groupBy = mockExpenseGroupBy;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(prismaMock.expense as any).groupBy = mockExpenseGroupBy;
 
 const params = {
   userId: "user-1",

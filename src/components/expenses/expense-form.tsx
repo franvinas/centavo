@@ -10,6 +10,7 @@ import {
   ChevronDown,
   Trash2,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CategoryChip } from "./category-chip";
@@ -56,6 +57,7 @@ export function ExpenseForm({
   const [notes, setNotes] = useState(expense?.notes ?? "");
   const [categoryId, setCategoryId] = useState(expense?.categoryId ?? "");
   const [showAllCategories, setShowAllCategories] = useState(false);
+  const t = useTranslations("expenses");
 
   const visibleCategories = showAllCategories
     ? categories
@@ -104,7 +106,7 @@ export function ExpenseForm({
           <X className="text-text-primary h-6 w-6" />
         </button>
         <h1 className="text-text-primary text-base font-semibold">
-          {expense ? "Edit Expense" : "Add Expense"}
+          {expense ? t("editExpense") : t("addExpense")}
         </h1>
         <div className="w-6" />
       </div>
@@ -166,7 +168,7 @@ export function ExpenseForm({
           <div className="flex items-center gap-3">
             <FileText className="text-text-tertiary h-5 w-5 shrink-0" />
             <Input
-              placeholder="Description"
+              placeholder={t("description")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="border-border-subtle border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
@@ -184,7 +186,7 @@ export function ExpenseForm({
           <div className="flex items-center gap-3">
             <StickyNote className="text-text-tertiary h-5 w-5 shrink-0" />
             <Input
-              placeholder="Notes (optional)"
+              placeholder={t("notesPlaceholder")}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="border-border-subtle border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
@@ -195,7 +197,7 @@ export function ExpenseForm({
         {/* Category selector */}
         <div className="mt-6">
           <p className="text-text-secondary mb-3 text-sm font-medium">
-            Category
+            {t("category")}
           </p>
           <div className="grid grid-cols-4 gap-2">
             {visibleCategories.map((cat) => (
@@ -213,7 +215,7 @@ export function ExpenseForm({
               onClick={() => setShowAllCategories(true)}
               className="text-accent-primary mt-2 text-sm font-medium"
             >
-              More
+              {t("more")}
             </button>
           )}
         </div>
@@ -227,10 +229,10 @@ export function ExpenseForm({
           className="bg-accent-primary hover:bg-accent-primary/90 h-14 w-full rounded-md text-base font-semibold text-white disabled:opacity-50"
         >
           {isPending
-            ? "Saving..."
+            ? t("saving")
             : expense
-              ? "Update Expense"
-              : "Save Expense"}
+              ? t("updateExpense")
+              : t("saveExpense")}
         </Button>
         {expense && (
           <Button
@@ -240,7 +242,7 @@ export function ExpenseForm({
             className="text-status-negative hover:bg-status-negative/10 hover:text-status-negative mt-3 h-12 w-full text-base font-semibold"
           >
             <Trash2 className="mr-2 h-5 w-5" />
-            Delete Expense
+            {t("deleteExpense")}
           </Button>
         )}
       </div>

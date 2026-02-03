@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import type { AnalyticsSummary } from "@/types/analytics";
 import { formatCurrency } from "@/lib/format";
 
@@ -7,17 +10,19 @@ interface SummaryCardsProps {
 }
 
 export function SummaryCards({ summary, baseCurrency }: SummaryCardsProps) {
+  const t = useTranslations("analytics");
+
   const cards = [
     {
-      label: "Total Spent",
+      label: t("totalSpent"),
       value: formatCurrency(summary.totalSpent, baseCurrency),
     },
     {
-      label: "Transactions",
+      label: t("transactions"),
       value: summary.transactionCount.toString(),
     },
     {
-      label: "Daily Average",
+      label: t("dailyAverage"),
       value: formatCurrency(summary.dailyAverage, baseCurrency),
     },
   ];

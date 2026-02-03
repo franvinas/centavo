@@ -1,0 +1,135 @@
+{
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "allExpenses": "All Expenses",
+    "categories": "Categories",
+    "analytics": "Analytics",
+    "settings": "Settings"
+  },
+  "auth": {
+    "welcome": "Welcome to Centavo",
+    "tagline": "Track your expenses with ease",
+    "continueGoogle": "Continue with Google",
+    "continueEmail": "Continue with Email",
+    "or": "or",
+    "emailPlaceholder": "Enter your email",
+    "enterCode": "Enter verification code",
+    "codeSent": "We sent a 6-digit code to {email}",
+    "verifying": "Verifying...",
+    "resendCode": "Resend code",
+    "resendIn": "Resend code in {seconds}s",
+    "differentEmail": "Use a different email",
+    "errorVerification": "That code is invalid or has expired. Please request a new one.",
+    "errorOAuthLinked": "This email is already associated with another sign-in method.",
+    "errorDefault": "Something went wrong. Please try again.",
+    "errorInvalidCode": "Invalid or expired code. Please try again."
+  },
+  "onboarding": {
+    "title": "Welcome to Centavo",
+    "subtitle": "Let's set up your account",
+    "nameLabel": "What should we call you?",
+    "namePlaceholder": "Your name",
+    "currencyLabel": "Base currency",
+    "currencyHint": "All expenses will be converted to this currency",
+    "submit": "Get Started",
+    "submitting": "Setting up..."
+  },
+  "dashboard": {
+    "greeting": "Good morning, {name}",
+    "overview": "Here's your expense overview",
+    "totalSpent": "Total Spent",
+    "lessLastMonth": "{value}% less than last month",
+    "moreLastMonth": "{value}% more than last month",
+    "byCategory": "By Category",
+    "allCategories": "All categories",
+    "recentExpenses": "Recent Expenses",
+    "viewAll": "View all",
+    "noExpensesMonth": "No expenses this month. Tap + to add one.",
+    "emptyWelcome": "Welcome, {name}!",
+    "emptySubtitle": "Start tracking your expenses today",
+    "emptyTitle": "Add your first expense",
+    "emptyDescription": "Tap the button below to start tracking where your money goes",
+    "addExpense": "Add Expense"
+  },
+  "expenses": {
+    "title": "All Expenses",
+    "found": "{count, plural, =1 {# expense} other {# expenses}} found",
+    "noExpenses": "No expenses found",
+    "searchPlaceholder": "Search expenses...",
+    "allCategories": "All categories",
+    "from": "From",
+    "to": "To",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {totalPages}",
+    "addExpense": "Add Expense",
+    "editExpense": "Edit Expense",
+    "description": "Description",
+    "notesPlaceholder": "Notes (optional)",
+    "category": "Category",
+    "more": "More",
+    "saveExpense": "Save Expense",
+    "updateExpense": "Update Expense",
+    "deleteExpense": "Delete Expense",
+    "saving": "Saving..."
+  },
+  "categories": {
+    "title": "Categories",
+    "subtitle": "Manage your expense categories",
+    "add": "Add",
+    "newCategory": "New Category",
+    "editCategory": "Edit Category",
+    "namePlaceholder": "Category name",
+    "color": "Color",
+    "icon": "Icon",
+    "create": "Create",
+    "update": "Update",
+    "saving": "Saving..."
+  },
+  "analytics": {
+    "title": "Analytics",
+    "subtitle": "Spending insights and trends",
+    "noExpenses": "No expenses yet. Add some expenses to see your analytics.",
+    "spendingOverTime": "Spending Over Time",
+    "noSpendingData": "No spending data for this period.",
+    "byCategory": "By Category",
+    "byCurrency": "By Currency",
+    "totalSpent": "Total Spent",
+    "transactions": "Transactions",
+    "dailyAverage": "Daily Average",
+    "period": "Period"
+  },
+  "periods": {
+    "thisMonth": "This Month",
+    "last3Months": "Last 3 Months",
+    "last6Months": "Last 6 Months",
+    "last12Months": "Last 12 Months",
+    "thisYear": "This Year",
+    "customRange": "Custom Range"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account",
+    "baseCurrency": "Base Currency",
+    "currencyHint": "All expenses are converted to this currency for totals.",
+    "language": "Language",
+    "languageHint": "Choose your preferred language.",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "saved": "Saved!",
+    "signOut": "Sign Out"
+  },
+  "dates": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{count} days ago"
+  },
+  "metadata": {
+    "description": "Personal expense tracker"
+  },
+  "common": {
+    "expense": "expense",
+    "expenses": "expenses"
+  }
+}

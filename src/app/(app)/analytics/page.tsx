@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { getCurrentUser } from "@/lib/data/user";
 import { hasAnyExpenses } from "@/lib/data/onboarding";
 import { getDateRange } from "@/lib/analytics-periods";
@@ -19,6 +20,7 @@ export default async function AnalyticsPage({
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/signin");
+  const t = await getTranslations("analytics");
 
   const params = await searchParams;
   const period =
@@ -33,16 +35,12 @@ export default async function AnalyticsPage({
       <div className="space-y-6">
         <div>
           <h1 className="text-text-primary text-2xl font-semibold">
-            Analytics
+            {t("title")}
           </h1>
-          <p className="text-text-secondary mt-1 text-sm">
-            Spending insights and trends
-          </p>
+          <p className="text-text-secondary mt-1 text-sm">{t("subtitle")}</p>
         </div>
         <div className="bg-bg-surface shadow-card rounded-lg p-8 text-center">
-          <p className="text-text-tertiary text-sm">
-            No expenses yet. Add some expenses to see your analytics.
-          </p>
+          <p className="text-text-tertiary text-sm">{t("noExpenses")}</p>
         </div>
       </div>
     );

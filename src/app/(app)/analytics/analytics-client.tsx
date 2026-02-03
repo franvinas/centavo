@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import type { AnalyticsData } from "@/types/analytics";
 import { PeriodSelector } from "@/components/analytics/period-selector";
 import { SummaryCards } from "@/components/analytics/summary-cards";
@@ -32,6 +33,7 @@ export function AnalyticsClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const t = useTranslations("analytics");
 
   const updateParams = useCallback(
     (updates: Record<string, string>) => {
@@ -66,16 +68,16 @@ export function AnalyticsClient({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-text-primary text-2xl font-semibold">Analytics</h1>
-        <p className="text-text-secondary mt-1 text-sm">
-          Spending insights and trends
-        </p>
+        <h1 className="text-text-primary text-2xl font-semibold">
+          {t("title")}
+        </h1>
+        <p className="text-text-secondary mt-1 text-sm">{t("subtitle")}</p>
       </div>
 
       <div className="bg-bg-surface shadow-card rounded-lg p-5">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-text-primary text-base font-semibold">
-            Spending Over Time
+            {t("spendingOverTime")}
           </h2>
           <PeriodSelector
             period={currentTimePeriod}
@@ -127,7 +129,7 @@ export function AnalyticsClient({
       <div className="grid gap-6 md:grid-cols-2">
         <div className="bg-bg-surface shadow-card rounded-lg p-5">
           <h2 className="text-text-primary mb-4 text-base font-semibold">
-            By Category
+            {t("byCategory")}
           </h2>
           {isPending ? (
             <PieChartSkeleton />
@@ -141,7 +143,7 @@ export function AnalyticsClient({
 
         <div className="bg-bg-surface shadow-card rounded-lg p-5">
           <h2 className="text-text-primary mb-4 text-base font-semibold">
-            By Currency
+            {t("byCurrency")}
           </h2>
           {isPending ? (
             <ListSkeleton rows={3} />

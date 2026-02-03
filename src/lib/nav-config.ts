@@ -9,25 +9,25 @@ import {
 } from "lucide-react";
 
 export interface NavItem {
-  label: string;
+  labelKey: string;
   href: string;
   icon: LucideIcon;
 }
 
 export const mobileNavItems: NavItem[] = [
-  { label: "Home", href: "/dashboard", icon: Home },
-  { label: "Analytics", href: "/analytics", icon: BarChart3 },
-  { label: "Categories", href: "/categories", icon: Grid3X3 },
-  { label: "Settings", href: "/settings", icon: Settings },
+  { labelKey: "nav.home", href: "/dashboard", icon: Home },
+  { labelKey: "nav.analytics", href: "/analytics", icon: BarChart3 },
+  { labelKey: "nav.categories", href: "/categories", icon: Grid3X3 },
+  { labelKey: "nav.settings", href: "/settings", icon: Settings },
 ];
 
 export const desktopNavItems: NavItem[] = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "All Expenses", href: "/expenses", icon: List },
-  { label: "Categories", href: "/categories", icon: Grid3X3 },
-  { label: "Analytics", href: "/analytics", icon: BarChart3 },
+  { labelKey: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { labelKey: "nav.allExpenses", href: "/expenses", icon: List },
+  { labelKey: "nav.categories", href: "/categories", icon: Grid3X3 },
+  { labelKey: "nav.analytics", href: "/analytics", icon: BarChart3 },
 ];
 
 export const desktopBottomNavItems: NavItem[] = [
-  { label: "Settings", href: "/settings", icon: Settings },
+  { labelKey: "nav.settings", href: "/settings", icon: Settings },
 ];

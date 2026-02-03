@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { mobileNavItems } from "@/lib/nav-config";
 
 export function MobileNav() {
   const pathname = usePathname();
+  const t = useTranslations();
 
   // Split items evenly around the center FAB
   const half = Math.ceil(mobileNavItems.length / 2);
@@ -20,7 +22,7 @@ export function MobileNav() {
           <NavTab
             key={item.href}
             href={item.href}
-            label={item.label}
+            label={t(item.labelKey)}
             icon={item.icon}
             active={pathname === item.href}
           />
@@ -40,7 +42,7 @@ export function MobileNav() {
           <NavTab
             key={item.href}
             href={item.href}
-            label={item.label}
+            label={t(item.labelKey)}
             icon={item.icon}
             active={pathname === item.href}
           />

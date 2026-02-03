@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { PERIOD_PRESETS } from "@/lib/analytics-periods";
 import { Input } from "@/components/ui/input";
 
@@ -22,10 +23,15 @@ export function PeriodSelector({
   onCustomToChange,
   exclude,
 }: PeriodSelectorProps) {
+  const t = useTranslations();
+  const tAnalytics = useTranslations("analytics");
+  const tExpenses = useTranslations("expenses");
   return (
     <div className="flex flex-wrap items-end gap-3">
       <div>
-        <label className="text-text-secondary mb-1 block text-xs">Period</label>
+        <label className="text-text-secondary mb-1 block text-xs">
+          {tAnalytics("period")}
+        </label>
         <select
           value={period}
           onChange={(e) => onPeriodChange(e.target.value)}
@@ -33,7 +39,7 @@ export function PeriodSelector({
         >
           {PERIOD_PRESETS.filter((p) => !exclude?.includes(p.key)).map((p) => (
             <option key={p.key} value={p.key}>
-              {p.label}
+              {t(p.labelKey)}
             </option>
           ))}
         </select>
@@ -42,7 +48,9 @@ export function PeriodSelector({
       {period === "custom" && (
         <>
           <label className="grid gap-1">
-            <span className="text-text-secondary text-xs">From</span>
+            <span className="text-text-secondary text-xs">
+              {tExpenses("from")}
+            </span>
             <Input
               type="date"
               value={customFrom}
@@ -51,7 +59,9 @@ export function PeriodSelector({
             />
           </label>
           <label className="grid gap-1">
-            <span className="text-text-secondary text-xs">To</span>
+            <span className="text-text-secondary text-xs">
+              {tExpenses("to")}
+            </span>
             <Input
               type="date"
               value={customTo}

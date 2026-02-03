@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { CirclePlus } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-export function EmptyStateDashboard({ userName }: { userName: string }) {
+export async function EmptyStateDashboard({ userName }: { userName: string }) {
+  const t = await getTranslations("dashboard");
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-text-primary text-2xl font-bold">
-          Welcome, {userName}!
+          {t("emptyWelcome", { name: userName })}
         </h1>
         <p className="text-text-secondary mt-1 text-[15px]">
-          Start tracking your expenses today
+          {t("emptySubtitle")}
         </p>
       </div>
 
@@ -18,16 +20,16 @@ export function EmptyStateDashboard({ userName }: { userName: string }) {
           <CirclePlus className="text-accent-primary h-7 w-7" />
         </div>
         <h2 className="text-text-primary text-lg font-semibold">
-          Add your first expense
+          {t("emptyTitle")}
         </h2>
         <p className="text-text-secondary text-center text-sm">
-          Tap the button below to start tracking where your money goes
+          {t("emptyDescription")}
         </p>
         <Link
           href="/expenses/new"
           className="bg-accent-primary shadow-fab flex h-12 w-full items-center justify-center rounded-xl text-[15px] font-semibold text-white"
         >
-          Add Expense
+          {t("addExpense")}
         </Link>
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { ExpenseFilters } from "@/components/expenses/expense-filters";
 import { ExpenseList } from "@/components/expenses/expense-list";
 import type { Expense, Category } from "@/types";
@@ -23,6 +24,7 @@ export function ExpensesClient({
 }: ExpensesClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("expenses");
 
   const updateParam = useCallback(
     (key: string, value: string) => {
@@ -42,10 +44,10 @@ export function ExpensesClient({
     <div className="space-y-6">
       <div>
         <h1 className="text-text-primary text-2xl font-semibold">
-          All Expenses
+          {t("title")}
         </h1>
         <p className="text-text-secondary mt-1 text-sm">
-          {total} expense{total !== 1 ? "s" : ""} found
+          {t("found", { count: total })}
         </p>
       </div>
 
@@ -64,7 +66,7 @@ export function ExpensesClient({
       <div className="bg-bg-surface shadow-card rounded-lg p-5">
         {expenses.length === 0 ? (
           <p className="text-text-tertiary py-8 text-center text-sm">
-            No expenses found
+            {t("noExpenses")}
           </p>
         ) : (
           <ExpenseList expenses={expenses} />
@@ -82,10 +84,10 @@ export function ExpensesClient({
             disabled={page <= 1}
             className="text-accent-primary disabled:text-text-tertiary text-sm font-medium"
           >
-            Previous
+            {t("previous")}
           </button>
           <span className="text-text-secondary text-sm">
-            Page {page} of {totalPages}
+            {t("page", { page, totalPages })}
           </span>
           <button
             onClick={() => {
@@ -96,7 +98,7 @@ export function ExpensesClient({
             disabled={page >= totalPages}
             className="text-accent-primary disabled:text-text-tertiary text-sm font-medium"
           >
-            Next
+            {t("next")}
           </button>
         </div>
       )}
