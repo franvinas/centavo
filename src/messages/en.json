@@ -130,6 +130,16 @@
   "metadata": {
     "description": "Personal expense tracker"
   },
+  "defaultCategories": {
+    "foodDining": "Food & Dining",
+    "transport": "Transport",
+    "groceries": "Groceries",
+    "entertainment": "Entertainment",
+    "health": "Health",
+    "housing": "Housing",
+    "shopping": "Shopping",
+    "utilities": "Utilities"
+  },
   "common": {
     "expense": "expense",
     "expenses": "expenses"

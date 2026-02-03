@@ -130,6 +130,16 @@
   "metadata": {
     "description": "Rastreador personal de gastos"
   },
+  "defaultCategories": {
+    "foodDining": "Comida y Restaurantes",
+    "transport": "Transporte",
+    "groceries": "Supermercado",
+    "entertainment": "Entretenimiento",
+    "health": "Salud",
+    "housing": "Vivienda",
+    "shopping": "Compras",
+    "utilities": "Servicios"
+  },
   "common": {
     "expense": "gasto",
     "expenses": "gastos"

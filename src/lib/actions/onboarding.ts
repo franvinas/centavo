@@ -1,9 +1,11 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { completeOnboardingSchema } from "@/lib/validations/onboarding";
+import { getDefaultCategories } from "@/lib/default-categories";
 
 export async function completeOnboarding(formData: {
   name: string;
@@ -21,6 +23,23 @@ export async function completeOnboarding(formData: {
       baseCurrency: parsed.baseCurrency,
     },
   });
+
+  const categoryCount = await prisma.category.count({
+    where: { userId: session.user.id },
+  });
+
+  if (categoryCount === 0) {
+    const locale = await getLocale();
+    const categories = await getDefaultCategories(locale);
+    await prisma.category.createMany({
+      data: categories.map((cat) => ({
+        userId: session.user!.id!,
+        name: cat.name,
+        color: cat.color,
+        icon: cat.icon,
+      })),
+    });
+  }
 
   redirect("/dashboard");
 }
