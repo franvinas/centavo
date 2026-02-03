@@ -13,6 +13,7 @@ import {
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { CategoryChip } from "./category-chip";
 import {
   createExpense,
@@ -176,10 +177,9 @@ export function ExpenseForm({
           </div>
           <div className="flex items-center gap-3">
             <Calendar className="text-text-tertiary h-5 w-5 shrink-0" />
-            <Input
-              type="date"
+            <DatePicker
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={setDate}
               className="border-border-subtle border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
             />
           </div>

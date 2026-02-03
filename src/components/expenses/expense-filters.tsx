@@ -1,8 +1,9 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 import type { Category } from "@/types";
 
 interface ExpenseFiltersProps {
@@ -11,9 +12,8 @@ interface ExpenseFiltersProps {
   categoryId: string;
   onCategoryChange: (id: string) => void;
   dateFrom: string;
-  onDateFromChange: (value: string) => void;
   dateTo: string;
-  onDateToChange: (value: string) => void;
+  onDateRangeChange: (from: string, to: string) => void;
   categories: Category[];
 }
 
@@ -23,30 +23,47 @@ export function ExpenseFilters({
   categoryId,
   onCategoryChange,
   dateFrom,
-  onDateFromChange,
   dateTo,
-  onDateToChange,
+  onDateRangeChange,
   categories,
 }: ExpenseFiltersProps) {
   const t = useTranslations("expenses");
+  const hasActiveFilters = search || categoryId || dateFrom || dateTo;
+
+  function clearAll() {
+    onSearchChange("");
+    onCategoryChange("");
+    onDateRangeChange("", "");
+  }
+
   return (
-    <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap">
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-[1fr_auto_auto_auto] md:items-end">
       {/* Search */}
-      <div className="relative col-span-2 min-w-[180px] md:flex-1">
-        <Search className="text-text-tertiary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+      <div className="relative col-span-2 md:col-span-1">
+        <Search className="text-text-tertiary pointer-events-none absolute inset-y-0 left-3 my-auto h-4 w-4" />
         <Input
           placeholder={t("searchPlaceholder")}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pl-9"
         />
+        {search && (
+          <button
+            type="button"
+            onClick={() => onSearchChange("")}
+            className="text-text-tertiary hover:text-text-primary absolute inset-y-0 right-3 my-auto h-4 w-4"
+            aria-label={t("clearFilters")}
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {/* Category filter */}
       <select
         value={categoryId}
         onChange={(e) => onCategoryChange(e.target.value)}
-        className="border-input bg-bg-surface text-text-primary col-span-2 h-9 rounded-md border px-3 text-sm"
+        className="border-input bg-bg-surface text-text-primary h-9 rounded-md border px-3 text-sm"
       >
         <option value="">{t("allCategories")}</option>
         {categories.map((cat) => (
@@ -57,24 +74,23 @@ export function ExpenseFilters({
       </select>
 
       {/* Date range */}
-      <label className="grid gap-1">
-        <span className="text-text-secondary text-xs">{t("from")}</span>
-        <Input
-          type="date"
-          value={dateFrom}
-          onChange={(e) => onDateFromChange(e.target.value)}
-          className="md:w-36"
-        />
-      </label>
-      <label className="grid gap-1">
-        <span className="text-text-secondary text-xs">{t("to")}</span>
-        <Input
-          type="date"
-          value={dateTo}
-          onChange={(e) => onDateToChange(e.target.value)}
-          className="md:w-36"
-        />
-      </label>
+      <DateRangePicker
+        from={dateFrom}
+        to={dateTo}
+        onChange={onDateRangeChange}
+        placeholder={t("dateRange")}
+      />
+
+      {/* Clear all */}
+      {hasActiveFilters && (
+        <button
+          type="button"
+          onClick={clearAll}
+          className="text-text-secondary hover:text-text-primary col-span-2 h-9 text-xs font-medium md:col-span-1"
+        >
+          {t("clearFilters")}
+        </button>
+      )}
     </div>
   );
 }

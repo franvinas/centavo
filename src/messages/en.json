@@ -60,6 +60,8 @@
     "allCategories": "All categories",
     "from": "From",
     "to": "To",
+    "dateRange": "Date range",
+    "clearFilters": "Clear filters",
     "previous": "Previous",
     "next": "Next",
     "page": "Page {page} of {totalPages}",

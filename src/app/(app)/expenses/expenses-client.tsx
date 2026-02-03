@@ -57,9 +57,16 @@ export function ExpensesClient({
         categoryId={searchParams.get("categoryId") ?? ""}
         onCategoryChange={(v) => updateParam("categoryId", v)}
         dateFrom={searchParams.get("from") ?? ""}
-        onDateFromChange={(v) => updateParam("from", v)}
         dateTo={searchParams.get("to") ?? ""}
-        onDateToChange={(v) => updateParam("to", v)}
+        onDateRangeChange={(from, to) => {
+          const params = new URLSearchParams(searchParams.toString());
+          if (from) params.set("from", from);
+          else params.delete("from");
+          if (to) params.set("to", to);
+          else params.delete("to");
+          params.delete("page");
+          router.push(`/expenses?${params.toString()}`);
+        }}
         categories={categories}
       />
 
