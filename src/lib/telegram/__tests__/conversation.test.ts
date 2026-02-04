@@ -69,7 +69,61 @@ describe("Conversation", () => {
     });
 
     it("handles tool result messages", async () => {
+      const toolCalls = [
+        {
+          id: "tc-1",
+          type: "function",
+          function: { name: "add_expense", arguments: '{"amount":25}' },
+        },
+      ];
+
       prismaMock.telegramMessage.findMany.mockResolvedValue([
+        {
+          id: "msg-2",
+          userId: "user-1",
+          role: "tool",
+          content: '{"id":"exp-1"}',
+          toolCalls: null,
+          toolCallId: "tc-1",
+          createdAt: new Date("2025-01-15T12:00:01Z"),
+        },
+        {
+          id: "msg-1",
+          userId: "user-1",
+          role: "assistant",
+          content: null,
+          toolCalls,
+          toolCallId: null,
+          createdAt: new Date("2025-01-15T12:00:00Z"),
+        },
+      ] as never);
+
+      const history = await getConversationHistory("user-1");
+
+      expect(history).toHaveLength(2);
+      expect(history[0]).toEqual({
+        role: "assistant",
+        content: null,
+        tool_calls: toolCalls,
+      });
+      expect(history[1]).toEqual({
+        role: "tool",
+        content: '{"id":"exp-1"}',
+        tool_call_id: "tc-1",
+      });
+    });
+
+    it("drops orphaned leading tool messages", async () => {
+      prismaMock.telegramMessage.findMany.mockResolvedValue([
+        {
+          id: "msg-2",
+          userId: "user-1",
+          role: "user",
+          content: "Hi",
+          toolCalls: null,
+          toolCallId: null,
+          createdAt: new Date("2025-01-15T12:01:00Z"),
+        },
         {
           id: "msg-1",
           userId: "user-1",
@@ -83,11 +137,8 @@ describe("Conversation", () => {
 
       const history = await getConversationHistory("user-1");
 
-      expect(history[0]).toEqual({
-        role: "tool",
-        content: '{"id":"exp-1"}',
-        tool_call_id: "tc-1",
-      });
+      expect(history).toHaveLength(1);
+      expect(history[0]).toEqual({ role: "user", content: "Hi" });
     });
   });
 
