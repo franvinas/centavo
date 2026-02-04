@@ -121,7 +121,7 @@
     "saving": "Guardando...",
     "saved": "¡Guardado!",
     "telegram": "Telegram",
-    "telegramHint": "Vincula tu cuenta de Telegram para registrar gastos por chat. Envía /start a @CentavoBot para obtener un código.",
+    "telegramHint": "Vincula tu cuenta de Telegram para registrar gastos por chat. Envía /start a @CentaBot para obtener un código.",
     "linkCode": "Ingresa el código",
     "linkButton": "Vincular",
     "unlinkButton": "Desvincular",
