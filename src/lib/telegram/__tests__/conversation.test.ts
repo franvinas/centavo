@@ -113,32 +113,26 @@ describe("Conversation", () => {
       });
     });
 
-    it("drops orphaned leading tool messages", async () => {
+    it("uses secondary id sort for stable ordering", async () => {
       prismaMock.telegramMessage.findMany.mockResolvedValue([
         {
-          id: "msg-2",
+          id: "msg-1",
           userId: "user-1",
           role: "user",
           content: "Hi",
           toolCalls: null,
           toolCallId: null,
-          createdAt: new Date("2025-01-15T12:01:00Z"),
-        },
-        {
-          id: "msg-1",
-          userId: "user-1",
-          role: "tool",
-          content: '{"id":"exp-1"}',
-          toolCalls: null,
-          toolCallId: "tc-1",
           createdAt: new Date("2025-01-15T12:00:00Z"),
         },
       ] as never);
 
-      const history = await getConversationHistory("user-1");
+      await getConversationHistory("user-1");
 
-      expect(history).toHaveLength(1);
-      expect(history[0]).toEqual({ role: "user", content: "Hi" });
+      expect(prismaMock.telegramMessage.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        }),
+      );
     });
   });
 

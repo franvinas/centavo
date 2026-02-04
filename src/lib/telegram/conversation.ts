@@ -9,30 +9,12 @@ export async function getConversationHistory(
 ): Promise<ChatCompletionMessageParam[]> {
   const messages = await prisma.telegramMessage.findMany({
     where: { userId },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: MAX_HISTORY,
   });
 
   // Reverse to chronological order
   messages.reverse();
-
-  // Drop leading orphaned tool/assistant messages that lost their
-  // paired assistant+tool_calls message due to the TAKE slice
-  // (messages with identical createdAt can come back in any order).
-  while (messages.length > 0) {
-    const first = messages[0];
-    if (first.role === "tool") {
-      messages.shift();
-    } else if (
-      first.role === "assistant" &&
-      !first.toolCalls &&
-      !first.content
-    ) {
-      messages.shift();
-    } else {
-      break;
-    }
-  }
 
   return messages.map((msg) => {
     if (msg.role === "assistant" && msg.toolCalls) {
@@ -86,7 +68,7 @@ export async function saveMessages(
   if (count > PRUNE_THRESHOLD) {
     const toKeep = await prisma.telegramMessage.findMany({
       where: { userId },
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: MAX_HISTORY,
       select: { id: true },
     });
