@@ -22,6 +22,7 @@ import {
 } from "@/lib/actions/expenses";
 import type { Category } from "@/types";
 import { CURRENCIES } from "@/lib/constants";
+import { parseLocalDate } from "@/lib/format";
 
 interface ExpenseFormProps {
   expense?: {
@@ -50,11 +51,17 @@ export function ExpenseForm({
   );
   const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
   const [description, setDescription] = useState(expense?.description ?? "");
-  const [date, setDate] = useState(
-    expense?.date
-      ? new Date(expense.date).toISOString().split("T")[0]
-      : new Date().toISOString().split("T")[0],
-  );
+  const [date, setDate] = useState(() => {
+    // For existing expenses the date comes from the DB as UTC midnight,
+    // so use parseLocalDate to avoid shifting a day in negative-offset TZs.
+    // For new expenses just use the current local date.
+    const d = expense?.date ? parseLocalDate(expense.date) : new Date();
+    return [
+      d.getFullYear(),
+      String(d.getMonth() + 1).padStart(2, "0"),
+      String(d.getDate()).padStart(2, "0"),
+    ].join("-");
+  });
   const [notes, setNotes] = useState(expense?.notes ?? "");
   const [categoryId, setCategoryId] = useState(expense?.categoryId ?? "");
   const [showAllCategories, setShowAllCategories] = useState(false);
