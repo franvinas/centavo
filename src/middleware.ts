@@ -5,7 +5,7 @@ import { locales, defaultLocale, type Locale } from "@/i18n/config";
 
 const { auth } = NextAuth(authConfig);
 
-const publicPaths = ["/auth/signin", "/api/auth"];
+const publicPaths = ["/auth/signin", "/api/auth", "/api/telegram/webhook"];
 
 function detectLocale(req: Parameters<Parameters<typeof auth>[0]>[0]): Locale {
   const cookie = req.cookies.get("NEXT_LOCALE")?.value;

@@ -58,10 +58,12 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts   Account[]
-  sessions   Session[]
-  expenses   Expense[]
-  categories Category[]
+  accounts         Account[]
+  sessions         Session[]
+  expenses         Expense[]
+  categories       Category[]
+  telegramChatId   String?            @unique
+  telegramMessages TelegramMessage[]
 }
 
 model Category {
@@ -98,4 +100,26 @@ model Expense {
 
   @@index([userId, date])
   @@index([userId, categoryId])
+}
+
+model TelegramMessage {
+  id         String   @id @default(cuid())
+  userId     String
+  role       String
+  content    String?
+  toolCalls  Json?
+  toolCallId String?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model TelegramLinkToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  chatId    String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }

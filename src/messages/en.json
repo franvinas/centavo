@@ -120,6 +120,12 @@
     "save": "Save Changes",
     "saving": "Saving...",
     "saved": "Saved!",
+    "telegram": "Telegram",
+    "telegramHint": "Link your Telegram account to track expenses via chat. Send /start to @CentavoBot to get a link code.",
+    "linkCode": "Enter link code",
+    "linkButton": "Link",
+    "unlinkButton": "Unlink",
+    "telegramLinked": "Connected",
     "signOut": "Sign Out"
   },
   "dates": {
