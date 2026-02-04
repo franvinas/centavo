@@ -15,6 +15,7 @@ export default async function SettingsPage() {
         email: user.email,
         baseCurrency: user.baseCurrency,
         locale: user.locale,
+        telegramChatId: user.telegramChatId ?? null,
       }}
     />
   );

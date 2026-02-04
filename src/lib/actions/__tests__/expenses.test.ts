@@ -39,17 +39,19 @@ describe("createExpense", () => {
 
     await createExpense(validExpenseData);
 
-    expect(prismaMock.expense.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        userId: "user-1",
-        amount: 25.5,
-        currency: "USD",
-        description: "Lunch",
-        categoryId: "cat-1",
-        baseAmount: 25.5,
-        exchangeRate: 1,
+    expect(prismaMock.expense.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          userId: "user-1",
+          amount: 25.5,
+          currency: "USD",
+          description: "Lunch",
+          categoryId: "cat-1",
+          baseAmount: 25.5,
+          exchangeRate: 1,
+        }),
       }),
-    });
+    );
     expect(revalidatePath).toHaveBeenCalledWith("/dashboard");
     expect(revalidatePath).toHaveBeenCalledWith("/expenses");
   });
@@ -79,10 +81,12 @@ describe("updateExpense", () => {
 
     await updateExpense("exp-1", { description: "Updated" });
 
-    expect(prismaMock.expense.update).toHaveBeenCalledWith({
-      where: { id: "exp-1" },
-      data: expect.objectContaining({ description: "Updated" }),
-    });
+    expect(prismaMock.expense.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "exp-1" },
+        data: expect.objectContaining({ description: "Updated" }),
+      }),
+    );
     expect(revalidatePath).toHaveBeenCalledWith("/dashboard");
   });
 
@@ -106,14 +110,16 @@ describe("updateExpense", () => {
 
     await updateExpense("exp-1", { amount: 100 });
 
-    expect(prismaMock.expense.update).toHaveBeenCalledWith({
-      where: { id: "exp-1" },
-      data: expect.objectContaining({
-        amount: 100,
-        baseAmount: 100,
-        exchangeRate: 1,
+    expect(prismaMock.expense.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "exp-1" },
+        data: expect.objectContaining({
+          amount: 100,
+          baseAmount: 100,
+          exchangeRate: 1,
+        }),
       }),
-    });
+    );
   });
 });
 
