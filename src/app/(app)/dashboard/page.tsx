@@ -13,8 +13,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import type { Expense, Category } from "@/types";
 
-export const dynamic = "force-dynamic";
-
 export default async function DashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/signin");

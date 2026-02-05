@@ -4,8 +4,6 @@ import { getCategories } from "@/lib/data/categories";
 import { ExpenseForm } from "@/components/expenses/expense-form";
 import type { Category } from "@/types";
 
-export const dynamic = "force-dynamic";
-
 export default async function NewExpensePage() {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/signin");

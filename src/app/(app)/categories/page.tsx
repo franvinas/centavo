@@ -3,8 +3,6 @@ import { getCurrentUser } from "@/lib/data/user";
 import { getCategories } from "@/lib/data/categories";
 import { CategoriesClient } from "./categories-client";
 
-export const dynamic = "force-dynamic";
-
 export default async function CategoriesPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/signin");

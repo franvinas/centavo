@@ -5,8 +5,6 @@ import { getCategories } from "@/lib/data/categories";
 import { ExpensesClient } from "./expenses-client";
 import type { Expense, Category } from "@/types";
 
-export const dynamic = "force-dynamic";
-
 export default async function ExpensesPage({
   searchParams,
 }: {
