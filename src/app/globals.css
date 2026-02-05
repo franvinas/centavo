@@ -122,6 +122,8 @@
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @layer base {
