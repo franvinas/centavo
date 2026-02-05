@@ -37,7 +37,7 @@ describe("ExpenseFilters", () => {
   it("renders search input", () => {
     const { container } = renderFilters();
     const search = container.querySelector(
-      'input[placeholder="Search expenses..."]',
+      'input[placeholder="Search expenses…"]',
     );
     expect(search).toBeInTheDocument();
   });
@@ -47,7 +47,7 @@ describe("ExpenseFilters", () => {
     const { container, props } = renderFilters();
 
     const search = container.querySelector(
-      'input[placeholder="Search expenses..."]',
+      'input[placeholder="Search expenses…"]',
     )!;
     await user.type(search, "l");
     expect(props.onSearchChange).toHaveBeenCalled();

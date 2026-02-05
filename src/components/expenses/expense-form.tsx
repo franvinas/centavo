@@ -65,6 +65,7 @@ export function ExpenseForm({
   const [notes, setNotes] = useState(expense?.notes ?? "");
   const [categoryId, setCategoryId] = useState(expense?.categoryId ?? "");
   const [showAllCategories, setShowAllCategories] = useState(false);
+  const [error, setError] = useState("");
   const t = useTranslations("expenses");
 
   const visibleCategories = showAllCategories
@@ -96,12 +97,14 @@ export function ExpenseForm({
   }
 
   function handleDelete() {
+    if (!window.confirm(t("confirmDelete"))) return;
+    setError("");
     startTransition(async () => {
       try {
         await deleteExpense(expense!.id);
         router.push("/expenses");
       } catch (e) {
-        alert(e instanceof Error ? e.message : "Failed to delete expense");
+        setError(e instanceof Error ? e.message : "Failed to delete expense");
       }
     });
   }
@@ -123,8 +126,12 @@ export function ExpenseForm({
         {/* Amount hero */}
         <div className="flex flex-col items-center py-8">
           <div className="flex items-baseline">
+            <label htmlFor="expense-amount" className="sr-only">
+              {t("amount")}
+            </label>
             <span className="text-text-tertiary text-lg">$</span>
             <input
+              id="expense-amount"
               type="text"
               inputMode="decimal"
               value={amount}
@@ -243,15 +250,25 @@ export function ExpenseForm({
               : t("saveExpense")}
         </Button>
         {expense && (
-          <Button
-            variant="ghost"
-            onClick={handleDelete}
-            disabled={isPending}
-            className="text-status-negative hover:bg-status-negative/10 hover:text-status-negative mt-3 h-12 w-full text-base font-semibold"
-          >
-            <Trash2 className="mr-2 h-5 w-5" />
-            {t("deleteExpense")}
-          </Button>
+          <>
+            <Button
+              variant="ghost"
+              onClick={handleDelete}
+              disabled={isPending}
+              className="text-status-negative hover:bg-status-negative/10 hover:text-status-negative mt-3 h-12 w-full text-base font-semibold"
+            >
+              <Trash2 className="mr-2 h-5 w-5" />
+              {t("deleteExpense")}
+            </Button>
+            {error && (
+              <p
+                role="alert"
+                className="text-status-negative mt-2 text-center text-sm"
+              >
+                {error}
+              </p>
+            )}
+          </>
         )}
       </div>
     </div>

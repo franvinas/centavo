@@ -35,6 +35,7 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
   const [name, setName] = useState("");
   const [color, setColor] = useState("#E67E22");
   const [icon, setIcon] = useState("UtensilsCrossed");
+  const [error, setError] = useState("");
   const t = useTranslations("categories");
 
   function openCreate() {
@@ -68,12 +69,14 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
   }
 
   function handleDelete(id: string) {
+    if (!window.confirm(t("confirmDelete"))) return;
+    setError("");
     startTransition(async () => {
       try {
         await deleteCategory(id);
         router.refresh();
       } catch (e) {
-        alert(e instanceof Error ? e.message : "Failed to delete category");
+        setError(e instanceof Error ? e.message : "Failed to delete category");
       }
     });
   }
@@ -132,6 +135,12 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
           </DialogContent>
         </Dialog>
       </div>
+
+      {error && (
+        <p role="alert" className="text-status-negative text-sm">
+          {error}
+        </p>
+      )}
 
       <div className="space-y-2">
         {initialCategories.map((cat) => {

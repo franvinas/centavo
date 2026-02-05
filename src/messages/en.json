@@ -16,7 +16,7 @@
     "emailPlaceholder": "Enter your email",
     "enterCode": "Enter verification code",
     "codeSent": "We sent a 6-digit code to {email}",
-    "verifying": "Verifying...",
+    "verifying": "Verifying\u2026",
     "resendCode": "Resend code",
     "resendIn": "Resend code in {seconds}s",
     "differentEmail": "Use a different email",
@@ -33,7 +33,7 @@
     "currencyLabel": "Base currency",
     "currencyHint": "All expenses will be converted to this currency",
     "submit": "Get Started",
-    "submitting": "Setting up..."
+    "submitting": "Setting up\u2026"
   },
   "dashboard": {
     "greeting": "Good morning, {name}",
@@ -56,7 +56,7 @@
     "title": "All Expenses",
     "found": "{count, plural, =1 {# expense} other {# expenses}} found",
     "noExpenses": "No expenses found",
-    "searchPlaceholder": "Search expenses...",
+    "searchPlaceholder": "Search expenses\u2026",
     "allCategories": "All categories",
     "from": "From",
     "to": "To",
@@ -74,7 +74,9 @@
     "saveExpense": "Save Expense",
     "updateExpense": "Update Expense",
     "deleteExpense": "Delete Expense",
-    "saving": "Saving..."
+    "confirmDelete": "Are you sure you want to delete this expense?",
+    "amount": "Amount",
+    "saving": "Saving\u2026"
   },
   "categories": {
     "title": "Categories",
@@ -87,7 +89,8 @@
     "icon": "Icon",
     "create": "Create",
     "update": "Update",
-    "saving": "Saving..."
+    "confirmDelete": "Are you sure you want to delete this category?",
+    "saving": "Saving\u2026"
   },
   "analytics": {
     "title": "Analytics",
@@ -118,7 +121,7 @@
     "language": "Language",
     "languageHint": "Choose your preferred language.",
     "save": "Save Changes",
-    "saving": "Saving...",
+    "saving": "Saving\u2026",
     "saved": "Saved!",
     "telegram": "Telegram",
     "telegramHint": "Link your Telegram account to track expenses via chat. Send /start to @CentaBot to get a link code.",

@@ -16,7 +16,7 @@
     "emailPlaceholder": "Ingresa tu email",
     "enterCode": "Ingresa el código de verificación",
     "codeSent": "Enviamos un código de 6 dígitos a {email}",
-    "verifying": "Verificando...",
+    "verifying": "Verificando\u2026",
     "resendCode": "Reenviar código",
     "resendIn": "Reenviar código en {seconds}s",
     "differentEmail": "Usar otro email",
@@ -33,7 +33,7 @@
     "currencyLabel": "Moneda base",
     "currencyHint": "Todos los gastos se convertirán a esta moneda",
     "submit": "Comenzar",
-    "submitting": "Configurando..."
+    "submitting": "Configurando\u2026"
   },
   "dashboard": {
     "greeting": "Buenos días, {name}",
@@ -56,7 +56,7 @@
     "title": "Todos los gastos",
     "found": "{count, plural, =1 {# gasto encontrado} other {# gastos encontrados}}",
     "noExpenses": "No se encontraron gastos",
-    "searchPlaceholder": "Buscar gastos...",
+    "searchPlaceholder": "Buscar gastos\u2026",
     "allCategories": "Todas las categorías",
     "from": "Desde",
     "to": "Hasta",
@@ -74,7 +74,9 @@
     "saveExpense": "Guardar gasto",
     "updateExpense": "Actualizar gasto",
     "deleteExpense": "Eliminar gasto",
-    "saving": "Guardando..."
+    "confirmDelete": "\u00bfEst\u00e1s seguro de que quieres eliminar este gasto?",
+    "amount": "Monto",
+    "saving": "Guardando\u2026"
   },
   "categories": {
     "title": "Categorías",
@@ -87,7 +89,8 @@
     "icon": "Ícono",
     "create": "Crear",
     "update": "Actualizar",
-    "saving": "Guardando..."
+    "confirmDelete": "\u00bfEst\u00e1s seguro de que quieres eliminar esta categor\u00eda?",
+    "saving": "Guardando\u2026"
   },
   "analytics": {
     "title": "Análisis",
@@ -118,7 +121,7 @@
     "language": "Idioma",
     "languageHint": "Elige tu idioma preferido.",
     "save": "Guardar cambios",
-    "saving": "Guardando...",
+    "saving": "Guardando\u2026",
     "saved": "¡Guardado!",
     "telegram": "Telegram",
     "telegramHint": "Vincula tu cuenta de Telegram para registrar gastos por chat. Envía /start a @CentaBot para obtener un código.",

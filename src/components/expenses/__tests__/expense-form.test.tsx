@@ -261,6 +261,8 @@ describe("ExpenseForm", () => {
       />,
     );
 
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+
     const buttons = container.querySelectorAll("button");
     const deleteButton = Array.from(buttons).find((b) =>
       b.textContent?.includes("Delete Expense"),
