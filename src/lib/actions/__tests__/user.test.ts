@@ -5,6 +5,14 @@ import { createPrismaUser, createPrismaExpense } from "@/test-utils/factories";
 import { updateUser } from "../user";
 import { revalidatePath } from "next/cache";
 
+// Mock next/server's after() - capture the promise so tests can await it
+let afterPromise: Promise<void> | null = null;
+vi.mock("next/server", () => ({
+  after: (callback: () => Promise<void>) => {
+    afterPromise = callback();
+  },
+}));
+
 vi.mock("@/lib/exchange-rate", () => ({
   getExchangeRate: vi.fn().mockResolvedValue(0.85),
 }));
@@ -12,6 +20,7 @@ vi.mock("@/lib/exchange-rate", () => ({
 beforeEach(() => {
   resetPrismaMock();
   vi.mocked(revalidatePath).mockClear();
+  afterPromise = null;
 });
 
 describe("updateUser", () => {
@@ -57,6 +66,8 @@ describe("updateUser", () => {
     prismaMock.expense.update.mockResolvedValue({} as never);
 
     await updateUser({ baseCurrency: "EUR" });
+    // Wait for the after() callback to complete
+    await afterPromise;
 
     expect(prismaMock.expense.findMany).toHaveBeenCalledWith({
       where: { userId: "user-1" },

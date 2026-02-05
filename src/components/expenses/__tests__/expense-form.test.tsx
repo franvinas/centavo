@@ -170,38 +170,30 @@ describe("ExpenseForm", () => {
     expect(saveButton!.disabled).toBe(true);
   });
 
-  it("shows first 8 categories by default", () => {
+  it("shows category picker trigger", () => {
     const { container } = render(<ExpenseForm categories={mockCategories} />);
 
-    expect(container.textContent).toContain("Food");
-    expect(container.textContent).toContain("Entertainment");
-    // 9th and 10th categories should not be visible
-    expect(container.textContent).not.toContain("Travel");
-    expect(container.textContent).not.toContain("Coffee");
+    // Categories are now inside a drawer/popover, triggered by a button
+    expect(container.textContent).toContain("Select category");
   });
 
-  it("shows 'More' button when there are more than 8 categories", () => {
-    const { container } = render(<ExpenseForm categories={mockCategories} />);
-
-    const buttons = container.querySelectorAll("button");
-    const moreButton = Array.from(buttons).find(
-      (b) => b.textContent === "More",
+  it("shows selected category name in picker trigger", () => {
+    const { container } = render(
+      <ExpenseForm
+        categories={mockCategories}
+        expense={{
+          id: "exp-1",
+          amount: 25.5,
+          currency: "USD",
+          description: "Lunch",
+          date: "2025-01-15",
+          categoryId: "cat-1",
+        }}
+      />,
     );
-    expect(moreButton).toBeDefined();
-  });
 
-  it("reveals all categories on 'More' click", async () => {
-    const user = userEvent.setup();
-    const { container } = render(<ExpenseForm categories={mockCategories} />);
-
-    const buttons = container.querySelectorAll("button");
-    const moreButton = Array.from(buttons).find(
-      (b) => b.textContent === "More",
-    )!;
-    await user.click(moreButton);
-
-    expect(container.textContent).toContain("Travel");
-    expect(container.textContent).toContain("Coffee");
+    // When a category is selected, its name should appear in the trigger
+    expect(container.textContent).toContain("Food");
   });
 
   it("navigates back on close button click", async () => {
