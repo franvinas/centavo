@@ -3,13 +3,34 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
 import type { AnalyticsData } from "@/types/analytics";
 import { PeriodSelector } from "@/components/analytics/period-selector";
 import { SummaryCards } from "@/components/analytics/summary-cards";
-import { CategoryPieChart } from "@/components/analytics/category-pie-chart";
-import { SpendingOverTimeChart } from "@/components/analytics/spending-over-time-chart";
 import { CurrencyBreakdown } from "@/components/analytics/currency-breakdown";
 import { Skeleton } from "@/components/ui/skeleton";
+
+const CategoryPieChart = dynamic(
+  () =>
+    import("@/components/analytics/category-pie-chart").then(
+      (m) => m.CategoryPieChart,
+    ),
+  {
+    ssr: false,
+    loading: () => <PieChartSkeleton />,
+  },
+);
+
+const SpendingOverTimeChart = dynamic(
+  () =>
+    import("@/components/analytics/spending-over-time-chart").then(
+      (m) => m.SpendingOverTimeChart,
+    ),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton />,
+  },
+);
 
 interface AnalyticsClientProps {
   data: AnalyticsData;
