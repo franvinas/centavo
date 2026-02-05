@@ -16,7 +16,6 @@ export default async function CategoriesPage() {
         name: c.name,
         color: c.color,
         icon: c.icon ?? "MoreHorizontal",
-        userId: c.userId,
       }))}
     />
   );

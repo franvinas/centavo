@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, userEvent } from "@/test-utils/react-testing";
+import { render, userEvent } from "@/test-utils/react-testing";
 import { ExpenseForm } from "../expense-form";
 import type { Category } from "@/types";
 
@@ -17,70 +17,60 @@ const mockCategories: Category[] = [
     name: "Food",
     icon: "UtensilsCrossed",
     color: "#E8855B",
-    userId: "user-1",
   },
   {
     id: "cat-2",
     name: "Transport",
     icon: "Car",
     color: "#5B8CE8",
-    userId: "user-1",
   },
   {
     id: "cat-3",
     name: "Shopping",
     icon: "ShoppingCart",
     color: "#9B59B6",
-    userId: "user-1",
   },
   {
     id: "cat-4",
     name: "Health",
     icon: "Heart",
     color: "#E74C3C",
-    userId: "user-1",
   },
   {
     id: "cat-5",
     name: "Home",
     icon: "Home",
     color: "#2ECC71",
-    userId: "user-1",
   },
   {
     id: "cat-6",
     name: "Bills",
     icon: "Zap",
     color: "#F39C12",
-    userId: "user-1",
   },
   {
     id: "cat-7",
     name: "Education",
     icon: "GraduationCap",
     color: "#1ABC9C",
-    userId: "user-1",
   },
   {
     id: "cat-8",
     name: "Entertainment",
     icon: "Film",
     color: "#3498DB",
-    userId: "user-1",
   },
   {
     id: "cat-9",
     name: "Travel",
     icon: "Plane",
     color: "#E67E22",
-    userId: "user-1",
   },
   {
     id: "cat-10",
     name: "Coffee",
     icon: "Coffee",
     color: "#795548",
-    userId: "user-1",
   },
 ];
 

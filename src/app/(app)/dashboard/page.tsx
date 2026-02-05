@@ -205,12 +205,8 @@ function mapExpense(e: any): Expense {
     baseAmount: Number(e.baseAmount),
     baseCurrency: e.baseCurrency ?? "USD",
     description: e.description,
-    notes: e.notes ?? undefined,
     date: e.date.toISOString(),
     categoryId: e.categoryId,
     category: e.category as Category,
-    userId: e.userId,
-    createdAt: e.createdAt.toISOString(),
-    updatedAt: e.updatedAt.toISOString(),
   };
 }

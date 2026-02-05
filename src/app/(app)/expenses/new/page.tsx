@@ -14,7 +14,6 @@ export default async function NewExpensePage() {
     name: c.name,
     color: c.color,
     icon: c.icon ?? "MoreHorizontal",
-    userId: c.userId,
   }));
 
   return (

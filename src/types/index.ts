@@ -19,7 +19,6 @@ export interface Category {
   name: string;
   icon: string;
   color: string;
-  userId: string;
 }
 
 export interface Expense {
@@ -29,11 +28,7 @@ export interface Expense {
   baseAmount: number;
   baseCurrency: string;
   description: string;
-  notes?: string;
   date: string;
   categoryId: string;
   category: Category;
-  userId: string;
-  createdAt: string;
-  updatedAt: string;
 }

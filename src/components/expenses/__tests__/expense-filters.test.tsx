@@ -9,14 +9,12 @@ const mockCategories: Category[] = [
     name: "Food",
     icon: "UtensilsCrossed",
     color: "#E8855B",
-    userId: "user-1",
   },
   {
     id: "cat-2",
     name: "Transport",
     icon: "Car",
     color: "#5B8CE8",
-    userId: "user-1",
   },
 ];
 

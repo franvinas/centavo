@@ -24,7 +24,6 @@ export function createMockCategory(
     name: "Food",
     icon: "UtensilsCrossed",
     color: "#E8855B",
-    userId: "user-1",
     ...overrides,
   };
 }
@@ -42,9 +41,6 @@ export function createMockExpense(overrides: Partial<Expense> = {}): Expense {
     date: "2025-01-15",
     categoryId: category.id,
     category,
-    userId: "user-1",
-    createdAt: "2025-01-15T12:00:00.000Z",
-    updatedAt: "2025-01-15T12:00:00.000Z",
     ...overrides,
   };
 }

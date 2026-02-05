@@ -32,13 +32,9 @@ export default async function ExpensesPage({
     baseAmount: Number(e.baseAmount),
     baseCurrency: user.baseCurrency,
     description: e.description,
-    notes: e.notes ?? undefined,
     date: e.date.toISOString(),
     categoryId: e.categoryId,
     category: e.category as Category,
-    userId: e.userId,
-    createdAt: e.createdAt.toISOString(),
-    updatedAt: e.updatedAt.toISOString(),
   }));
 
   const mappedCategories: Category[] = categories.map((c) => ({
@@ -46,7 +42,6 @@ export default async function ExpensesPage({
     name: c.name,
     color: c.color,
     icon: c.icon ?? "MoreHorizontal",
-    userId: c.userId,
   }));
 
   return (

@@ -8,7 +8,6 @@ const mockCategory: Category = {
   name: "Food",
   icon: "UtensilsCrossed",
   color: "#E8855B",
-  userId: "user-1",
 };
 
 describe("CategoryChip", () => {

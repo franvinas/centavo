@@ -41,7 +41,6 @@ describe("ExpenseCard", () => {
         name: "Food",
         icon: "UtensilsCrossed",
         color: "#E8855B",
-        userId: "user-1",
       },
     });
     const { container } = render(<ExpenseCard expense={expense} />);
@@ -64,7 +63,6 @@ describe("ExpenseCard", () => {
         name: "Food",
         icon: "UtensilsCrossed",
         color: "#E8855B",
-        userId: "user-1",
       },
     });
     const { container } = render(<ExpenseCard expense={expense} />);
