@@ -8,11 +8,12 @@ export const createExpenseSchema = z.object({
     .toUpperCase(),
   description: z
     .string()
+    .trim()
     .min(1, "Description is required")
     .max(200, "Description must be under 200 characters"),
   categoryId: z.string().min(1, "Category is required"),
   date: z.string().date("Invalid date format"),
-  notes: z.string().max(500).optional(),
+  notes: z.string().trim().max(500).optional(),
 });
 
 export const updateExpenseSchema = createExpenseSchema.partial();
