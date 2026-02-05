@@ -8,7 +8,7 @@ export async function getConversationHistory(
   userId: string,
 ): Promise<ChatCompletionMessageParam[]> {
   const messages = await prisma.telegramMessage.findMany({
-    where: { userId },
+    where: { userId, role: { in: ["user", "assistant"] } },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: MAX_HISTORY,
   });
@@ -16,32 +16,10 @@ export async function getConversationHistory(
   // Reverse to chronological order
   messages.reverse();
 
-  return messages.map((msg) => {
-    if (msg.role === "assistant" && msg.toolCalls) {
-      return {
-        role: "assistant" as const,
-        content: msg.content ?? null,
-        tool_calls: msg.toolCalls as Array<{
-          id: string;
-          type: "function";
-          function: { name: string; arguments: string };
-        }>,
-      };
-    }
-
-    if (msg.role === "tool") {
-      return {
-        role: "tool" as const,
-        content: msg.content ?? "",
-        tool_call_id: msg.toolCallId ?? "",
-      };
-    }
-
-    return {
-      role: msg.role as "user" | "assistant",
-      content: msg.content ?? "",
-    };
-  });
+  return messages.map((msg) => ({
+    role: msg.role as "user" | "assistant",
+    content: msg.content ?? "",
+  }));
 }
 
 export async function saveMessages(
@@ -53,13 +31,21 @@ export async function saveMessages(
     toolCallId?: string;
   }>,
 ) {
+  // Only persist user messages and final assistant text replies.
+  // Tool-related messages (assistant+tool_calls, tool results) are
+  // ephemeral and only needed within a single request loop.
+  const persistable = messages.filter(
+    (msg) =>
+      (msg.role === "user" || msg.role === "assistant") && !msg.toolCalls,
+  );
+
+  if (persistable.length === 0) return;
+
   await prisma.telegramMessage.createMany({
-    data: messages.map((msg) => ({
+    data: persistable.map((msg) => ({
       userId,
       role: msg.role,
       content: msg.content ?? null,
-      toolCalls: msg.toolCalls ? (msg.toolCalls as object) : undefined,
-      toolCallId: msg.toolCallId ?? null,
     })),
   });
 

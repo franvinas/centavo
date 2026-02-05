@@ -8,7 +8,7 @@ describe("Conversation", () => {
   });
 
   describe("getConversationHistory", () => {
-    it("returns messages in OpenAI format", async () => {
+    it("returns user and assistant messages in chronological order", async () => {
       prismaMock.telegramMessage.findMany.mockResolvedValue([
         {
           id: "msg-2",
@@ -32,104 +32,19 @@ describe("Conversation", () => {
 
       const history = await getConversationHistory("user-1");
 
-      // Messages are reversed to chronological order
       expect(history).toHaveLength(2);
       expect(history[0]).toEqual({ role: "user", content: "Hi" });
       expect(history[1]).toEqual({ role: "assistant", content: "Hello!" });
     });
 
-    it("handles tool call messages", async () => {
-      const toolCalls = [
-        {
-          id: "tc-1",
-          type: "function",
-          function: { name: "add_expense", arguments: '{"amount":25}' },
-        },
-      ];
-
-      prismaMock.telegramMessage.findMany.mockResolvedValue([
-        {
-          id: "msg-1",
-          userId: "user-1",
-          role: "assistant",
-          content: null,
-          toolCalls,
-          toolCallId: null,
-          createdAt: new Date("2025-01-15T12:00:00Z"),
-        },
-      ] as never);
-
-      const history = await getConversationHistory("user-1");
-
-      expect(history[0]).toEqual({
-        role: "assistant",
-        content: null,
-        tool_calls: toolCalls,
-      });
-    });
-
-    it("handles tool result messages", async () => {
-      const toolCalls = [
-        {
-          id: "tc-1",
-          type: "function",
-          function: { name: "add_expense", arguments: '{"amount":25}' },
-        },
-      ];
-
-      prismaMock.telegramMessage.findMany.mockResolvedValue([
-        {
-          id: "msg-2",
-          userId: "user-1",
-          role: "tool",
-          content: '{"id":"exp-1"}',
-          toolCalls: null,
-          toolCallId: "tc-1",
-          createdAt: new Date("2025-01-15T12:00:01Z"),
-        },
-        {
-          id: "msg-1",
-          userId: "user-1",
-          role: "assistant",
-          content: null,
-          toolCalls,
-          toolCallId: null,
-          createdAt: new Date("2025-01-15T12:00:00Z"),
-        },
-      ] as never);
-
-      const history = await getConversationHistory("user-1");
-
-      expect(history).toHaveLength(2);
-      expect(history[0]).toEqual({
-        role: "assistant",
-        content: null,
-        tool_calls: toolCalls,
-      });
-      expect(history[1]).toEqual({
-        role: "tool",
-        content: '{"id":"exp-1"}',
-        tool_call_id: "tc-1",
-      });
-    });
-
-    it("uses secondary id sort for stable ordering", async () => {
-      prismaMock.telegramMessage.findMany.mockResolvedValue([
-        {
-          id: "msg-1",
-          userId: "user-1",
-          role: "user",
-          content: "Hi",
-          toolCalls: null,
-          toolCallId: null,
-          createdAt: new Date("2025-01-15T12:00:00Z"),
-        },
-      ] as never);
+    it("only queries user and assistant roles", async () => {
+      prismaMock.telegramMessage.findMany.mockResolvedValue([] as never);
 
       await getConversationHistory("user-1");
 
       expect(prismaMock.telegramMessage.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
+          where: { userId: "user-1", role: { in: ["user", "assistant"] } },
           orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         }),
       );
@@ -137,7 +52,49 @@ describe("Conversation", () => {
   });
 
   describe("saveMessages", () => {
-    it("persists messages and prunes when over threshold", async () => {
+    it("only persists user and assistant text messages", async () => {
+      prismaMock.telegramMessage.createMany.mockResolvedValue({
+        count: 2,
+      } as never);
+      prismaMock.telegramMessage.count.mockResolvedValue(2 as never);
+
+      await saveMessages("user-1", [
+        { role: "user", content: "spent 25 on lunch" },
+        {
+          role: "assistant",
+          content: null,
+          toolCalls: [{ id: "tc-1", type: "function", function: {} }],
+        },
+        { role: "tool", content: '{"id":"exp-1"}', toolCallId: "tc-1" },
+        { role: "assistant", content: "Done! Recorded 25 for lunch." },
+      ]);
+
+      expect(prismaMock.telegramMessage.createMany).toHaveBeenCalledWith({
+        data: [
+          { userId: "user-1", role: "user", content: "spent 25 on lunch" },
+          {
+            userId: "user-1",
+            role: "assistant",
+            content: "Done! Recorded 25 for lunch.",
+          },
+        ],
+      });
+    });
+
+    it("skips save when no persistable messages", async () => {
+      await saveMessages("user-1", [
+        {
+          role: "assistant",
+          content: null,
+          toolCalls: [{ id: "tc-1", type: "function", function: {} }],
+        },
+        { role: "tool", content: '{"id":"exp-1"}', toolCallId: "tc-1" },
+      ]);
+
+      expect(prismaMock.telegramMessage.createMany).not.toHaveBeenCalled();
+    });
+
+    it("prunes old messages when over threshold", async () => {
       prismaMock.telegramMessage.createMany.mockResolvedValue({
         count: 1,
       } as never);
