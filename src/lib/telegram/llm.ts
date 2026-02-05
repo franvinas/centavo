@@ -21,6 +21,7 @@ interface ChatContext {
   userName: string;
   baseCurrency: string;
   locale: string;
+  timezone: string;
   categories: Array<{ id: string; name: string; icon: string | null }>;
 }
 
@@ -35,6 +36,7 @@ export function buildSystemPrompt(context: ChatContext): string {
 User: ${context.userName}
 Base currency: ${context.baseCurrency}
 Locale: ${context.locale}
+Timezone: ${context.timezone}
 Today: ${today}
 
 Available categories:
@@ -48,6 +50,7 @@ Rules:
 - Keep responses concise — this is a chat interface.
 - Respond in the user's locale (${context.locale === "es" ? "Spanish" : "English"}).
 - Format currency amounts with 2 decimal places.
+- When interpreting relative dates (yesterday, last Friday, etc.), use the user's timezone.
 - When the user asks to delete or edit "the last expense", use list_expenses first to find it.`;
 }
 

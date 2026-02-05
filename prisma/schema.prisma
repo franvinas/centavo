@@ -55,6 +55,7 @@ model User {
   emailVerified DateTime?
   baseCurrency  String    @default("USD")
   locale        String    @default("en")
+  timezone      String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

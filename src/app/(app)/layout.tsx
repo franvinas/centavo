@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
+import { TimezoneDetector } from "@/components/timezone-detector";
 import { getCurrentUser } from "@/lib/data/user";
 
 export default async function AppLayout({
@@ -13,6 +14,7 @@ export default async function AppLayout({
 
   return (
     <AppShell user={user ? { name: user.name ?? "", email: user.email } : null}>
+      {user && <TimezoneDetector currentTimezone={user.timezone ?? null} />}
       {children}
     </AppShell>
   );

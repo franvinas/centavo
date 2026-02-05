@@ -50,6 +50,7 @@ export async function handleMessage({
         name: true,
         baseCurrency: true,
         locale: true,
+        timezone: true,
       },
     });
 
@@ -72,6 +73,7 @@ export async function handleMessage({
       userName: user.name ?? "User",
       baseCurrency: user.baseCurrency,
       locale: user.locale,
+      timezone: user.timezone ?? "UTC",
       categories: categories.map((c) => ({
         id: c.id,
         name: c.name,
