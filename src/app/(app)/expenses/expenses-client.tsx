@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { ExpenseFilters } from "@/components/expenses/expense-filters";
 import { ExpenseList } from "@/components/expenses/expense-list";
@@ -24,6 +24,7 @@ export function ExpensesClient({
 }: ExpensesClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [, startTransition] = useTransition();
   const t = useTranslations("expenses");
 
   const updateParam = useCallback(
@@ -35,9 +36,11 @@ export function ExpensesClient({
         params.delete(key);
       }
       params.delete("page"); // reset page on filter change
-      router.push(`/expenses?${params.toString()}`);
+      startTransition(() => {
+        router.push(`/expenses?${params.toString()}`);
+      });
     },
-    [router, searchParams],
+    [router, searchParams, startTransition],
   );
 
   return (
@@ -65,7 +68,9 @@ export function ExpensesClient({
           if (to) params.set("to", to);
           else params.delete("to");
           params.delete("page");
-          router.push(`/expenses?${params.toString()}`);
+          startTransition(() => {
+            router.push(`/expenses?${params.toString()}`);
+          });
         }}
         categories={categories}
       />
@@ -86,7 +91,9 @@ export function ExpensesClient({
             onClick={() => {
               const params = new URLSearchParams(searchParams.toString());
               params.set("page", String(page - 1));
-              router.push(`/expenses?${params.toString()}`);
+              startTransition(() => {
+                router.push(`/expenses?${params.toString()}`);
+              });
             }}
             disabled={page <= 1}
             className="text-accent-primary disabled:text-text-tertiary text-sm font-medium"
@@ -100,7 +107,9 @@ export function ExpensesClient({
             onClick={() => {
               const params = new URLSearchParams(searchParams.toString());
               params.set("page", String(page + 1));
-              router.push(`/expenses?${params.toString()}`);
+              startTransition(() => {
+                router.push(`/expenses?${params.toString()}`);
+              });
             }}
             disabled={page >= totalPages}
             className="text-accent-primary disabled:text-text-tertiary text-sm font-medium"
