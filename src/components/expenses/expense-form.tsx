@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   X,
@@ -71,6 +71,15 @@ export function ExpenseForm({
   const visibleCategories = showAllCategories
     ? categories
     : categories.slice(0, 8);
+
+  const isDirty = Boolean(amount || description || notes || categoryId);
+
+  useEffect(() => {
+    if (!isDirty) return;
+    const handler = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty]);
 
   const isValid = amount && parseFloat(amount) > 0 && description && categoryId;
 

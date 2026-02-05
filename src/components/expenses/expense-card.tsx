@@ -25,7 +25,7 @@ export function ExpenseCard({ expense }: ExpenseCardProps) {
   return (
     <Link
       href={`/expenses/${expense.id}`}
-      className="hover:bg-bg-muted flex items-center gap-3 rounded-lg px-1 py-3 transition-colors"
+      className="hover:bg-bg-muted flex items-center gap-3 rounded-lg px-1 py-3 transition-colors [contain-intrinsic-size:0_48px] [content-visibility:auto]"
     >
       {/* Category dot */}
       <div
