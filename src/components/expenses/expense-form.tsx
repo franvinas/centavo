@@ -116,9 +116,9 @@ export function ExpenseForm({
   }
 
   return (
-    <div className="bg-bg-surface flex min-h-screen flex-col">
+    <div className="bg-bg-surface flex h-[100dvh] flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4">
+      <div className="flex items-center justify-between px-6 py-3">
         <button onClick={() => router.back()} aria-label="Close">
           <X className="text-text-primary h-6 w-6" />
         </button>
@@ -130,7 +130,7 @@ export function ExpenseForm({
 
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-6">
         {/* Amount hero */}
-        <div className="flex flex-col items-center py-8">
+        <div className="flex flex-col items-center py-4">
           <div className="flex items-baseline">
             <label htmlFor="expense-amount" className="sr-only">
               {t("amount")}
@@ -194,7 +194,7 @@ export function ExpenseForm({
         </div>
 
         {/* Form fields */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div className="flex items-center gap-3">
             <FileText className="text-text-tertiary h-5 w-5 shrink-0" />
             <Input
@@ -230,7 +230,7 @@ export function ExpenseForm({
       </div>
 
       {/* Save button */}
-      <div className="mx-auto w-full max-w-md px-6 pt-4 pb-8">
+      <div className="mx-auto w-full max-w-md px-6 pt-2 pb-4">
         <Button
           onClick={handleSave}
           disabled={!isValid || isPending}
