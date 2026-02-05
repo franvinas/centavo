@@ -49,6 +49,7 @@ export function OnboardingForm() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={t("namePlaceholder")}
+                autoComplete="name"
                 className="border-border-subtle bg-bg-primary text-text-primary placeholder:text-text-tertiary focus:border-accent-primary h-12 w-full rounded-xl border px-4 text-base focus:outline-none"
               />
             </div>

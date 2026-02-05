@@ -108,6 +108,7 @@ export function SettingsClient({ user }: SettingsClientProps) {
               onChange={(e) => setName(e.target.value)}
               className="text-base font-medium"
               aria-label="Display name"
+              autoComplete="name"
             />
             <p className="text-text-tertiary mt-1 text-sm">{user.email}</p>
           </div>

@@ -133,6 +133,7 @@ export function ExpenseForm({
                 if (/^\d*\.?\d{0,2}$/.test(val)) setAmount(val);
               }}
               placeholder="0.00"
+              autoComplete="off"
               className="text-text-primary placeholder:text-text-tertiary w-48 bg-transparent text-center text-5xl font-bold outline-none"
             />
           </div>

@@ -32,6 +32,7 @@ export function MobileNav() {
         <div className="-mt-4 flex flex-col items-center">
           <Link
             href="/expenses/new"
+            aria-label="Add expense"
             className="bg-accent-primary flex h-[60px] w-[60px] items-center justify-center rounded-full shadow-[0_4px_12px_rgba(61,138,90,0.25),0_2px_6px_rgba(61,138,90,0.19)]"
           >
             <Plus className="h-7 w-7 text-white" />
