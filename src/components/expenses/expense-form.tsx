@@ -128,7 +128,7 @@ export function ExpenseForm({
         <div className="w-6" />
       </div>
 
-      <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-6">
+      <div className="mx-auto w-full max-w-md px-6">
         {/* Amount hero */}
         <div className="flex flex-col items-center py-4">
           <div className="flex items-baseline">
