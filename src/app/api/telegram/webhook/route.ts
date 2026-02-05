@@ -1,16 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { webhookCallback } from "grammy";
-import { getBot } from "@/lib/telegram/bot";
+import { after, NextRequest, NextResponse } from "next/server";
+import { isDuplicate } from "@/lib/telegram/dedup";
 import { handleMessage } from "@/lib/telegram/handler";
-
-let initialized = false;
-
-function ensureHandlers() {
-  if (initialized) return;
-  const bot = getBot();
-  bot.on("message:text", handleMessage);
-  initialized = true;
-}
 
 export async function POST(req: NextRequest) {
   // Verify webhook secret
@@ -19,8 +9,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  ensureHandlers();
+  const update = await req.json();
 
-  const handler = webhookCallback(getBot(), "std/http");
-  return handler(req);
+  // Dedup by update_id
+  if (isDuplicate(update.update_id)) {
+    return NextResponse.json({ ok: true });
+  }
+
+  const text = update.message?.text;
+  const chatId = update.message?.chat?.id?.toString();
+  if (!text || !chatId) {
+    return NextResponse.json({ ok: true });
+  }
+
+  // Return 200 immediately, process in background
+  after(() => handleMessage({ chatId, text }));
+  return NextResponse.json({ ok: true });
 }
