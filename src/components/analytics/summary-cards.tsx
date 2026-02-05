@@ -37,7 +37,7 @@ export function SummaryCards({ summary, baseCurrency }: SummaryCardsProps) {
           <p className="text-text-secondary text-sm font-medium">
             {card.label}
           </p>
-          <p className="text-text-primary mt-1 text-2xl font-bold">
+          <p className="text-text-primary mt-1 text-2xl font-bold tabular-nums">
             {card.value}
           </p>
         </div>

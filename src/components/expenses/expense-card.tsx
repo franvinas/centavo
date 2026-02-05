@@ -45,7 +45,7 @@ export function ExpenseCard({ expense }: ExpenseCardProps) {
       </div>
 
       {/* Amount */}
-      <div className="shrink-0 text-right">
+      <div className="shrink-0 text-right tabular-nums">
         <p className="text-text-primary text-sm font-bold">
           {formatCurrency(expense.amount, expense.currency)}
         </p>
