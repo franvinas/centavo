@@ -95,7 +95,7 @@ async function DashboardCategoryBreakdown({ userId }: { userId: string }) {
   const expenses: Expense[] = summary.recentExpenses.map(mapExpense);
 
   return (
-    <div className="bg-bg-surface shadow-card rounded-lg p-5">
+    <div className="bg-bg-surface shadow-card overflow-hidden rounded-lg p-5">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-text-primary text-base font-semibold">
           {t("byCategory")}
@@ -127,7 +127,7 @@ async function DashboardRecentExpenses({
   }));
 
   return (
-    <div className="bg-bg-surface shadow-card rounded-lg p-5">
+    <div className="bg-bg-surface shadow-card overflow-hidden rounded-lg p-5">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-text-primary text-base font-semibold">
           {t("recentExpenses")}
