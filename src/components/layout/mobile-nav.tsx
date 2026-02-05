@@ -67,11 +67,11 @@ function NavTab({
   return (
     <Link
       href={href}
-      className={`flex flex-col items-center gap-0.5 ${
+      className={`flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 ${
         active ? "text-accent-primary" : "text-text-tertiary"
       }`}
     >
-      <Icon className="h-[22px] w-[22px]" />
+      <Icon className="h-6 w-6" />
       <span
         className={`text-[10px] ${active ? "font-semibold" : "font-medium"}`}
       >

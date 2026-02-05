@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import type { Expense } from "@/types";
 import { ExpenseCard } from "./expense-card";
+import { SwipeableExpenseCard } from "./swipeable-expense-card";
 import { formatDateGroup, parseLocalDate, type DateLabels } from "@/lib/format";
 
 interface ExpenseListProps {
@@ -39,7 +40,14 @@ export function ExpenseList({ expenses }: ExpenseListProps) {
           </p>
           <div className="divide-border-subtle divide-y">
             {group.map((expense) => (
-              <ExpenseCard key={expense.id} expense={expense} />
+              <div key={expense.id}>
+                {/* Swipeable on mobile */}
+                <SwipeableExpenseCard expense={expense} />
+                {/* Regular card on desktop */}
+                <div className="hidden md:block">
+                  <ExpenseCard expense={expense} />
+                </div>
+              </div>
             ))}
           </div>
         </div>

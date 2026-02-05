@@ -14,6 +14,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
+import { DeleteConfirmDrawer } from "@/components/ui/delete-confirm-drawer";
 import { CategoryPicker } from "./category-picker";
 import {
   createExpense,
@@ -65,6 +66,7 @@ export function ExpenseForm({
   const [notes, setNotes] = useState(expense?.notes ?? "");
   const [categoryId, setCategoryId] = useState(expense?.categoryId ?? "");
   const [error, setError] = useState("");
+  const [deleteDrawerOpen, setDeleteDrawerOpen] = useState(false);
   const t = useTranslations("expenses");
 
   const isDirty = Boolean(amount || description || notes || categoryId);
@@ -101,13 +103,13 @@ export function ExpenseForm({
   }
 
   function handleDelete() {
-    if (!window.confirm(t("confirmDelete"))) return;
     setError("");
     startTransition(async () => {
       try {
         await deleteExpense(expense!.id);
         router.push("/expenses");
       } catch (e) {
+        setDeleteDrawerOpen(false);
         setError(e instanceof Error ? e.message : "Failed to delete expense");
       }
     });
@@ -244,7 +246,7 @@ export function ExpenseForm({
           <>
             <Button
               variant="ghost"
-              onClick={handleDelete}
+              onClick={() => setDeleteDrawerOpen(true)}
               disabled={isPending}
               className="text-status-negative hover:bg-status-negative/10 hover:text-status-negative mt-3 h-12 w-full text-base font-semibold"
             >
@@ -259,6 +261,13 @@ export function ExpenseForm({
                 {error}
               </p>
             )}
+            <DeleteConfirmDrawer
+              open={deleteDrawerOpen}
+              onOpenChange={setDeleteDrawerOpen}
+              onConfirm={handleDelete}
+              title={t("confirmDelete")}
+              isDeleting={isPending}
+            />
           </>
         )}
       </div>

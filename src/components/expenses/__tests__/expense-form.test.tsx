@@ -239,7 +239,7 @@ describe("ExpenseForm", () => {
 
   it("calls deleteExpense and navigates to /expenses on delete", async () => {
     const user = userEvent.setup();
-    const { container } = render(
+    const { container, baseElement } = render(
       <ExpenseForm
         categories={mockCategories}
         expense={{
@@ -253,13 +253,21 @@ describe("ExpenseForm", () => {
       />,
     );
 
-    vi.spyOn(window, "confirm").mockReturnValue(true);
-
+    // Click the delete button to open the confirmation drawer
     const buttons = container.querySelectorAll("button");
     const deleteButton = Array.from(buttons).find((b) =>
       b.textContent?.includes("Delete Expense"),
     )!;
     await user.click(deleteButton);
+
+    // Find and click the confirm button in the drawer (rendered in portal)
+    const drawerButtons = baseElement.querySelectorAll(
+      '[data-slot="drawer-content"] button',
+    );
+    const confirmButton = Array.from(drawerButtons).find((b) =>
+      b.textContent?.includes("Delete"),
+    )!;
+    await user.click(confirmButton);
 
     expect(mockDeleteExpense).toHaveBeenCalledWith("exp-1");
     expect(mockRouter.push).toHaveBeenCalledWith("/expenses");

@@ -153,6 +153,11 @@
   },
   "common": {
     "expense": "expense",
-    "expenses": "expenses"
+    "expenses": "expenses",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "deleting": "Deleting…",
+    "deleteConfirmTitle": "Delete this item?",
+    "deleteConfirmDescription": "This action cannot be undone."
   }
 }

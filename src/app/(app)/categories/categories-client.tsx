@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DeleteConfirmDrawer } from "@/components/ui/delete-confirm-drawer";
 import { ColorPicker } from "@/components/expenses/color-picker";
 import { IconPicker } from "@/components/expenses/icon-picker";
 import { categoryIconMap } from "@/lib/category-icon-map";
@@ -36,6 +37,10 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
   const [color, setColor] = useState("#E67E22");
   const [icon, setIcon] = useState("UtensilsCrossed");
   const [error, setError] = useState("");
+  const [deleteDrawerOpen, setDeleteDrawerOpen] = useState(false);
+  const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(
+    null,
+  );
   const t = useTranslations("categories");
 
   function openCreate() {
@@ -68,14 +73,23 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
     });
   }
 
-  function handleDelete(id: string) {
-    if (!window.confirm(t("confirmDelete"))) return;
+  function openDeleteDrawer(id: string) {
+    setDeletingCategoryId(id);
+    setDeleteDrawerOpen(true);
+  }
+
+  function handleDelete() {
+    if (!deletingCategoryId) return;
     setError("");
     startTransition(async () => {
       try {
-        await deleteCategory(id);
+        await deleteCategory(deletingCategoryId);
+        setDeleteDrawerOpen(false);
+        setDeletingCategoryId(null);
         router.refresh();
       } catch (e) {
+        setDeleteDrawerOpen(false);
+        setDeletingCategoryId(null);
         setError(e instanceof Error ? e.message : "Failed to delete category");
       }
     });
@@ -169,7 +183,7 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
                 <Pencil className="h-4 w-4" />
               </button>
               <button
-                onClick={() => handleDelete(cat.id)}
+                onClick={() => openDeleteDrawer(cat.id)}
                 disabled={isPending}
                 className="text-text-tertiary hover:text-status-negative p-1.5"
                 aria-label={`Delete ${cat.name}`}
@@ -180,6 +194,14 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
           );
         })}
       </div>
+
+      <DeleteConfirmDrawer
+        open={deleteDrawerOpen}
+        onOpenChange={setDeleteDrawerOpen}
+        onConfirm={handleDelete}
+        title={t("confirmDelete")}
+        isDeleting={isPending}
+      />
     </div>
   );
 }

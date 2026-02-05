@@ -153,6 +153,11 @@
   },
   "common": {
     "expense": "gasto",
-    "expenses": "gastos"
+    "expenses": "gastos",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "deleting": "Eliminando…",
+    "deleteConfirmTitle": "¿Eliminar este elemento?",
+    "deleteConfirmDescription": "Esta acción no se puede deshacer."
   }
 }
