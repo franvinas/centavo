@@ -14,7 +14,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
-import { CategoryChip } from "./category-chip";
+import { CategoryPicker } from "./category-picker";
 import {
   createExpense,
   updateExpense,
@@ -64,13 +64,8 @@ export function ExpenseForm({
   });
   const [notes, setNotes] = useState(expense?.notes ?? "");
   const [categoryId, setCategoryId] = useState(expense?.categoryId ?? "");
-  const [showAllCategories, setShowAllCategories] = useState(false);
   const [error, setError] = useState("");
   const t = useTranslations("expenses");
-
-  const visibleCategories = showAllCategories
-    ? categories
-    : categories.slice(0, 8);
 
   const isDirty = Boolean(amount || description || notes || categoryId);
 
@@ -131,7 +126,7 @@ export function ExpenseForm({
         <div className="w-6" />
       </div>
 
-      <div className="flex flex-1 flex-col px-6">
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-6">
         {/* Amount hero */}
         <div className="flex flex-col items-center py-8">
           <div className="flex items-baseline">
@@ -216,37 +211,16 @@ export function ExpenseForm({
               className="border-border-subtle border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
             />
           </div>
-        </div>
-
-        {/* Category selector */}
-        <div className="mt-6">
-          <p className="text-text-secondary mb-3 text-sm font-medium">
-            {t("category")}
-          </p>
-          <div className="grid grid-cols-4 gap-2">
-            {visibleCategories.map((cat) => (
-              <CategoryChip
-                key={cat.id}
-                category={cat}
-                selected={categoryId === cat.id}
-                onSelect={setCategoryId}
-              />
-            ))}
-          </div>
-          {!showAllCategories && categories.length > 8 && (
-            <button
-              type="button"
-              onClick={() => setShowAllCategories(true)}
-              className="text-accent-primary mt-2 text-sm font-medium"
-            >
-              {t("more")}
-            </button>
-          )}
+          <CategoryPicker
+            categories={categories}
+            selectedId={categoryId}
+            onSelect={setCategoryId}
+          />
         </div>
       </div>
 
       {/* Save button */}
-      <div className="px-6 pt-4 pb-8">
+      <div className="mx-auto w-full max-w-md px-6 pt-4 pb-8">
         <Button
           onClick={handleSave}
           disabled={!isValid || isPending}

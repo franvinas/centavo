@@ -76,7 +76,9 @@
     "deleteExpense": "Delete Expense",
     "confirmDelete": "Are you sure you want to delete this expense?",
     "amount": "Amount",
-    "saving": "Saving\u2026"
+    "saving": "Saving\u2026",
+    "selectCategory": "Select category",
+    "searchCategories": "Search categories\u2026"
   },
   "categories": {
     "title": "Categories",

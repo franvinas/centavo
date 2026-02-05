@@ -76,7 +76,9 @@
     "deleteExpense": "Eliminar gasto",
     "confirmDelete": "\u00bfEst\u00e1s seguro de que quieres eliminar este gasto?",
     "amount": "Monto",
-    "saving": "Guardando\u2026"
+    "saving": "Guardando\u2026",
+    "selectCategory": "Seleccionar categoría",
+    "searchCategories": "Buscar categorías\u2026"
   },
   "categories": {
     "title": "Categorías",
