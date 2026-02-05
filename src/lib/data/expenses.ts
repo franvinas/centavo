@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "@/lib/db";
 
 interface GetExpensesOptions {
@@ -51,7 +52,9 @@ export async function getExpenseById(id: string, userId: string) {
   });
 }
 
-export async function getExpenseSummary(userId: string) {
+export const getExpenseSummary = cache(async function getExpenseSummary(
+  userId: string,
+) {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -87,4 +90,4 @@ export async function getExpenseSummary(userId: string) {
     lastMonthCount: lastMonthExpenses.length,
     recentExpenses: currentMonthExpenses,
   };
-}
+});
