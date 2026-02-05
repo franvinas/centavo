@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { formatCurrency, formatRelativeDate, formatDateGroup } from "../format";
+import {
+  formatCurrency,
+  formatNumber,
+  formatRelativeDate,
+  formatDateGroup,
+} from "../format";
 
 describe("formatCurrency", () => {
   it("formats USD by default", () => {
@@ -21,6 +26,28 @@ describe("formatCurrency", () => {
 
   it("rounds to 2 decimal places", () => {
     expect(formatCurrency(10.999)).toBe("$11.00");
+  });
+});
+
+describe("formatNumber", () => {
+  it("formats integers with thousands separators", () => {
+    expect(formatNumber(1234)).toBe("1,234");
+  });
+
+  it("formats large numbers", () => {
+    expect(formatNumber(1234567)).toBe("1,234,567");
+  });
+
+  it("formats small numbers without separators", () => {
+    expect(formatNumber(999)).toBe("999");
+  });
+
+  it("formats zero", () => {
+    expect(formatNumber(0)).toBe("0");
+  });
+
+  it("formats decimals", () => {
+    expect(formatNumber(1234.56)).toBe("1,234.56");
   });
 });
 

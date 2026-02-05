@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import type { AnalyticsSummary } from "@/types/analytics";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatNumber } from "@/lib/format";
 
 interface SummaryCardsProps {
   summary: AnalyticsSummary;
@@ -19,7 +19,7 @@ export function SummaryCards({ summary, baseCurrency }: SummaryCardsProps) {
     },
     {
       label: t("transactions"),
-      value: summary.transactionCount.toString(),
+      value: formatNumber(summary.transactionCount),
     },
     {
       label: t("dailyAverage"),

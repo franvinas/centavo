@@ -10,6 +10,10 @@ export function formatCurrency(
   }).format(amount);
 }
 
+export function formatNumber(value: number): string {
+  return new Intl.NumberFormat("en-US").format(value);
+}
+
 /**
  * Parse a date string as a local date. ISO strings like
  * "2025-02-02T00:00:00.000Z" are UTC, which shifts the day

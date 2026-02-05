@@ -22,7 +22,7 @@ import {
 } from "@/lib/actions/expenses";
 import type { Category } from "@/types";
 import { CURRENCIES } from "@/lib/constants";
-import { parseLocalDate } from "@/lib/format";
+import { parseLocalDate, formatNumber } from "@/lib/format";
 
 interface ExpenseFormProps {
   expense?: {
@@ -138,9 +138,17 @@ export function ExpenseForm({
               id="expense-amount"
               type="text"
               inputMode="decimal"
-              value={amount}
+              value={
+                amount
+                  ? amount.includes(".")
+                    ? formatNumber(parseFloat(amount.split(".")[0])) +
+                      "." +
+                      amount.split(".")[1]
+                    : formatNumber(parseFloat(amount))
+                  : ""
+              }
               onChange={(e) => {
-                const val = e.target.value;
+                const val = e.target.value.replace(/,/g, "");
                 if (/^\d*\.?\d{0,2}$/.test(val)) setAmount(val);
               }}
               placeholder="0.00"

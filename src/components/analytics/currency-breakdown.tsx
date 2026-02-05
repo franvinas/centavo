@@ -1,5 +1,5 @@
 import type { CurrencySpending } from "@/types/analytics";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatNumber } from "@/lib/format";
 
 interface CurrencyBreakdownProps {
   data: CurrencySpending[];
@@ -46,7 +46,7 @@ export function CurrencyBreakdown({
             />
           </div>
           <p className="text-text-tertiary mt-0.5 text-xs">
-            {item.count} transaction{item.count !== 1 ? "s" : ""}
+            {formatNumber(item.count)} transaction{item.count !== 1 ? "s" : ""}
           </p>
         </div>
       ))}
