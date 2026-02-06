@@ -1,7 +1,30 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, userEvent } from "@/test-utils/react-testing";
 import { ExpenseForm } from "../expense-form";
 import type { Category } from "@/types";
+
+// Mock browser APIs that vaul drawer library needs but jsdom doesn't support
+beforeEach(() => {
+  Element.prototype.setPointerCapture = vi.fn();
+  Element.prototype.releasePointerCapture = vi.fn();
+  // Mock window.getComputedStyle to return valid transform value
+  const originalGetComputedStyle = window.getComputedStyle;
+  vi.spyOn(window, "getComputedStyle").mockImplementation((el, pseudo) => {
+    const style = originalGetComputedStyle(el, pseudo);
+    return {
+      ...style,
+      transform: style.transform || "none",
+      getPropertyValue: (prop: string) => {
+        if (prop === "transform") return style.transform || "none";
+        return style.getPropertyValue(prop);
+      },
+    } as CSSStyleDeclaration;
+  });
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 // Mock server actions
 const mockDeleteExpense = vi.fn().mockResolvedValue(undefined);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   X,
@@ -47,6 +47,9 @@ export function ExpenseForm({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [amount, setAmount] = useState(expense?.amount.toFixed(2) ?? "");
+  const [scale, setScale] = useState(1);
+  const measureRef = useRef<HTMLSpanElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [currency, setCurrency] = useState(
     expense?.currency ?? defaultCurrency,
   );
@@ -70,6 +73,30 @@ export function ExpenseForm({
   const t = useTranslations("expenses");
 
   const isDirty = Boolean(amount || description || notes || categoryId);
+
+  const displayAmount = amount
+    ? amount.includes(".")
+      ? formatNumber(parseFloat(amount.split(".")[0])) +
+        "." +
+        amount.split(".")[1]
+      : formatNumber(parseFloat(amount))
+    : "";
+
+  useEffect(() => {
+    if (measureRef.current && containerRef.current) {
+      const textWidth = measureRef.current.offsetWidth;
+      const containerWidth = containerRef.current.offsetWidth;
+      const maxWidth = containerWidth - 24; // account for padding
+
+      if (textWidth > maxWidth && maxWidth > 0) {
+        // Scale down the entire amount display proportionally
+        const newScale = Math.max(maxWidth / textWidth, 0.4); // min 40% scale
+        setScale(newScale);
+      } else {
+        setScale(1);
+      }
+    }
+  }, [displayAmount]);
 
   useEffect(() => {
     if (!isDirty) return;
@@ -128,35 +155,49 @@ export function ExpenseForm({
         <div className="w-6" />
       </div>
 
-      <div className="mx-auto w-full max-w-md px-6">
+      <div ref={containerRef} className="mx-auto w-full max-w-md px-6">
         {/* Amount hero */}
         <div className="flex flex-col items-center py-4">
-          <div className="flex items-baseline">
+          {/* Hidden span for measuring text width at base size */}
+          <span
+            ref={measureRef}
+            aria-hidden="true"
+            className="pointer-events-none absolute left-[-9999px] font-bold whitespace-pre"
+            style={{ fontSize: "48px" }}
+          >
+            {displayAmount || "0.00"}
+          </span>
+          <div className="flex w-full justify-center">
             <label htmlFor="expense-amount" className="sr-only">
               {t("amount")}
             </label>
-            <span className="text-text-tertiary text-lg">$</span>
-            <input
-              id="expense-amount"
-              type="text"
-              inputMode="decimal"
-              value={
-                amount
-                  ? amount.includes(".")
-                    ? formatNumber(parseFloat(amount.split(".")[0])) +
-                      "." +
-                      amount.split(".")[1]
-                    : formatNumber(parseFloat(amount))
-                  : ""
-              }
-              onChange={(e) => {
-                const val = e.target.value.replace(/,/g, "");
-                if (/^\d*\.?\d{0,2}$/.test(val)) setAmount(val);
+            <div
+              className="flex items-baseline"
+              style={{
+                transform: `scale(${scale})`,
+                transformOrigin: "center",
               }}
-              placeholder="0.00"
-              autoComplete="off"
-              className="text-text-primary placeholder:text-text-tertiary w-48 bg-transparent text-center text-5xl font-bold outline-none"
-            />
+            >
+              <span className="text-text-tertiary text-5xl leading-none">
+                $
+              </span>
+              <input
+                id="expense-amount"
+                type="text"
+                inputMode="decimal"
+                value={displayAmount}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/,/g, "");
+                  if (/^\d*\.?\d{0,2}$/.test(val)) setAmount(val);
+                }}
+                placeholder="0.00"
+                autoComplete="off"
+                className="text-text-primary placeholder:text-text-tertiary bg-transparent text-5xl leading-none font-bold outline-none"
+                style={{
+                  width: `${Math.max((displayAmount || "0.00").length, 4) * 0.6}em`,
+                }}
+              />
+            </div>
           </div>
           <div className="relative mt-2">
             <button
