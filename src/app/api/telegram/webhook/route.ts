@@ -17,12 +17,13 @@ export async function POST(req: NextRequest) {
   }
 
   const text = update.message?.text;
+  const voiceFileId = update.message?.voice?.file_id as string | undefined;
   const chatId = update.message?.chat?.id?.toString();
-  if (!text || !chatId) {
+  if ((!text && !voiceFileId) || !chatId) {
     return NextResponse.json({ ok: true });
   }
 
   // Return 200 immediately, process in background
-  after(() => handleMessage({ chatId, text }));
+  after(() => handleMessage({ chatId, text, voiceFileId }));
   return NextResponse.json({ ok: true });
 }

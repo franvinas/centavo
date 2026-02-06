@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import { prisma } from "@/lib/db";
 import { getCategories } from "@/lib/data/categories";
 import { getBot } from "@/lib/telegram/bot";
+import { transcribeVoice } from "@/lib/telegram/transcribe";
 import { getConversationHistory, saveMessages } from "./conversation";
 import { chat } from "./llm";
 
@@ -18,11 +19,22 @@ async function sendReply(chatId: string, text: string) {
 export async function handleMessage({
   chatId,
   text,
+  voiceFileId,
 }: {
   chatId: string;
-  text: string;
+  text?: string;
+  voiceFileId?: string;
 }) {
   try {
+    // Transcribe voice message if present
+    if (voiceFileId && !text) {
+      text = await transcribeVoice(voiceFileId);
+    }
+
+    if (!text) {
+      return;
+    }
+
     // Handle /start command — generate link token
     if (text.startsWith("/start")) {
       const token = crypto.randomBytes(3).toString("hex"); // 6-char hex code
