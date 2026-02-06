@@ -46,6 +46,11 @@ Personal expense tracker with multi-currency support. Track spending across curr
    | `GOOGLE_CLIENT_SECRET`       | Google OAuth client secret             |
    | `RESEND_API_KEY`             | Resend API key for email OTP           |
    | `OPEN_EXCHANGE_RATES_APP_ID` | Open Exchange Rates API key            |
+   | `OPENAI_API_KEY`             | OpenAI API key (Telegram assistant)    |
+   | `TELEGRAM_BOT_TOKEN`         | Telegram bot token                     |
+   | `TELEGRAM_WEBHOOK_SECRET`    | Secret used to validate webhook calls  |
+   | `TELEGRAM_WEBHOOK_URL`       | Public `/api/telegram/webhook` URL     |
+   | `TELEGRAM_BOT_USERNAME`      | Bot username (default `CentaBot`)      |
 
 3. Set up the database:
 

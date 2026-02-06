@@ -1,41 +1,31 @@
-import { NextRequest, NextResponse } from "next/server";
+import crypto from "node:crypto";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getAuthUser, unauthorized, badRequest } from "@/lib/api-utils";
+import { getAuthUser, unauthorized } from "@/lib/api-utils";
 
-export async function POST(req: NextRequest) {
+const LINK_TOKEN_TTL_MS = 10 * 60 * 1000;
+const DEFAULT_BOT_USERNAME = "CentaBot";
+
+export async function POST() {
   const user = await getAuthUser();
   if (!user) return unauthorized();
 
-  const body = await req.json();
-  const token = body?.token?.trim();
+  const token = crypto.randomBytes(24).toString("base64url");
+  const expiresAt = new Date(Date.now() + LINK_TOKEN_TTL_MS);
+  const botUsername =
+    process.env.TELEGRAM_BOT_USERNAME?.trim() || DEFAULT_BOT_USERNAME;
 
-  if (!token || typeof token !== "string") {
-    return badRequest("Link code is required");
-  }
-
-  const linkToken = await prisma.telegramLinkToken.findUnique({
-    where: { token },
+  await prisma.telegramLinkToken.upsert({
+    where: { userId: user.id },
+    update: { token, expiresAt },
+    create: { userId: user.id, token, expiresAt },
   });
 
-  if (!linkToken) {
-    return badRequest("Invalid link code");
-  }
-
-  if (linkToken.expiresAt < new Date()) {
-    await prisma.telegramLinkToken.delete({ where: { id: linkToken.id } });
-    return badRequest("Link code has expired. Send /start to get a new one.");
-  }
-
-  // Link the Telegram chat to this user
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { telegramChatId: linkToken.chatId },
+  return NextResponse.json({
+    success: true,
+    url: `https://t.me/${botUsername}?start=${token}`,
+    expiresAt: expiresAt.toISOString(),
   });
-
-  // Clean up the token
-  await prisma.telegramLinkToken.delete({ where: { id: linkToken.id } });
-
-  return NextResponse.json({ success: true });
 }
 
 export async function DELETE() {

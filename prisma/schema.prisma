@@ -120,7 +120,7 @@ model TelegramMessage {
 model TelegramLinkToken {
   id        String   @id @default(cuid())
   token     String   @unique
-  chatId    String   @unique
+  userId    String   @unique @map("chatId")
   expiresAt DateTime
   createdAt DateTime @default(now())
 }

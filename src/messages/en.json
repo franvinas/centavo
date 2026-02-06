@@ -126,9 +126,10 @@
     "saving": "Saving\u2026",
     "saved": "Saved!",
     "telegram": "Telegram",
-    "telegramHint": "Link your Telegram account to track expenses via chat. Send /start to @CentaBot to get a link code.",
+    "telegramHint": "Link your Telegram account to track expenses via chat.",
     "linkCode": "Enter link code",
-    "linkButton": "Link",
+    "linkButton": "Connect on Telegram",
+    "telegramConnectHelp": "We will open @CentaBot. Tap Start in Telegram to finish connecting.",
     "unlinkButton": "Unlink",
     "telegramLinked": "Connected",
     "signOut": "Sign Out"

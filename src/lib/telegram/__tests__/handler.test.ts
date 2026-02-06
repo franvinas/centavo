@@ -38,25 +38,45 @@ describe("handleMessage", () => {
     vi.clearAllMocks();
   });
 
-  it("handles /start command — generates link token", async () => {
-    prismaMock.telegramLinkToken.upsert.mockResolvedValue({
-      id: "lt-1",
-      token: "abc123",
-      chatId: "123456",
-      expiresAt: new Date(),
-      createdAt: new Date(),
-    } as never);
-
+  it("handles /start without payload", async () => {
     await handleMessage({ chatId: "123456", text: "/start" });
 
-    expect(prismaMock.telegramLinkToken.upsert).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { chatId: "123456" },
-      }),
-    );
     expect(mockSendMessage).toHaveBeenCalledWith(
       "123456",
-      expect.stringContaining("link code"),
+      expect.stringContaining("Connect on Telegram"),
+      expect.objectContaining({ parse_mode: "Markdown" }),
+    );
+  });
+
+  it("handles /start payload and links account", async () => {
+    prismaMock.telegramLinkToken.findUnique.mockResolvedValue({
+      id: "lt-1",
+      token: "abc123",
+      userId: "user-1",
+      expiresAt: new Date(Date.now() + 60_000),
+      createdAt: new Date(),
+    } as never);
+    prismaMock.user.findUnique.mockResolvedValue(null);
+    prismaMock.user.update.mockResolvedValue({} as never);
+    prismaMock.telegramLinkToken.deleteMany.mockResolvedValue({
+      count: 1,
+    } as never);
+
+    await handleMessage({ chatId: "123456", text: "/start abc123" });
+
+    expect(prismaMock.telegramLinkToken.findUnique).toHaveBeenCalledWith({
+      where: { token: "abc123" },
+    });
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: "user-1" },
+      data: { telegramChatId: "123456" },
+    });
+    expect(prismaMock.telegramLinkToken.deleteMany).toHaveBeenCalledWith({
+      where: { userId: "user-1" },
+    });
+    expect(mockSendMessage).toHaveBeenCalledWith(
+      "123456",
+      expect.stringContaining("Connected successfully"),
       expect.objectContaining({ parse_mode: "Markdown" }),
     );
   });

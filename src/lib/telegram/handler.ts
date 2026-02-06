@@ -1,4 +1,3 @@
-import crypto from "node:crypto";
 import { prisma } from "@/lib/db";
 import { getCategories } from "@/lib/data/categories";
 import { getBot } from "@/lib/telegram/bot";
@@ -35,21 +34,63 @@ export async function handleMessage({
       return;
     }
 
-    // Handle /start command — generate link token
+    // Handle /start command with deep-link payload
     if (text.startsWith("/start")) {
-      const token = crypto.randomBytes(3).toString("hex"); // 6-char hex code
-      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+      const payload = text.trim().split(/\s+/, 2)[1];
+      if (!payload) {
+        await sendReply(
+          chatId,
+          "To connect your account, open Centavo Settings and tap *Connect on Telegram*.",
+        );
+        return;
+      }
 
-      // Upsert to handle re-starts
-      await prisma.telegramLinkToken.upsert({
-        where: { chatId },
-        update: { token, expiresAt },
-        create: { token, chatId, expiresAt },
+      const linkToken = await prisma.telegramLinkToken.findUnique({
+        where: { token: payload },
+      });
+
+      if (!linkToken) {
+        await sendReply(
+          chatId,
+          "This connection link is invalid or already used. Please start again from Centavo Settings.",
+        );
+        return;
+      }
+
+      if (linkToken.expiresAt < new Date()) {
+        await prisma.telegramLinkToken.delete({ where: { id: linkToken.id } });
+        await sendReply(
+          chatId,
+          "This connection link has expired. Please start again from Centavo Settings.",
+        );
+        return;
+      }
+
+      const ownerOfChat = await prisma.user.findUnique({
+        where: { telegramChatId: chatId },
+        select: { id: true },
+      });
+
+      if (ownerOfChat && ownerOfChat.id !== linkToken.userId) {
+        await sendReply(
+          chatId,
+          "This Telegram account is already connected to another Centavo account.",
+        );
+        return;
+      }
+
+      await prisma.user.update({
+        where: { id: linkToken.userId },
+        data: { telegramChatId: chatId },
+      });
+
+      await prisma.telegramLinkToken.deleteMany({
+        where: { userId: linkToken.userId },
       });
 
       await sendReply(
         chatId,
-        `Your link code is: *${token}*\n\nEnter this code in Centavo Settings to connect your account. It expires in 10 minutes.`,
+        "Connected successfully. You can now track expenses from Telegram.",
       );
       return;
     }

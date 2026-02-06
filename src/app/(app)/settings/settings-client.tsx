@@ -35,8 +35,6 @@ export function SettingsClient({ user }: SettingsClientProps) {
   const [name, setName] = useState(user.name);
   const [baseCurrency, setBaseCurrency] = useState(user.baseCurrency);
   const [saved, setSaved] = useState(false);
-  const [telegramLinked, setTelegramLinked] = useState(!!user.telegramChatId);
-  const [linkCode, setLinkCode] = useState("");
   const [linkError, setLinkError] = useState("");
   const t = useTranslations("settings");
 
@@ -61,15 +59,20 @@ export function SettingsClient({ user }: SettingsClientProps) {
     startTransition(async () => {
       const res = await fetch("/api/telegram/link", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: linkCode }),
       });
+
       if (res.ok) {
-        setTelegramLinked(true);
-        setLinkCode("");
+        const data = (await res.json()) as { url?: string };
+        if (data.url) {
+          window.open(data.url, "_blank", "noopener,noreferrer");
+        }
+
+        setTimeout(() => {
+          router.refresh();
+        }, 2000);
       } else {
         const data = await res.json();
-        setLinkError(data.error ?? "Failed to link");
+        setLinkError(data.error ?? "Failed to start Telegram connection");
       }
     });
   }
@@ -78,7 +81,7 @@ export function SettingsClient({ user }: SettingsClientProps) {
     startTransition(async () => {
       const res = await fetch("/api/telegram/link", { method: "DELETE" });
       if (res.ok) {
-        setTelegramLinked(false);
+        router.refresh();
       }
     });
   }
@@ -169,7 +172,7 @@ export function SettingsClient({ user }: SettingsClientProps) {
           {t("telegram")}
         </h2>
         <p className="text-text-secondary mb-4 text-sm">{t("telegramHint")}</p>
-        {telegramLinked ? (
+        {user.telegramChatId ? (
           <div className="flex items-center justify-between">
             <span className="bg-accent-light text-accent-primary rounded-full px-3 py-1 text-sm font-medium">
               {t("telegramLinked")}
@@ -185,21 +188,16 @@ export function SettingsClient({ user }: SettingsClientProps) {
           </div>
         ) : (
           <div className="space-y-2">
-            <div className="flex gap-2">
-              <Input
-                value={linkCode}
-                onChange={(e) => setLinkCode(e.target.value)}
-                placeholder={t("linkCode")}
-                className="flex-1"
-              />
-              <Button
-                onClick={handleTelegramLink}
-                disabled={isPending || !linkCode.trim()}
-                className="bg-accent-primary hover:bg-accent-primary/90 text-white"
-              >
-                {t("linkButton")}
-              </Button>
-            </div>
+            <Button
+              onClick={handleTelegramLink}
+              disabled={isPending}
+              className="bg-accent-primary hover:bg-accent-primary/90 text-white"
+            >
+              {t("linkButton")}
+            </Button>
+            <p className="text-text-tertiary text-xs">
+              {t("telegramConnectHelp")}
+            </p>
             {linkError && (
               <p className="text-status-negative text-sm">{linkError}</p>
             )}
