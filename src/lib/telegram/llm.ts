@@ -25,8 +25,38 @@ interface ChatContext {
   categories: Array<{ id: string; name: string; icon: string | null }>;
 }
 
+export function getCurrentDateInTimeZone(
+  timezone: string,
+  now: Date = new Date(),
+): string {
+  const formatDate = (timeZone: string): string => {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(now);
+
+    const year = parts.find((part) => part.type === "year")?.value;
+    const month = parts.find((part) => part.type === "month")?.value;
+    const day = parts.find((part) => part.type === "day")?.value;
+
+    if (!year || !month || !day) {
+      throw new Error("Could not format date parts");
+    }
+
+    return `${year}-${month}-${day}`;
+  };
+
+  try {
+    return formatDate(timezone);
+  } catch {
+    return formatDate("UTC");
+  }
+}
+
 export function buildSystemPrompt(context: ChatContext): string {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getCurrentDateInTimeZone(context.timezone);
   const categoryList = context.categories
     .map((c) => `- ${c.name} (id: ${c.id})`)
     .join("\n");

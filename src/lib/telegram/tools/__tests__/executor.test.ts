@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { prismaMock, resetPrismaMock } from "@/test-utils/prisma-mock";
 import { executeTool } from "../executor";
 
 vi.mock("@/lib/services/expenses", () => ({
@@ -33,6 +34,7 @@ const mockGetCategories = vi.mocked(getCategories);
 
 describe("executeTool", () => {
   beforeEach(() => {
+    resetPrismaMock();
     vi.clearAllMocks();
   });
 
@@ -113,6 +115,52 @@ describe("executeTool", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].description).toBe("Coffee");
+  });
+
+  it("add_expense defaults date using user's timezone when missing", async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date("2026-02-06T00:30:00.000Z"));
+      prismaMock.user.findUnique.mockResolvedValue({
+        timezone: "America/Argentina/Buenos_Aires",
+      } as never);
+      mockCreateExpense.mockResolvedValue({
+        id: "exp-2",
+        description: "Dinner",
+        amount: 40 as never,
+        currency: "ARS",
+        baseAmount: 40 as never,
+        exchangeRate: 1 as never,
+        date: new Date("2026-02-05"),
+        categoryId: "cat-1",
+        userId: "user-1",
+        notes: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        category: {
+          id: "cat-1",
+          name: "Food",
+          color: "#E8855B",
+          icon: "UtensilsCrossed",
+          userId: "user-1",
+          createdAt: new Date(),
+        },
+      });
+
+      await executeTool("user-1", "add_expense", {
+        amount: 40,
+        currency: "ARS",
+        description: "Dinner",
+        categoryId: "cat-1",
+      });
+
+      expect(mockCreateExpense).toHaveBeenCalledWith(
+        "user-1",
+        expect.objectContaining({ date: "2026-02-05" }),
+      );
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("list_categories returns categories", async () => {

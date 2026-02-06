@@ -6,6 +6,46 @@ import {
 import { getExpenses, getExpenseSummary } from "@/lib/data/expenses";
 import { getSpendingByCategory } from "@/lib/data/analytics";
 import { getCategories } from "@/lib/data/categories";
+import { prisma } from "@/lib/db";
+
+function getCurrentDateInTimeZone(
+  timezone: string,
+  now: Date = new Date(),
+): string {
+  const formatDate = (timeZone: string): string => {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(now);
+
+    const year = parts.find((part) => part.type === "year")?.value;
+    const month = parts.find((part) => part.type === "month")?.value;
+    const day = parts.find((part) => part.type === "day")?.value;
+
+    if (!year || !month || !day) {
+      throw new Error("Could not format date parts");
+    }
+
+    return `${year}-${month}-${day}`;
+  };
+
+  try {
+    return formatDate(timezone);
+  } catch {
+    return formatDate("UTC");
+  }
+}
+
+async function getDefaultExpenseDate(userId: string): Promise<string> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { timezone: true },
+  });
+
+  return getCurrentDateInTimeZone(user?.timezone ?? "UTC");
+}
 
 function serializeExpense(e: Record<string, unknown>) {
   return {
@@ -32,12 +72,17 @@ export async function executeTool(
 ): Promise<string> {
   switch (toolName) {
     case "add_expense": {
+      const date =
+        typeof args.date === "string" && args.date.trim().length > 0
+          ? args.date
+          : await getDefaultExpenseDate(userId);
+
       const expense = await createExpenseForUser(userId, {
         amount: args.amount as number,
         currency: args.currency as string,
         description: args.description as string,
         categoryId: args.categoryId as string,
-        date: args.date as string,
+        date,
         notes: args.notes as string | undefined,
       });
       return JSON.stringify(serializeExpense(expense as never));
