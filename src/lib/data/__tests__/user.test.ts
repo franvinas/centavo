@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { prismaMock, resetPrismaMock } from "@/test-utils/prisma-mock";
 import { mockAuth, mockUnauthenticated } from "@/test-utils/auth-mock";
 import { createPrismaUser } from "@/test-utils/factories";

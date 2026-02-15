@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { prismaMock, resetPrismaMock } from "@/test-utils/prisma-mock";
 import { mockAuth, mockUnauthenticated } from "@/test-utils/auth-mock";
-import { createPrismaExpense, createPrismaUser } from "@/test-utils/factories";
+import { createPrismaExpense } from "@/test-utils/factories";
 import { GET, POST } from "../route";
 import { NextRequest } from "next/server";
 

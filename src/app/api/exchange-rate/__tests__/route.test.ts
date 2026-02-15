@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { mockAuth, mockUnauthenticated } from "@/test-utils/auth-mock";
 import { GET } from "../route";
 import { NextRequest } from "next/server";
