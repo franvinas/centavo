@@ -143,19 +143,21 @@ export function ExpenseForm({
   }
 
   return (
-    <div className="bg-bg-surface flex h-[100dvh] flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 py-3">
-        <button onClick={() => router.back()} aria-label="Close">
-          <X className="text-text-primary h-6 w-6" />
-        </button>
-        <h1 className="text-text-primary text-base font-semibold">
-          {expense ? t("editExpense") : t("addExpense")}
-        </h1>
-        <div className="w-6" />
-      </div>
-
-      <div ref={containerRef} className="mx-auto w-full max-w-md px-6">
+    <div className="bg-bg-primary flex h-[100dvh] flex-col">
+      <div
+        ref={containerRef}
+        className="bg-bg-surface shadow-card mx-auto w-full max-w-md rounded-lg p-5"
+      >
+        {/* Header */}
+        <div className="mb-2 flex items-center justify-between">
+          <button onClick={() => router.back()} aria-label="Close">
+            <X className="text-text-primary h-6 w-6" />
+          </button>
+          <h1 className="text-text-primary text-base font-semibold">
+            {expense ? t("editExpense") : t("addExpense")}
+          </h1>
+          <div className="w-6" />
+        </div>
         {/* Amount hero */}
         <div className="flex flex-col items-center py-4">
           {/* Hidden span for measuring text width at base size */}
@@ -268,49 +270,49 @@ export function ExpenseForm({
             onSelect={setCategoryId}
           />
         </div>
-      </div>
 
-      {/* Save button */}
-      <div className="mx-auto w-full max-w-md px-6 pt-2 pb-4">
-        <Button
-          onClick={handleSave}
-          disabled={!isValid || isPending}
-          className="bg-accent-primary hover:bg-accent-primary/90 h-14 w-full rounded-md text-base font-semibold text-white disabled:opacity-50"
-        >
-          {isPending
-            ? t("saving")
-            : expense
-              ? t("updateExpense")
-              : t("saveExpense")}
-        </Button>
-        {expense && (
-          <>
-            <Button
-              variant="ghost"
-              onClick={() => setDeleteDrawerOpen(true)}
-              disabled={isPending}
-              className="text-status-negative hover:bg-status-negative/10 hover:text-status-negative mt-3 h-12 w-full text-base font-semibold"
-            >
-              <Trash2 className="mr-2 h-5 w-5" />
-              {t("deleteExpense")}
-            </Button>
-            {error && (
-              <p
-                role="alert"
-                className="text-status-negative mt-2 text-center text-sm"
+        {/* Save button */}
+        <div className="pt-2">
+          <Button
+            onClick={handleSave}
+            disabled={!isValid || isPending}
+            className="bg-accent-primary hover:bg-accent-primary/90 h-14 w-full rounded-md text-base font-semibold text-white disabled:opacity-50"
+          >
+            {isPending
+              ? t("saving")
+              : expense
+                ? t("updateExpense")
+                : t("saveExpense")}
+          </Button>
+          {expense && (
+            <>
+              <Button
+                variant="ghost"
+                onClick={() => setDeleteDrawerOpen(true)}
+                disabled={isPending}
+                className="text-status-negative hover:bg-status-negative/10 hover:text-status-negative mt-3 h-12 w-full text-base font-semibold"
               >
-                {error}
-              </p>
-            )}
-            <DeleteConfirmDrawer
-              open={deleteDrawerOpen}
-              onOpenChange={setDeleteDrawerOpen}
-              onConfirm={handleDelete}
-              title={t("confirmDelete")}
-              isDeleting={isPending}
-            />
-          </>
-        )}
+                <Trash2 className="mr-2 h-5 w-5" />
+                {t("deleteExpense")}
+              </Button>
+              {error && (
+                <p
+                  role="alert"
+                  className="text-status-negative mt-2 text-center text-sm"
+                >
+                  {error}
+                </p>
+              )}
+              <DeleteConfirmDrawer
+                open={deleteDrawerOpen}
+                onOpenChange={setDeleteDrawerOpen}
+                onConfirm={handleDelete}
+                title={t("confirmDelete")}
+                isDeleting={isPending}
+              />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

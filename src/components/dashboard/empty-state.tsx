@@ -15,7 +15,7 @@ export async function EmptyStateDashboard({ userName }: { userName: string }) {
         </p>
       </div>
 
-      <div className="bg-bg-surface shadow-card flex flex-col items-center gap-4 rounded-2xl p-8">
+      <div className="bg-bg-surface shadow-card flex flex-col items-center gap-4 rounded-lg p-5">
         <div className="bg-accent-light flex h-14 w-14 items-center justify-center rounded-full">
           <CirclePlus className="text-accent-primary h-7 w-7" />
         </div>

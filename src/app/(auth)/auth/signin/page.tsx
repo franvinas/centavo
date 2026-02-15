@@ -180,7 +180,7 @@ function SignInContent() {
           </div>
         )}
 
-        <div className="bg-bg-surface shadow-card rounded-lg p-6">
+        <div className="bg-bg-surface shadow-card rounded-lg p-5">
           {emailSent ? (
             <div className="text-center">
               <Mail className="text-accent-primary mx-auto h-10 w-10" />

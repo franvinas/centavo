@@ -39,7 +39,7 @@ export default async function AnalyticsPage({
           </h1>
           <p className="text-text-secondary mt-1 text-sm">{t("subtitle")}</p>
         </div>
-        <div className="bg-bg-surface shadow-card rounded-lg p-8 text-center">
+        <div className="bg-bg-surface shadow-card rounded-lg p-5 text-center">
           <p className="text-text-tertiary text-sm">{t("noExpenses")}</p>
         </div>
       </div>

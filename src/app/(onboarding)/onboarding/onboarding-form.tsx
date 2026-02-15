@@ -33,7 +33,7 @@ export function OnboardingForm() {
           {t("subtitle")}
         </p>
 
-        <div className="bg-bg-surface shadow-card mt-6 w-full rounded-2xl p-6">
+        <div className="bg-bg-surface shadow-card mt-6 w-full rounded-lg p-5">
           <div className="space-y-6">
             <div className="space-y-2">
               <label
