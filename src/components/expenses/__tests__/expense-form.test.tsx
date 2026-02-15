@@ -157,7 +157,7 @@ describe("ExpenseForm", () => {
     );
 
     const amountInput = container.querySelector(
-      'input[placeholder="0.00"]',
+      'input[id="expense-amount"]',
     ) as HTMLInputElement;
     expect(amountInput?.value).toBe("25.50");
 
@@ -176,7 +176,7 @@ describe("ExpenseForm", () => {
     const user = userEvent.setup();
     const { container } = render(<ExpenseForm categories={mockCategories} />);
 
-    const amountInput = container.querySelector('input[placeholder="0.00"]')!;
+    const amountInput = container.querySelector('input[id="expense-amount"]')!;
     await user.type(amountInput, "12.34");
     expect((amountInput as HTMLInputElement).value).toBe("12.34");
   });

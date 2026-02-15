@@ -22,7 +22,7 @@ import {
   deleteExpense,
 } from "@/lib/actions/expenses";
 import type { Category } from "@/types";
-import { CURRENCIES } from "@/lib/constants";
+import { CURRENCIES, CURRENCY_SYMBOLS } from "@/lib/constants";
 import { parseLocalDate, formatNumber } from "@/lib/format";
 
 interface ExpenseFormProps {
@@ -48,8 +48,10 @@ export function ExpenseForm({
   const [isPending, startTransition] = useTransition();
   const [amount, setAmount] = useState(expense?.amount.toFixed(2) ?? "");
   const [scale, setScale] = useState(1);
+  const [measuredWidth, setMeasuredWidth] = useState(0);
   const measureRef = useRef<HTMLSpanElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [currency, setCurrency] = useState(
     expense?.currency ?? defaultCurrency,
   );
@@ -74,6 +76,8 @@ export function ExpenseForm({
 
   const isDirty = Boolean(amount || description || notes || categoryId);
 
+  const currencySymbol = CURRENCY_SYMBOLS[currency] ?? "$";
+
   const displayAmount = amount
     ? amount.includes(".")
       ? formatNumber(parseFloat(amount.split(".")[0])) +
@@ -82,21 +86,26 @@ export function ExpenseForm({
       : formatNumber(parseFloat(amount))
     : "";
 
+  const fullDisplay = displayAmount
+    ? `${currencySymbol}${displayAmount}`
+    : `${currencySymbol}0.00`;
+
   useEffect(() => {
     if (measureRef.current && containerRef.current) {
       const textWidth = measureRef.current.offsetWidth;
       const containerWidth = containerRef.current.offsetWidth;
-      const maxWidth = containerWidth - 24; // account for padding
+      const maxWidth = containerWidth - 24;
+
+      setMeasuredWidth(textWidth);
 
       if (textWidth > maxWidth && maxWidth > 0) {
-        // Scale down the entire amount display proportionally
-        const newScale = Math.max(maxWidth / textWidth, 0.4); // min 40% scale
+        const newScale = Math.max(maxWidth / textWidth, 0.4);
         setScale(newScale);
       } else {
         setScale(1);
       }
     }
-  }, [displayAmount]);
+  }, [fullDisplay]);
 
   useEffect(() => {
     if (!isDirty) return;
@@ -160,30 +169,43 @@ export function ExpenseForm({
         </div>
         {/* Amount hero */}
         <div className="flex flex-col items-center py-4">
-          {/* Hidden span for measuring text width at base size */}
+          {/* Hidden span for measuring full display width */}
           <span
             ref={measureRef}
             aria-hidden="true"
-            className="pointer-events-none absolute left-[-9999px] font-bold whitespace-pre"
+            className="pointer-events-none absolute left-[-9999px] whitespace-pre"
             style={{ fontSize: "48px" }}
           >
-            {displayAmount || "0.00"}
+            <span className="font-medium">{currencySymbol}</span>
+            <span className="font-bold">{displayAmount || "0.00"}</span>
           </span>
-          <div className="flex w-full justify-center">
-            <label htmlFor="expense-amount" className="sr-only">
-              {t("amount")}
-            </label>
+          <label htmlFor="expense-amount" className="sr-only">
+            {t("amount")}
+          </label>
+          {/* Centered amount display — tap anywhere to focus the hidden input */}
+          <div
+            className="flex w-full cursor-text justify-center"
+            onClick={() => inputRef.current?.focus()}
+          >
             <div
-              className="flex items-baseline"
+              className="relative flex items-baseline justify-center"
               style={{
+                width: measuredWidth > 0 ? `${measuredWidth}px` : "auto",
                 transform: `scale(${scale})`,
                 transformOrigin: "center",
               }}
             >
-              <span className="text-text-tertiary text-5xl leading-none">
-                $
+              <span className="text-text-tertiary text-5xl leading-none font-medium">
+                {currencySymbol}
               </span>
+              <span className="text-text-primary text-5xl leading-none font-bold">
+                {displayAmount || (
+                  <span className="text-text-tertiary">0.00</span>
+                )}
+              </span>
+              {/* Invisible input overlaid to capture keyboard input */}
               <input
+                ref={inputRef}
                 id="expense-amount"
                 type="text"
                 inputMode="decimal"
@@ -192,12 +214,9 @@ export function ExpenseForm({
                   const val = e.target.value.replace(/,/g, "");
                   if (/^\d*\.?\d{0,2}$/.test(val)) setAmount(val);
                 }}
-                placeholder="0.00"
                 autoComplete="off"
-                className="text-text-primary placeholder:text-text-tertiary bg-transparent text-5xl leading-none font-bold outline-none"
-                style={{
-                  width: `${Math.max((displayAmount || "0.00").length, 4) * 0.6}em`,
-                }}
+                className="absolute inset-0 caret-transparent opacity-0"
+                aria-label={t("amount")}
               />
             </div>
           </div>
