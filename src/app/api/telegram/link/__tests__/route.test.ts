@@ -2,6 +2,14 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { prismaMock, resetPrismaMock } from "@/test-utils/prisma-mock";
 import { mockAuth, mockUnauthenticated } from "@/test-utils/auth-mock";
 import { POST, DELETE } from "../route";
+import { NextRequest } from "next/server";
+
+function createRequest(
+  url: string,
+  init?: ConstructorParameters<typeof NextRequest>[1],
+) {
+  return new NextRequest(new URL(url, "http://localhost:3000"), init);
+}
 
 describe("Telegram Link API", () => {
   beforeEach(() => {
@@ -11,7 +19,9 @@ describe("Telegram Link API", () => {
   describe("POST /api/telegram/link", () => {
     it("returns 401 when unauthenticated", async () => {
       mockUnauthenticated();
-      const res = await POST();
+      const res = await POST(
+        createRequest("/api/telegram/link", { method: "POST" }),
+      );
       expect(res.status).toBe(401);
     });
 
@@ -25,7 +35,9 @@ describe("Telegram Link API", () => {
         createdAt: new Date(),
       } as never);
 
-      const res = await POST();
+      const res = await POST(
+        createRequest("/api/telegram/link", { method: "POST" }),
+      );
       expect(res.status).toBe(200);
 
       expect(prismaMock.telegramLinkToken.upsert).toHaveBeenCalledWith({
@@ -50,7 +62,9 @@ describe("Telegram Link API", () => {
   describe("DELETE /api/telegram/link", () => {
     it("returns 401 when unauthenticated", async () => {
       mockUnauthenticated();
-      const res = await DELETE();
+      const res = await DELETE(
+        createRequest("/api/telegram/link", { method: "DELETE" }),
+      );
       expect(res.status).toBe(401);
     });
 
@@ -61,7 +75,9 @@ describe("Telegram Link API", () => {
         count: 0,
       } as never);
 
-      const res = await DELETE();
+      const res = await DELETE(
+        createRequest("/api/telegram/link", { method: "DELETE" }),
+      );
       expect(res.status).toBe(200);
 
       expect(prismaMock.user.update).toHaveBeenCalledWith({

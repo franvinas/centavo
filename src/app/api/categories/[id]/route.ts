@@ -11,7 +11,7 @@ import { updateCategorySchema } from "@/lib/validations/category";
 type RouteParams = { params: Promise<{ id: string }> };
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
-  const user = await getAuthUser();
+  const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
   const { id } = await params;
@@ -46,8 +46,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   return NextResponse.json({ category });
 }
 
-export async function DELETE(_request: NextRequest, { params }: RouteParams) {
-  const user = await getAuthUser();
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
   const { id } = await params;

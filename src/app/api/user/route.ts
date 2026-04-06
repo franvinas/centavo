@@ -4,8 +4,8 @@ import { getAuthUser, unauthorized, badRequest } from "@/lib/api-utils";
 import { updateUserSchema } from "@/lib/validations/user";
 import { getExchangeRate } from "@/lib/exchange-rate";
 
-export async function GET() {
-  const user = await getAuthUser();
+export async function GET(request: NextRequest) {
+  const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
   const dbUser = await prisma.user.findUnique({
@@ -16,7 +16,7 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
-  const user = await getAuthUser();
+  const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
   const body = await request.json();

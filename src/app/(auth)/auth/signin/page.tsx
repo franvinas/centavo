@@ -26,6 +26,15 @@ const LOCALE_LABELS: Record<Locale, string> = {
   es: "ES",
 };
 
+function getSafeCallbackUrl(rawValue: string | null) {
+  if (!rawValue) return "/dashboard";
+  if (!rawValue.startsWith("/") || rawValue.startsWith("//")) {
+    return "/dashboard";
+  }
+
+  return rawValue;
+}
+
 export default function SignInPage() {
   return (
     <Suspense>
@@ -41,6 +50,7 @@ function SignInContent() {
   const currentLocale = useLocale();
   const [isLocaleChanging, startLocaleTransition] = useTransition();
   const errorType = searchParams.get("error");
+  const callbackUrl = getSafeCallbackUrl(searchParams.get("callbackUrl"));
 
   const ERROR_MESSAGES: Record<string, string> = {
     Verification: t("errorVerification"),
@@ -68,14 +78,14 @@ function SignInContent() {
 
   async function handleGoogle() {
     setLoading(true);
-    await signIn("google", { callbackUrl: "/dashboard" });
+    await signIn("google", { callbackUrl });
   }
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    await signIn("resend", { email, redirect: false });
+    await signIn("resend", { email, redirect: false, callbackUrl });
     setEmailSent(true);
     setLoading(false);
     setCooldown(RESEND_COOLDOWN);
@@ -88,11 +98,14 @@ function SignInContent() {
       setOtpError(null);
 
       try {
-        const callbackUrl = `/api/auth/callback/resend?token=${encodeURIComponent(code)}&email=${encodeURIComponent(email)}`;
-        const res = await fetch(callbackUrl, { redirect: "follow" });
+        const verifyUrl =
+          `/api/auth/callback/resend?token=${encodeURIComponent(code)}` +
+          `&email=${encodeURIComponent(email)}` +
+          `&callbackUrl=${encodeURIComponent(callbackUrl)}`;
+        const res = await fetch(verifyUrl, { redirect: "follow" });
 
         if (res.ok || res.redirected) {
-          router.push("/dashboard");
+          router.push(callbackUrl);
           router.refresh();
         } else {
           setOtpError(t("errorInvalidCode"));
@@ -103,7 +116,7 @@ function SignInContent() {
         setVerifying(false);
       }
     },
-    [email, router, t],
+    [callbackUrl, email, router, t],
   );
 
   function handleOtpChange(value: string) {
@@ -120,7 +133,7 @@ function SignInContent() {
     setCooldown(RESEND_COOLDOWN);
     setOtp("");
     setOtpError(null);
-    await signIn("resend", { email, redirect: false });
+    await signIn("resend", { email, redirect: false, callbackUrl });
   }
 
   function handleBack() {

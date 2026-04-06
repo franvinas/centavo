@@ -1,13 +1,13 @@
 import crypto from "node:crypto";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorized } from "@/lib/api-utils";
 
 const LINK_TOKEN_TTL_MS = 10 * 60 * 1000;
 const DEFAULT_BOT_USERNAME = "CentaBot";
 
-export async function POST() {
-  const user = await getAuthUser();
+export async function POST(request: NextRequest) {
+  const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
   const token = crypto.randomBytes(24).toString("base64url");
@@ -28,8 +28,8 @@ export async function POST() {
   });
 }
 
-export async function DELETE() {
-  const user = await getAuthUser();
+export async function DELETE(request: NextRequest) {
+  const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
   await prisma.user.update({

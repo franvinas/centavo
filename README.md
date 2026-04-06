@@ -56,7 +56,7 @@ Personal expense tracker with multi-currency support. Track spending across curr
 
    ```bash
    pnpm db:generate   # Generate Prisma client
-   pnpm db:push       # Push schema to database
+   pnpm db:deploy     # Apply existing migrations
    pnpm db:seed       # Seed default categories
    ```
 
@@ -67,6 +67,21 @@ Personal expense tracker with multi-currency support. Track spending across curr
    ```
 
    Open [http://localhost:3000](http://localhost:3000).
+
+### CLI
+
+Build and link the CLI locally:
+
+```bash
+pnpm cli:build
+pnpm cli:link
+```
+
+Then authenticate against your running Centavo app:
+
+```bash
+centavo auth login --base-url http://localhost:3000
+```
 
 ## Scripts
 
@@ -81,9 +96,14 @@ pnpm format:check     # Prettier check
 # Database
 pnpm db:generate      # Generate Prisma client
 pnpm db:migrate       # Run migrations (dev)
-pnpm db:push          # Push schema to DB
+pnpm db:deploy        # Apply existing migrations
+pnpm db:push          # Push schema directly to DB
 pnpm db:seed          # Seed default categories
 pnpm db:studio        # Prisma Studio GUI
+
+# CLI
+pnpm cli:build        # Build the Centavo CLI
+pnpm cli:link         # Link the CLI globally
 
 # Testing
 pnpm test             # Run all tests

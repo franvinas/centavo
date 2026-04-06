@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorized, badRequest } from "@/lib/api-utils";
 import { createExpenseSchema } from "@/lib/validations/expense";
-import { getExchangeRate } from "@/lib/exchange-rate";
+import { getExpenses } from "@/lib/data/expenses";
+import { createExpenseForUser } from "@/lib/services/expenses";
 
 export async function GET(request: NextRequest) {
-  const user = await getAuthUser();
+  const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
   const { searchParams } = request.nextUrl;
@@ -19,38 +19,26 @@ export async function GET(request: NextRequest) {
     Math.max(1, parseInt(searchParams.get("limit") ?? "50")),
   );
 
-  const where: Record<string, unknown> = { userId: user.id };
-
-  if (from || to) {
-    where.date = {
-      ...(from ? { gte: new Date(from) } : {}),
-      ...(to ? { lte: new Date(to) } : {}),
-    };
-  }
-  if (categoryId) where.categoryId = categoryId;
-  if (search) where.description = { contains: search, mode: "insensitive" };
-
-  const [expenses, total] = await Promise.all([
-    prisma.expense.findMany({
-      where,
-      include: { category: true },
-      orderBy: { date: "desc" },
-      skip: (page - 1) * limit,
-      take: limit,
-    }),
-    prisma.expense.count({ where }),
-  ]);
+  const { expenses, total, totalPages } = await getExpenses({
+    userId: user.id,
+    from: from ?? undefined,
+    to: to ?? undefined,
+    categoryId: categoryId ?? undefined,
+    search: search ?? undefined,
+    page,
+    limit,
+  });
 
   return NextResponse.json({
     expenses,
     total,
     page,
-    totalPages: Math.ceil(total / limit),
+    totalPages,
   });
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getAuthUser();
+  const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
   const body = await request.json();
@@ -60,34 +48,13 @@ export async function POST(request: NextRequest) {
     return badRequest(parsed.error.issues[0]?.message ?? "Invalid input");
   }
 
-  const { amount, currency, description, categoryId, date, notes } =
-    parsed.data;
+  try {
+    const expense = await createExpenseForUser(user.id, parsed.data);
 
-  // Get user's base currency
-  const dbUser = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: { baseCurrency: true },
-  });
-  const baseCurrency = dbUser?.baseCurrency ?? "USD";
-
-  // Calculate exchange rate
-  const exchangeRate = await getExchangeRate(currency, baseCurrency);
-  const baseAmount = parseFloat((amount * exchangeRate).toFixed(2));
-
-  const expense = await prisma.expense.create({
-    data: {
-      userId: user.id,
-      amount,
-      currency,
-      baseAmount,
-      exchangeRate,
-      description,
-      categoryId,
-      date: new Date(date),
-      notes,
-    },
-    include: { category: true },
-  });
-
-  return NextResponse.json({ expense }, { status: 201 });
+    return NextResponse.json({ expense }, { status: 201 });
+  } catch (error) {
+    return badRequest(
+      error instanceof Error ? error.message : "Unable to create expense",
+    );
+  }
 }

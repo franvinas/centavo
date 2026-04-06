@@ -3,7 +3,7 @@ import { getAuthUser, unauthorized, badRequest } from "@/lib/api-utils";
 import { getExchangeRate } from "@/lib/exchange-rate";
 
 export async function GET(request: NextRequest) {
-  const user = await getAuthUser();
+  const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
   const { searchParams } = request.nextUrl;

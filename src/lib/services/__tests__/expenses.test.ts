@@ -15,6 +15,10 @@ describe("Expense Service", () => {
 
   describe("createExpenseForUser", () => {
     it("creates an expense with exchange rate calculation", async () => {
+      prismaMock.category.findFirst.mockResolvedValue({
+        id: "cat-1",
+        userId: "user-1",
+      } as never);
       prismaMock.user.findUnique.mockResolvedValue({
         id: "user-1",
         baseCurrency: "USD",
@@ -67,6 +71,10 @@ describe("Expense Service", () => {
     });
 
     it("converts currency when different from base", async () => {
+      prismaMock.category.findFirst.mockResolvedValue({
+        id: "cat-1",
+        userId: "user-1",
+      } as never);
       prismaMock.user.findUnique.mockResolvedValue({
         id: "user-1",
         baseCurrency: "USD",

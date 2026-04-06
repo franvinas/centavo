@@ -1,5 +1,3 @@
-Loaded Prisma config from prisma.config.ts.
-
 -- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "public";
 
@@ -164,4 +162,3 @@ ALTER TABLE "Expense" ADD CONSTRAINT "Expense_categoryId_fkey" FOREIGN KEY ("cat
 
 -- AddForeignKey
 ALTER TABLE "TelegramMessage" ADD CONSTRAINT "TelegramMessage_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-

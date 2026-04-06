@@ -5,7 +5,13 @@ import { locales, defaultLocale, type Locale } from "@/i18n/config";
 
 const { auth } = NextAuth(authConfig);
 
-const publicPaths = ["/auth/signin", "/api/auth", "/api/telegram/webhook"];
+const publicPaths = [
+  "/auth/signin",
+  "/api/auth",
+  "/api/telegram/webhook",
+  "/api/cli/auth",
+  "/cli/auth",
+];
 
 function detectLocale(req: Parameters<Parameters<typeof auth>[0]>[0]): Locale {
   const cookie = req.cookies.get("NEXT_LOCALE")?.value;
@@ -28,6 +34,11 @@ function detectLocale(req: Parameters<Parameters<typeof auth>[0]>[0]): Locale {
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
+
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.next();
+  }
+
   const isPublic = publicPaths.some((path) => pathname.startsWith(path));
   if (!req.auth && !isPublic) {
     const signInUrl = new URL("/auth/signin", req.url);

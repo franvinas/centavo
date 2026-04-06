@@ -3,12 +3,17 @@ import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorized, badRequest } from "@/lib/api-utils";
 import { createCategorySchema } from "@/lib/validations/category";
 
-export async function GET() {
-  const user = await getAuthUser();
+export async function GET(request: NextRequest) {
+  const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
   const categories = await prisma.category.findMany({
     where: { userId: user.id },
+    include: {
+      _count: {
+        select: { expenses: true },
+      },
+    },
     orderBy: { createdAt: "asc" },
   });
 
@@ -16,7 +21,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getAuthUser();
+  const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
   const body = await request.json();

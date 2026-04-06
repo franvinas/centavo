@@ -1,14 +1,17 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { getCliTokenAuthFromRequest } from "@/lib/cli-auth";
 
 export interface AuthUser {
   id: string;
   name?: string | null;
   email?: string | null;
   image?: string | null;
+  authType?: "session" | "cli";
+  cliTokenId?: string | null;
 }
 
-export async function getAuthUser(): Promise<AuthUser | null> {
+export async function getSessionAuthUser(): Promise<AuthUser | null> {
   const session = await auth();
   if (!session?.user?.id) {
     return null;
@@ -18,7 +21,24 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     name: session.user.name,
     email: session.user.email,
     image: session.user.image,
+    authType: "session",
+    cliTokenId: null,
   };
+}
+
+export async function getAuthUser(request?: Request): Promise<AuthUser | null> {
+  if (request) {
+    const cliAuth = await getCliTokenAuthFromRequest(request);
+    if (cliAuth) {
+      return {
+        ...cliAuth.user,
+        authType: "cli",
+        cliTokenId: cliAuth.tokenId,
+      };
+    }
+  }
+
+  return getSessionAuthUser();
 }
 
 export function unauthorized() {

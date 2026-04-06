@@ -23,7 +23,7 @@ beforeEach(() => {
 describe("GET /api/user", () => {
   it("returns 401 when unauthenticated", async () => {
     mockUnauthenticated();
-    const res = await GET();
+    const res = await GET(createRequest("/api/user"));
     expect(res.status).toBe(401);
   });
 
@@ -32,12 +32,40 @@ describe("GET /api/user", () => {
     const user = createPrismaUser();
     prismaMock.user.findUnique.mockResolvedValue(user as never);
 
-    const res = await GET();
+    const res = await GET(createRequest("/api/user"));
     const body = await res.json();
 
     expect(res.status).toBe(200);
     expect(body.user).toBeDefined();
     expect(body.user.email).toBe("test@example.com");
+  });
+
+  it("accepts CLI bearer tokens", async () => {
+    mockUnauthenticated();
+    prismaMock.cliToken.findUnique.mockResolvedValue({
+      id: "cli-token-1",
+      revokedAt: null,
+      expiresAt: null,
+      user: {
+        id: "user-1",
+        name: "Test User",
+        email: "test@example.com",
+        image: null,
+      },
+    } as never);
+    prismaMock.cliToken.update.mockResolvedValue({} as never);
+    prismaMock.user.findUnique.mockResolvedValue(createPrismaUser() as never);
+
+    const res = await GET(
+      createRequest("/api/user", {
+        headers: { authorization: "Bearer ctv_valid_token" },
+      }),
+    );
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.user.email).toBe("test@example.com");
+    expect(prismaMock.cliToken.findUnique).toHaveBeenCalled();
   });
 });
 

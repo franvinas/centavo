@@ -7,12 +7,15 @@ import {
   badRequest,
 } from "@/lib/api-utils";
 import { updateExpenseSchema } from "@/lib/validations/expense";
-import { getExchangeRate } from "@/lib/exchange-rate";
+import {
+  deleteExpenseForUser,
+  updateExpenseForUser,
+} from "@/lib/services/expenses";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
 export async function GET(_request: NextRequest, { params }: RouteParams) {
-  const user = await getAuthUser();
+  const user = await getAuthUser(_request);
   if (!user) return unauthorized();
 
   const { id } = await params;
@@ -27,16 +30,10 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 }
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
-  const user = await getAuthUser();
+  const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
   const { id } = await params;
-  const existing = await prisma.expense.findFirst({
-    where: { id, userId: user.id },
-  });
-
-  if (!existing) return notFound("Expense not found");
-
   const body = await request.json();
   const parsed = updateExpenseSchema.safeParse(body);
 
@@ -44,53 +41,37 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     return badRequest(parsed.error.issues[0]?.message ?? "Invalid input");
   }
 
-  const data = parsed.data;
-  const updateData: Record<string, unknown> = {};
+  try {
+    const expense = await updateExpenseForUser(user.id, id, parsed.data);
+    return NextResponse.json({ expense });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Unable to update expense";
 
-  if (data.description !== undefined) updateData.description = data.description;
-  if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
-  if (data.date !== undefined) updateData.date = new Date(data.date);
-  if (data.notes !== undefined) updateData.notes = data.notes;
+    if (message === "Expense not found") {
+      return notFound(message);
+    }
 
-  // If amount or currency changed, recalculate base amount
-  if (data.amount !== undefined || data.currency !== undefined) {
-    const amount = data.amount ?? Number(existing.amount);
-    const currency = data.currency ?? existing.currency;
-
-    const dbUser = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { baseCurrency: true },
-    });
-    const baseCurrency = dbUser?.baseCurrency ?? "USD";
-
-    const exchangeRate = await getExchangeRate(currency, baseCurrency);
-    updateData.amount = amount;
-    updateData.currency = currency;
-    updateData.baseAmount = parseFloat((amount * exchangeRate).toFixed(2));
-    updateData.exchangeRate = exchangeRate;
+    return badRequest(message);
   }
-
-  const expense = await prisma.expense.update({
-    where: { id },
-    data: updateData,
-    include: { category: true },
-  });
-
-  return NextResponse.json({ expense });
 }
 
-export async function DELETE(_request: NextRequest, { params }: RouteParams) {
-  const user = await getAuthUser();
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
   const { id } = await params;
-  const existing = await prisma.expense.findFirst({
-    where: { id, userId: user.id },
-  });
+  try {
+    const result = await deleteExpenseForUser(user.id, id);
+    return NextResponse.json(result);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Unable to delete expense";
 
-  if (!existing) return notFound("Expense not found");
+    if (message === "Expense not found") {
+      return notFound(message);
+    }
 
-  await prisma.expense.delete({ where: { id } });
-
-  return NextResponse.json({ success: true });
+    return badRequest(message);
+  }
 }

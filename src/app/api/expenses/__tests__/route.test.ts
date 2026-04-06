@@ -101,6 +101,10 @@ describe("POST /api/expenses", () => {
   it("creates an expense", async () => {
     mockAuth();
     const expense = createPrismaExpense();
+    prismaMock.category.findFirst.mockResolvedValue({
+      id: "cat-1",
+      userId: "user-1",
+    } as never);
     prismaMock.user.findUnique.mockResolvedValue({
       baseCurrency: "USD",
     } as never);

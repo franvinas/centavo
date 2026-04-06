@@ -19,7 +19,7 @@ beforeEach(() => {
 describe("GET /api/categories", () => {
   it("returns 401 when unauthenticated", async () => {
     mockUnauthenticated();
-    const res = await GET();
+    const res = await GET(createRequest("/api/categories"));
     expect(res.status).toBe(401);
   });
 
@@ -31,7 +31,7 @@ describe("GET /api/categories", () => {
     ];
     prismaMock.category.findMany.mockResolvedValue(categories as never);
 
-    const res = await GET();
+    const res = await GET(createRequest("/api/categories"));
     const body = await res.json();
 
     expect(res.status).toBe(200);
