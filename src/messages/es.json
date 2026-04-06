@@ -30,6 +30,8 @@
     "subtitle": "Configuremos tu cuenta",
     "nameLabel": "¿Cómo te llamamos?",
     "namePlaceholder": "Tu nombre",
+    "languageLabel": "Idioma",
+    "languageHint": "Usaremos este idioma para tu cuenta y categorías iniciales",
     "currencyLabel": "Moneda base",
     "currencyHint": "Todos los gastos se convertirán a esta moneda",
     "submit": "Comenzar",

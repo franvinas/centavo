@@ -30,6 +30,8 @@
     "subtitle": "Let's set up your account",
     "nameLabel": "What should we call you?",
     "namePlaceholder": "Your name",
+    "languageLabel": "Language",
+    "languageHint": "We'll use this language for your account and starter categories",
     "currencyLabel": "Base currency",
     "currencyHint": "All expenses will be converted to this currency",
     "submit": "Get Started",
