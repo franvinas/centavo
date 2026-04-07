@@ -2,7 +2,7 @@
 
 ## What is Centavo?
 
-Centavo is a personal expense tracker. It helps a single user record, categorize, and review their spending across multiple currencies.
+Centavo is a multi-user expense tracking web app. It helps authenticated users record, categorize, and review their own spending across multiple currencies.
 
 ## Platform
 
@@ -10,9 +10,9 @@ Centavo is a personal expense tracker. It helps a single user record, categorize
 - Installable on mobile devices (iOS/Android) via the browser
 - No native mobile app — the PWA provides an app-like experience on phones
 
-## Target user
+## Target users
 
-- Single user (personal use)
+- Individual users with their own Centavo account
 - Wants a fast, minimal interface to log expenses
 - Needs multi-currency support
 - Values simplicity over feature bloat
@@ -21,6 +21,7 @@ Centavo is a personal expense tracker. It helps a single user record, categorize
 
 - **Cloud-based**: all data stored server-side in PostgreSQL
 - Requires authentication to access
+- Each user's data is isolated from other users
 - Accessible from any device via browser
 
 ## MVP scope

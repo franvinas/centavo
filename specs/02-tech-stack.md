@@ -19,10 +19,11 @@
 
 ### Next.js + API routes (no separate backend)
 
-For a personal expense tracker, a separate backend service adds unnecessary complexity. Next.js API routes (Route Handlers in App Router) provide:
+For Centavo's current multi-user scope, a separate backend service adds unnecessary complexity. Next.js API routes (Route Handlers in App Router) provide:
 
 - Server-side logic co-located with the frontend
 - Built-in request handling, middleware, and auth integration
+- Per-user authorization and data scoping close to the product surface
 - Easy deployment as a single unit
 
 If the app grows beyond what API routes can handle, we can extract a separate service later.
