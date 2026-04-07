@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Centavo is a personal expense tracker web app with multi-currency support. Single-user, cloud-based (PostgreSQL), PWA-installable. Built with Next.js 16 App Router, Prisma 7, NextAuth v5 (JWT strategy), and Tailwind CSS 4.
+Centavo is a multi-user expense tracking web app with multi-currency support. Cloud-based (PostgreSQL), PWA-installable, with data isolated per authenticated user. Built with Next.js 16 App Router, Prisma 7, NextAuth v5 (JWT strategy), and Tailwind CSS 4.
 
 ## Common Commands
 

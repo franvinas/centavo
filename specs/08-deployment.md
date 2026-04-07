@@ -11,7 +11,7 @@
 ## Application hosting: Vercel
 
 - **Why**: Native Next.js support, zero-config deploys, automatic preview deployments per PR
-- **Plan**: Free tier (Hobby) is sufficient for personal use
+- **Plan**: Free tier (Hobby) is sufficient for early testing and a small user base
 - **Region**: Auto (choose closest to user, or pin to match Neon region)
 - **Domains**: custom domain TBD (e.g. centavo.app or similar)
 
@@ -25,7 +25,7 @@
 ## Database: Neon (PostgreSQL)
 
 - **Why**: Serverless Postgres, scales to zero on inactivity, generous free tier, native Vercel integration
-- **Plan**: Free tier (0.5 GiB storage, 190 compute hours/month — plenty for personal use)
+- **Plan**: Free tier (0.5 GiB storage, 190 compute hours/month) is enough for development and a small beta
 - **Region**: Match Vercel deployment region to minimize latency
 - **Branching**: Use Neon branches for preview deployments (each PR gets its own DB branch)
 - **Connection**: Use Neon's serverless driver (`@neondatabase/serverless`) for edge compatibility, or standard connection string with Prisma

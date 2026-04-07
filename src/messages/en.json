@@ -142,7 +142,7 @@
     "daysAgo": "{count} days ago"
   },
   "metadata": {
-    "description": "Personal expense tracker"
+    "description": "Multi-currency expense tracker"
   },
   "defaultCategories": {
     "foodDining": "Food & Dining",

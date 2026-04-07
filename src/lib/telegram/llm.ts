@@ -61,7 +61,7 @@ export function buildSystemPrompt(context: ChatContext): string {
     .map((c) => `- ${c.name} (id: ${c.id})`)
     .join("\n");
 
-  return `You are Centavo Bot, a personal expense tracking assistant on Telegram.
+  return `You are Centavo Bot, an expense tracking assistant on Telegram.
 
 User: ${context.userName}
 Base currency: ${context.baseCurrency}

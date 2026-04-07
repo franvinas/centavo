@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Centavo",
     short_name: "Centavo",
-    description: "Personal expense tracker",
+    description: "Multi-currency expense tracker",
     start_url: "/dashboard",
     display: "standalone",
     background_color: "#F5F4F1",

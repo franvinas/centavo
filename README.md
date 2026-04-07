@@ -1,6 +1,6 @@
 # Centavo
 
-Personal expense tracker with multi-currency support. Track spending across currencies with automatic exchange rate conversion, category management, and a mobile-first PWA experience.
+Multi-user expense tracker with multi-currency support. Track spending across currencies with automatic exchange rate conversion, category management, authenticated accounts, and a mobile-first PWA experience.
 
 ## Tech Stack
 

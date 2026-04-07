@@ -142,7 +142,7 @@
     "daysAgo": "hace {count} días"
   },
   "metadata": {
-    "description": "Rastreador personal de gastos"
+    "description": "Gestor de gastos multimoneda"
   },
   "defaultCategories": {
     "foodDining": "Comida y Restaurantes",

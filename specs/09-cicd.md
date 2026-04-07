@@ -66,7 +66,7 @@ All steps must pass before a PR can be merged.
 
 - **`main`**: production branch, always deployable
 - **Feature branches**: branch off `main`, PR back to `main`
-- No `develop` or `staging` branch — keep it simple for a personal project
+- No `develop` or `staging` branch — keep it simple while the product and team are still small
 - PRs require passing CI checks before merge
 
 ## npm scripts
