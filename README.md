@@ -70,14 +70,34 @@ Multi-user expense tracker with multi-currency support. Track spending across cu
 
 ### CLI
 
-Build and link the CLI locally:
+Install the published CLI:
+
+```bash
+npm install -g centavo-cli
+```
+
+The CLI targets production by default (`https://centavo.vercel.app/`), so you can sign in immediately:
+
+```bash
+centavo auth login
+centavo auth whoami
+centavo expense list
+```
+
+Use `npx` if you do not want a global install:
+
+```bash
+npx centavo-cli auth login
+```
+
+For local development against a local app instance, build and link the CLI locally:
 
 ```bash
 pnpm cli:build
 pnpm cli:link
 ```
 
-Then authenticate against your running Centavo app:
+Then authenticate against your running local Centavo app:
 
 ```bash
 centavo auth login --base-url http://localhost:3000
