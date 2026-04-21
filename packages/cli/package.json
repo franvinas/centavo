@@ -1,12 +1,32 @@
 {
   "name": "@centavo/cli",
   "version": "0.1.0",
-  "private": true,
+  "description": "Centavo CLI for expenses, categories, analytics, and settings.",
+  "license": "MIT",
   "bin": {
     "centavo": "dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsx src/index.ts"
-  }
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "pnpm build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/franvinas/centavo.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/franvinas/centavo/issues"
+  },
+  "homepage": "https://github.com/franvinas/centavo/tree/main/packages/cli"
 }

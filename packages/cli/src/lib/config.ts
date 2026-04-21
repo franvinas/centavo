@@ -47,6 +47,6 @@ export function resolveBaseUrl(input?: string, config?: CliConfig) {
     config?.baseUrl ||
     process.env.CENTAVO_BASE_URL ||
     process.env.NEXTAUTH_URL ||
-    "http://localhost:3000"
+    "https://centavo.vercel.app/"
   );
 }
