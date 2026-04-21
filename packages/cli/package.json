@@ -1,5 +1,5 @@
 {
-  "name": "@centavo/cli",
+  "name": "centavo-cli",
   "version": "0.1.0",
   "description": "Centavo CLI for expenses, categories, analytics, and settings.",
   "license": "MIT",
