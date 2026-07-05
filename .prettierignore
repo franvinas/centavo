@@ -1,3 +1,11 @@
 node_modules
 .next
 pnpm-lock.yaml
+.claude
+coverage
+src/generated/prisma
+packages/*/dist
+public/sw.js
+public/sw.js.map
+public/swe-worker-*.js
+public/swe-worker-*.js.map

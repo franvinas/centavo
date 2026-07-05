@@ -193,16 +193,13 @@ Each expense stores both the original amount/currency and the converted base amo
 
 ## Testing
 
-22 test files covering server actions, API routes, data queries, validations, utilities, and components. Tests use Prisma deep mocks (vitest-mock-extended), auth mocks, and factory functions for test data.
+Tests cover server actions, API routes, data queries, validations, utilities, CLI commands, Telegram helpers, and components. Tests use Prisma deep mocks (vitest-mock-extended), auth mocks, and factory functions for test data.
 
 ```bash
 pnpm test             # Run all tests
 pnpm docker:test      # Run with containerized PostgreSQL
 ```
 
-## CI/CD
+## Deployment
 
-GitHub Actions runs on push/PR to `main`:
-
-- **Check job:** lint, format, type-check, build
-- **Test job:** PostgreSQL service, schema push, tests, coverage upload
+Production deploys are handled by Vercel from the `main` branch. See `DEPLOYMENT.md` for the production runbook and `TODO.md` for pending operational improvements.
