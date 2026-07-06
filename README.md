@@ -19,7 +19,7 @@ Multi-user expense tracker with multi-currency support. Track spending across cu
 
 - Node.js 20+
 - pnpm 10+
-- PostgreSQL 16+ (or a [Neon](https://neon.tech) database)
+- Docker, for the local PostgreSQL and Mailpit sandbox
 
 ### Setup
 
@@ -29,13 +29,33 @@ Multi-user expense tracker with multi-currency support. Track spending across cu
    pnpm install
    ```
 
-2. Copy the environment template and fill in your values:
+2. Start the local sandbox and prepare the database:
 
    ```bash
-   cp .env.example .env
+   pnpm sandbox:setup
    ```
 
-   Required variables:
+   This starts PostgreSQL on `localhost:5432`, Mailpit SMTP on
+   `localhost:1026`, Mailpit UI on `localhost:8027`, syncs the Prisma schema,
+   and seeds the local database.
+
+3. Start the dev server with sandbox environment variables:
+
+   ```bash
+   pnpm sandbox:dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000). Email OTP messages are
+   captured in [http://localhost:8027](http://localhost:8027).
+
+4. Optional: copy the environment template if you want to run against custom
+   local or external services instead of `.env.sandbox`:
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Required variables for a non-sandbox setup:
 
    | Variable                     | Description                            |
    | ---------------------------- | -------------------------------------- |
@@ -52,21 +72,7 @@ Multi-user expense tracker with multi-currency support. Track spending across cu
    | `TELEGRAM_WEBHOOK_URL`       | Public `/api/telegram/webhook` URL     |
    | `TELEGRAM_BOT_USERNAME`      | Bot username (default `CentaBot`)      |
 
-3. Set up the database:
-
-   ```bash
-   pnpm db:generate   # Generate Prisma client
-   pnpm db:deploy     # Apply existing migrations
-   pnpm db:seed       # Seed default categories
-   ```
-
-4. Start the dev server:
-
-   ```bash
-   pnpm dev
-   ```
-
-   Open [http://localhost:3000](http://localhost:3000).
+   Do not point local development commands at production databases.
 
 ### CLI
 
@@ -112,6 +118,15 @@ pnpm lint             # ESLint
 pnpm type-check       # TypeScript check (tsc --noEmit)
 pnpm format           # Prettier write
 pnpm format:check     # Prettier check
+
+# Local sandbox
+pnpm sandbox:setup    # Start Postgres/Mailpit, migrate, seed
+pnpm sandbox:up       # Start Postgres and Mailpit
+pnpm sandbox:down     # Stop sandbox containers
+pnpm sandbox:reset    # Recreate sandbox database volume
+pnpm sandbox:migrate  # Sync Prisma schema to sandbox DB
+pnpm sandbox:seed     # Seed sandbox DB
+pnpm sandbox:dev      # Start Next.js with .env.sandbox
 
 # Database
 pnpm db:generate      # Generate Prisma client

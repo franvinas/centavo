@@ -49,6 +49,36 @@ Set these in Vercel for production. Use `.env.example` as the local template.
 Secrets must not be committed. If a real secret is accidentally written to a
 tracked or shared file, rotate it in the provider dashboard.
 
+Do not set `EMAIL_TRANSPORT=smtp` in production unless you intentionally want to
+use an SMTP provider. The local sandbox uses this value to route OTP emails to
+Mailpit.
+
+## Local Sandbox
+
+The local sandbox runs PostgreSQL and Mailpit through Docker Compose. The app
+still runs on the host for fast Next.js development.
+
+```bash
+pnpm sandbox:setup
+pnpm sandbox:dev
+```
+
+Local endpoints:
+
+- App: `http://localhost:3000`.
+- PostgreSQL: `localhost:5432`, database/user/password all `centavo`.
+- Mailpit SMTP: `localhost:1026`.
+- Mailpit UI: `http://localhost:8027`.
+
+The sandbox uses `.env.sandbox`, which is committed because it contains only
+local dummy values. Prisma sandbox commands set `CENTAVO_ENV=sandbox` so they
+load `.env.sandbox` explicitly. The sandbox uses `prisma db push` because it is
+a disposable local database; production releases must use migrations.
+
+Use email sign-in in the app and read the OTP from Mailpit. Google OAuth,
+Telegram, OpenAI, Resend, and live exchange rates still require real provider
+credentials if you want to test those integrations locally.
+
 ## Database Migrations
 
 Migrations are currently run manually. There is no checked-in GitHub Actions

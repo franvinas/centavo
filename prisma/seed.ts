@@ -1,7 +1,14 @@
-import "dotenv/config";
+import { config as loadEnv } from "dotenv";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
+
+loadEnv({ path: ".env" });
+loadEnv({ path: ".env.local", override: true });
+
+if (process.env.CENTAVO_ENV === "sandbox") {
+  loadEnv({ path: ".env.sandbox", override: true });
+}
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);

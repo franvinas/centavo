@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: centavo
+      POSTGRES_PASSWORD: centavo
+      POSTGRES_DB: centavo
+    ports:
+      - "5432:5432"
+    volumes:
+      - centavo_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U centavo -d centavo"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "1026:1025"
+      - "8027:8025"
+
+volumes:
+  centavo_postgres_data:
