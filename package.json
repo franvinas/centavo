@@ -12,7 +12,7 @@
     "sandbox:migrate": "CENTAVO_ENV=sandbox prisma db push",
     "sandbox:seed": "CENTAVO_ENV=sandbox pnpm exec tsx prisma/seed.ts",
     "sandbox:setup": "pnpm sandbox:up && pnpm db:generate && pnpm sandbox:migrate && pnpm sandbox:seed",
-    "sandbox:dev": "NODE_OPTIONS=--env-file=.env.sandbox next dev",
+    "sandbox:dev": "set -a; . ./.env.sandbox; set +a; next dev",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",

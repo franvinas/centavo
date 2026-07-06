@@ -37,8 +37,8 @@ export function OnboardingForm({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    startTransition(() => {
-      completeOnboarding({
+    startTransition(async () => {
+      await completeOnboarding({
         name: name.trim(),
         baseCurrency: currency,
         locale,
