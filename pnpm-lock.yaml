@@ -60,7 +60,7 @@ importers:
         specifier: ^4.8.2
         version: 4.8.2(next@16.1.6(@babel/core@7.28.6)(@playwright/test@1.58.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)(typescript@5.9.3)
       nodemailer:
-        specifier: ^7.0.11
+        specifier: 7.0.11
         version: 7.0.11
       openai:
         specifier: ^6.17.0
