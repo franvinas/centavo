@@ -37,9 +37,9 @@ export function ExpenseFilters({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-[1fr_auto_auto_auto] md:items-end">
+    <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 md:grid-cols-[1fr_auto_auto_auto] md:items-end">
       {/* Search */}
-      <div className="relative col-span-2 md:col-span-1">
+      <div className="relative min-[400px]:col-span-2 md:col-span-1">
         <Search className="text-text-tertiary pointer-events-none absolute inset-y-0 left-3 my-auto h-4 w-4" />
         <Input
           placeholder={t("searchPlaceholder")}
@@ -63,7 +63,7 @@ export function ExpenseFilters({
       <select
         value={categoryId}
         onChange={(e) => onCategoryChange(e.target.value)}
-        className="border-input bg-bg-surface text-text-primary h-9 rounded-md border px-3 text-sm"
+        className="border-input bg-bg-surface text-text-primary h-9 min-w-0 rounded-md border px-3 text-sm"
       >
         <option value="">{t("allCategories")}</option>
         {categories.map((cat) => (
@@ -86,7 +86,7 @@ export function ExpenseFilters({
         <button
           type="button"
           onClick={clearAll}
-          className="text-text-secondary hover:text-text-primary col-span-2 h-9 text-xs font-medium md:col-span-1"
+          className="text-text-secondary hover:text-text-primary h-9 text-xs font-medium min-[400px]:col-span-2 md:col-span-1"
         >
           {t("clearFilters")}
         </button>
