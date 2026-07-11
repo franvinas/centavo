@@ -27,6 +27,7 @@ function renderFilters(overrides = {}) {
     dateFrom: "",
     dateTo: "",
     onDateRangeChange: vi.fn(),
+    onClearAll: vi.fn(),
     categories: mockCategories,
     ...overrides,
   };
@@ -99,7 +100,7 @@ describe("ExpenseFilters", () => {
     expect(container.textContent).not.toContain("Clear filters");
   });
 
-  it("calls all reset handlers when clear filters is clicked", async () => {
+  it("clears all filters atomically", async () => {
     const user = userEvent.setup();
     const { container, props } = renderFilters({
       search: "food",
@@ -113,8 +114,9 @@ describe("ExpenseFilters", () => {
     )!;
     await user.click(clearButton);
 
-    expect(props.onSearchChange).toHaveBeenCalledWith("");
-    expect(props.onCategoryChange).toHaveBeenCalledWith("");
-    expect(props.onDateRangeChange).toHaveBeenCalledWith("", "");
+    expect(props.onClearAll).toHaveBeenCalledOnce();
+    expect(props.onSearchChange).not.toHaveBeenCalled();
+    expect(props.onCategoryChange).not.toHaveBeenCalled();
+    expect(props.onDateRangeChange).not.toHaveBeenCalled();
   });
 });

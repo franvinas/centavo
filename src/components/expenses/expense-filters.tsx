@@ -14,6 +14,7 @@ interface ExpenseFiltersProps {
   dateFrom: string;
   dateTo: string;
   onDateRangeChange: (from: string, to: string) => void;
+  onClearAll: () => void;
   categories: Category[];
 }
 
@@ -25,16 +26,11 @@ export function ExpenseFilters({
   dateFrom,
   dateTo,
   onDateRangeChange,
+  onClearAll,
   categories,
 }: ExpenseFiltersProps) {
   const t = useTranslations("expenses");
   const hasActiveFilters = search || categoryId || dateFrom || dateTo;
-
-  function clearAll() {
-    onSearchChange("");
-    onCategoryChange("");
-    onDateRangeChange("", "");
-  }
 
   return (
     <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 md:grid-cols-[1fr_auto_auto_auto] md:items-end">
@@ -85,7 +81,7 @@ export function ExpenseFilters({
       {hasActiveFilters && (
         <button
           type="button"
-          onClick={clearAll}
+          onClick={onClearAll}
           className="text-text-secondary hover:text-text-primary h-9 text-xs font-medium min-[400px]:col-span-2 md:col-span-1"
         >
           {t("clearFilters")}

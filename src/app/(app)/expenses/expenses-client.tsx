@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { ExpenseFilters } from "@/components/expenses/expense-filters";
 import { ExpenseList } from "@/components/expenses/expense-list";
@@ -26,22 +26,53 @@ export function ExpensesClient({
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
   const t = useTranslations("expenses");
+  const urlSearch = searchParams.get("search") ?? "";
+  const [search, setSearch] = useState(urlSearch);
+  const [previousUrlSearch, setPreviousUrlSearch] = useState(urlSearch);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout>>(null);
 
-  const updateParam = useCallback(
-    (key: string, value: string) => {
+  if (urlSearch !== previousUrlSearch) {
+    setPreviousUrlSearch(urlSearch);
+    setSearch(urlSearch);
+  }
+
+  const updateParams = useCallback(
+    (updates: Record<string, string>) => {
       const params = new URLSearchParams(searchParams.toString());
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
+      for (const [key, value] of Object.entries(updates)) {
+        if (value) {
+          params.set(key, value);
+        } else {
+          params.delete(key);
+        }
       }
       params.delete("page"); // reset page on filter change
+      const query = params.toString();
+      const href = query ? `/expenses?${query}` : "/expenses";
       startTransition(() => {
-        router.push(`/expenses?${params.toString()}`);
+        router.replace(href);
       });
     },
     [router, searchParams, startTransition],
   );
+
+  const cancelPendingSearch = useCallback(() => {
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = null;
+  }, []);
+
+  useEffect(() => {
+    return cancelPendingSearch;
+  }, [cancelPendingSearch, urlSearch]);
+
+  function handleSearchChange(value: string) {
+    setSearch(value);
+    cancelPendingSearch();
+    searchTimeout.current = setTimeout(() => {
+      updateParams({ search: value });
+      searchTimeout.current = null;
+    }, 300);
+  }
 
   return (
     <div className="space-y-6">
@@ -55,22 +86,23 @@ export function ExpensesClient({
       </div>
 
       <ExpenseFilters
-        search={searchParams.get("search") ?? ""}
-        onSearchChange={(v) => updateParam("search", v)}
+        search={search}
+        onSearchChange={handleSearchChange}
         categoryId={searchParams.get("categoryId") ?? ""}
-        onCategoryChange={(v) => updateParam("categoryId", v)}
+        onCategoryChange={(categoryId) => {
+          cancelPendingSearch();
+          updateParams({ search, categoryId });
+        }}
         dateFrom={searchParams.get("from") ?? ""}
         dateTo={searchParams.get("to") ?? ""}
         onDateRangeChange={(from, to) => {
-          const params = new URLSearchParams(searchParams.toString());
-          if (from) params.set("from", from);
-          else params.delete("from");
-          if (to) params.set("to", to);
-          else params.delete("to");
-          params.delete("page");
-          startTransition(() => {
-            router.push(`/expenses?${params.toString()}`);
-          });
+          cancelPendingSearch();
+          updateParams({ search, from, to });
+        }}
+        onClearAll={() => {
+          cancelPendingSearch();
+          setSearch("");
+          updateParams({ search: "", categoryId: "", from: "", to: "" });
         }}
         categories={categories}
       />
