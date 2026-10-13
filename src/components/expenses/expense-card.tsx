@@ -15,6 +15,7 @@ interface ExpenseCardProps {
 
 export function ExpenseCard({ expense }: ExpenseCardProps) {
   const t = useTranslations("dates");
+  const te = useTranslations("expenses");
 
   const labels: DateLabels = {
     today: t("today"),
@@ -49,6 +50,11 @@ export function ExpenseCard({ expense }: ExpenseCardProps) {
         <p className="text-text-primary text-sm font-bold">
           {formatCurrency(expense.amount, expense.currency)}
         </p>
+        {expense.conversionPending && (
+          <p className="text-status-negative text-xs">
+            {te("conversionPending")}
+          </p>
+        )}
         {expense.currency !== expense.baseCurrency && (
           <p className="text-text-tertiary text-xs">{expense.currency}</p>
         )}

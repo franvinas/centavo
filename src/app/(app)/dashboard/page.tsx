@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { formatCurrency } from "@/lib/format";
+import { ConversionNotice } from "@/components/expenses/conversion-notice";
 import { MetricCard } from "@/components/expenses/metric-card";
 import { ExpenseList } from "@/components/expenses/expense-list";
 import { CategoryBreakdown } from "@/components/expenses/category-breakdown";
@@ -71,21 +72,26 @@ async function DashboardMetric({
       : 0;
 
   return (
-    <MetricCard
-      label={t("totalSpent")}
-      value={formatCurrency(totalSpent, baseCurrency)}
-      trend={
-        lastMonthTotal > 0
-          ? {
-              value:
-                spendDiff <= 0
-                  ? t("lessLastMonth", { value: Math.abs(spendDiff) })
-                  : t("moreLastMonth", { value: Math.abs(spendDiff) }),
-              positive: spendDiff <= 0,
-            }
-          : undefined
-      }
-    />
+    <div>
+      <MetricCard
+        label={t("totalSpent")}
+        value={formatCurrency(totalSpent, baseCurrency)}
+        trend={
+          lastMonthTotal > 0 &&
+          !summary.pendingConversionCount &&
+          !summary.lastMonthPendingConversionCount
+            ? {
+                value:
+                  spendDiff <= 0
+                    ? t("lessLastMonth", { value: Math.abs(spendDiff) })
+                    : t("moreLastMonth", { value: Math.abs(spendDiff) }),
+                positive: spendDiff <= 0,
+              }
+            : undefined
+        }
+      />
+      <ConversionNotice count={summary.pendingConversionCount} />
+    </div>
   );
 }
 
@@ -202,7 +208,8 @@ function mapExpense(e: any): Expense {
     id: e.id,
     amount: Number(e.amount),
     currency: e.currency,
-    baseAmount: Number(e.baseAmount),
+    baseAmount: e.baseAmount,
+    conversionPending: e.conversionPending,
     baseCurrency: e.baseCurrency ?? "USD",
     description: e.description,
     date: e.date.toISOString(),

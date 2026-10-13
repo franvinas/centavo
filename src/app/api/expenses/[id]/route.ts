@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { presentExpense } from "@/lib/expense-valuation";
 import {
   getAuthUser,
   unauthorized,
@@ -26,7 +27,13 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
   if (!expense) return notFound("Expense not found");
 
-  return NextResponse.json({ expense });
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { baseCurrency: true },
+  });
+  return NextResponse.json({
+    expense: presentExpense(expense, dbUser?.baseCurrency ?? "USD"),
+  });
 }
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {

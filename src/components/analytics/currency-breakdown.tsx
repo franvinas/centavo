@@ -1,4 +1,5 @@
 import type { CurrencySpending } from "@/types/analytics";
+import { ConversionNotice } from "@/components/expenses/conversion-notice";
 import { formatCurrency, formatNumber } from "@/lib/format";
 
 interface CurrencyBreakdownProps {
@@ -18,7 +19,7 @@ export function CurrencyBreakdown({
     );
   }
 
-  const maxTotal = data[0]?.baseTotal ?? 1;
+  const maxTotal = data[0]?.baseTotal || 1;
 
   return (
     <div className="space-y-3">
@@ -45,6 +46,7 @@ export function CurrencyBreakdown({
               }}
             />
           </div>
+          <ConversionNotice count={item.pendingConversionCount ?? 0} />
           <p className="text-text-tertiary mt-0.5 text-xs">
             {formatNumber(item.count)} transaction{item.count !== 1 ? "s" : ""}
           </p>

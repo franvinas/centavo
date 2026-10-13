@@ -6,7 +6,11 @@ import { GET, PUT, DELETE } from "../route";
 import { NextRequest } from "next/server";
 
 vi.mock("@/lib/exchange-rate", () => ({
-  getExchangeRate: vi.fn().mockResolvedValue(1),
+  getHistoricalRates: vi.fn(async (date: string) => ({
+    USD: { rate: 1, date, source: "identity" },
+    ARS: { rate: 1000, date, source: "argentinadatos:blue:venta" },
+    EUR: { rate: 0.85, date, source: "frankfurter:USD/EUR" },
+  })),
 }));
 
 function createRequest(
@@ -119,8 +123,8 @@ describe("PUT /api/expenses/[id]", () => {
       expect.objectContaining({
         data: expect.objectContaining({
           amount: 50,
-          baseAmount: 50,
-          exchangeRate: 1,
+          usdAmount: expect.objectContaining({}),
+          usdExchangeRate: expect.objectContaining({}),
         }),
       }),
     );

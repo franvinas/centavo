@@ -120,10 +120,12 @@ describe("getExpenseById", () => {
 describe("getExpenseSummary", () => {
   it("returns summary with totals", async () => {
     const currentExpenses = [
-      createPrismaExpense({ baseAmount: 100 }),
-      createPrismaExpense({ baseAmount: 50 }),
+      createPrismaExpense({ amount: 100, baseAmount: 999 }),
+      createPrismaExpense({ amount: 50, baseAmount: 999 }),
     ];
-    const lastMonthExpenses = [createPrismaExpense({ baseAmount: 200 })];
+    const lastMonthExpenses = [
+      createPrismaExpense({ amount: 200, baseAmount: 999 }),
+    ];
 
     prismaMock.expense.findMany
       .mockResolvedValueOnce(currentExpenses as never)

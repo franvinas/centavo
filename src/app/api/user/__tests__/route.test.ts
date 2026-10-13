@@ -101,7 +101,7 @@ describe("PUT /api/user", () => {
     expect(prismaMock.user.update).toHaveBeenCalled();
   });
 
-  it("recalculates expenses on currency change", async () => {
+  it("changes display currency without recalculating expenses", async () => {
     mockAuth();
     const user = createPrismaUser({ baseCurrency: "USD" });
     prismaMock.user.findUnique.mockResolvedValue(user as never);
@@ -122,8 +122,8 @@ describe("PUT /api/user", () => {
     );
 
     expect(res.status).toBe(200);
-    expect(prismaMock.expense.findMany).toHaveBeenCalled();
-    expect(prismaMock.expense.update).toHaveBeenCalled();
+    expect(prismaMock.expense.findMany).not.toHaveBeenCalled();
+    expect(prismaMock.expense.update).not.toHaveBeenCalled();
   });
 
   it("returns 400 for invalid input", async () => {

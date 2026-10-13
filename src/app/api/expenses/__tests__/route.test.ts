@@ -6,7 +6,11 @@ import { GET, POST } from "../route";
 import { NextRequest } from "next/server";
 
 vi.mock("@/lib/exchange-rate", () => ({
-  getExchangeRate: vi.fn().mockResolvedValue(1),
+  getHistoricalRates: vi.fn(async (date: string) => ({
+    USD: { rate: 1, date, source: "identity" },
+    ARS: { rate: 1000, date, source: "argentinadatos:blue:venta" },
+    EUR: { rate: 0.85, date, source: "frankfurter:USD/EUR" },
+  })),
 }));
 
 function createRequest(

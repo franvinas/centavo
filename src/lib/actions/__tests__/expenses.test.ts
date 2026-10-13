@@ -6,7 +6,11 @@ import { createExpense, updateExpense, deleteExpense } from "../expenses";
 import { revalidatePath } from "next/cache";
 
 vi.mock("@/lib/exchange-rate", () => ({
-  getExchangeRate: vi.fn().mockResolvedValue(1),
+  getHistoricalRates: vi.fn().mockImplementation(async (date: string) => ({
+    USD: { rate: 1, date, source: "identity" },
+    ARS: { rate: 1000, date, source: "argentinadatos:blue:venta" },
+    EUR: { rate: 0.85, date, source: "frankfurter:USD/EUR" },
+  })),
 }));
 
 beforeEach(() => {
@@ -51,8 +55,8 @@ describe("createExpense", () => {
           currency: "USD",
           description: "Lunch",
           categoryId: "cat-1",
-          baseAmount: 25.5,
-          exchangeRate: 1,
+          usdAmount: expect.objectContaining({}),
+          usdExchangeRate: expect.objectContaining({}),
         }),
       }),
     );
@@ -87,7 +91,7 @@ describe("updateExpense", () => {
 
     expect(prismaMock.expense.update).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: "exp-1" },
+        where: expect.objectContaining({ id: "exp-1", userId: "user-1" }),
         data: expect.objectContaining({ description: "Updated" }),
       }),
     );
@@ -116,11 +120,11 @@ describe("updateExpense", () => {
 
     expect(prismaMock.expense.update).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: "exp-1" },
+        where: expect.objectContaining({ id: "exp-1", userId: "user-1" }),
         data: expect.objectContaining({
           amount: 100,
-          baseAmount: 100,
-          exchangeRate: 1,
+          usdAmount: expect.objectContaining({}),
+          usdExchangeRate: expect.objectContaining({}),
         }),
       }),
     );

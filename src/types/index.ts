@@ -25,7 +25,8 @@ export interface Expense {
   id: string;
   amount: number;
   currency: string;
-  baseAmount: number;
+  baseAmount: number | null;
+  conversionPending?: boolean;
   baseCurrency: string;
   description: string;
   date: string;

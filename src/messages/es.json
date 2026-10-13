@@ -16,7 +16,7 @@
     "emailPlaceholder": "Ingresa tu email",
     "enterCode": "Ingresa el código de verificación",
     "codeSent": "Enviamos un código de 6 dígitos a {email}",
-    "verifying": "Verificando\u2026",
+    "verifying": "Verificando…",
     "resendCode": "Reenviar código",
     "resendIn": "Reenviar código en {seconds}s",
     "differentEmail": "Usar otro email",
@@ -35,7 +35,7 @@
     "currencyLabel": "Moneda base",
     "currencyHint": "Todos los gastos se convertirán a esta moneda",
     "submit": "Comenzar",
-    "submitting": "Configurando\u2026"
+    "submitting": "Configurando…"
   },
   "dashboard": {
     "greeting": "Buenos días, {name}",
@@ -58,7 +58,7 @@
     "title": "Todos los gastos",
     "found": "{count, plural, =1 {# gasto encontrado} other {# gastos encontrados}}",
     "noExpenses": "No se encontraron gastos",
-    "searchPlaceholder": "Buscar gastos\u2026",
+    "searchPlaceholder": "Buscar gastos…",
     "allCategories": "Todas las categorías",
     "from": "Desde",
     "to": "Hasta",
@@ -76,11 +76,13 @@
     "saveExpense": "Guardar gasto",
     "updateExpense": "Actualizar gasto",
     "deleteExpense": "Eliminar gasto",
-    "confirmDelete": "\u00bfEst\u00e1s seguro de que quieres eliminar este gasto?",
+    "confirmDelete": "¿Estás seguro de que quieres eliminar este gasto?",
     "amount": "Monto",
-    "saving": "Guardando\u2026",
+    "saving": "Guardando…",
     "selectCategory": "Seleccionar categoría",
-    "searchCategories": "Buscar categorías\u2026"
+    "searchCategories": "Buscar categorías…",
+    "pendingConversions": "Total parcial: {count} gastos sin cotización histórica. Sus importes originales están conservados.",
+    "conversionPending": "Conversión pendiente"
   },
   "categories": {
     "title": "Categorías",
@@ -93,8 +95,8 @@
     "icon": "Ícono",
     "create": "Crear",
     "update": "Actualizar",
-    "confirmDelete": "\u00bfEst\u00e1s seguro de que quieres eliminar esta categor\u00eda?",
-    "saving": "Guardando\u2026"
+    "confirmDelete": "¿Estás seguro de que quieres eliminar esta categoría?",
+    "saving": "Guardando…"
   },
   "analytics": {
     "title": "Análisis",
@@ -125,7 +127,7 @@
     "language": "Idioma",
     "languageHint": "Elige tu idioma preferido.",
     "save": "Guardar cambios",
-    "saving": "Guardando\u2026",
+    "saving": "Guardando…",
     "saved": "¡Guardado!",
     "telegram": "Telegram",
     "telegramHint": "Vincula tu cuenta de Telegram para registrar gastos por chat.",

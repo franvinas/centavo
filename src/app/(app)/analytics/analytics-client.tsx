@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import type { AnalyticsData } from "@/types/analytics";
 import { PeriodSelector } from "@/components/analytics/period-selector";
+import { ConversionNotice } from "@/components/expenses/conversion-notice";
 import { SummaryCards } from "@/components/analytics/summary-cards";
 import { CurrencyBreakdown } from "@/components/analytics/currency-breakdown";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -116,6 +117,12 @@ export function AnalyticsClient({
             onCustomToChange={(to) => updateParams({ timeTo: to })}
           />
         </div>
+        <ConversionNotice
+          count={data.overTime.reduce(
+            (count, point) => count + (point.pendingConversionCount ?? 0),
+            0,
+          )}
+        />
         {isPending ? (
           <ChartSkeleton />
         ) : (
@@ -147,6 +154,7 @@ export function AnalyticsClient({
         <SummaryCards summary={data.summary} baseCurrency={data.baseCurrency} />
       )}
 
+      <ConversionNotice count={data.summary.pendingConversionCount ?? 0} />
       <div className="grid gap-6 md:grid-cols-2">
         <div className="bg-bg-surface shadow-card rounded-lg p-5">
           <h2 className="text-text-primary mb-4 text-base font-semibold">

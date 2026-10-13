@@ -67,7 +67,11 @@ describe("Expense Service", () => {
           }),
         }),
       );
-      expect(result).toEqual(mockExpense);
+      expect(result).toMatchObject({
+        ...mockExpense,
+        baseCurrency: "USD",
+        conversionPending: false,
+      });
     });
 
     it("converts currency when different from base", async () => {
@@ -92,7 +96,7 @@ describe("Expense Service", () => {
 
       const callArgs = prismaMock.expense.create.mock.calls[0][0];
       // EUR->USD: 1/0.85 ≈ 1.1765
-      expect(callArgs.data.exchangeRate).toBeCloseTo(1 / 0.85, 2);
+      expect(Number(callArgs.data.usdExchangeRate)).toBeCloseTo(1 / 0.85, 2);
     });
 
     it("throws on invalid input", async () => {
@@ -115,6 +119,7 @@ describe("Expense Service", () => {
         userId: "user-1",
         amount: 25,
         currency: "USD",
+        date: new Date("2025-01-15"),
       } as never);
 
       prismaMock.expense.update.mockResolvedValue({ id: "exp-1" } as never);
@@ -125,7 +130,7 @@ describe("Expense Service", () => {
 
       expect(prismaMock.expense.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: "exp-1" },
+          where: expect.objectContaining({ id: "exp-1", userId: "user-1" }),
           data: expect.objectContaining({ description: "Updated lunch" }),
         }),
       );

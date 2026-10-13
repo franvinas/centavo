@@ -29,22 +29,21 @@ managed in the Vercel dashboard.
 
 Set these in Vercel for production. Use `.env.example` as the local template.
 
-| Variable                     | Purpose                                       |
-| ---------------------------- | --------------------------------------------- |
-| `DATABASE_URL`               | PostgreSQL connection string used by Prisma   |
-| `AUTH_SECRET`                | NextAuth v5 secret                            |
-| `NEXTAUTH_SECRET`            | Backward-compatible auth secret               |
-| `NEXTAUTH_URL`               | Canonical app URL                             |
-| `GOOGLE_CLIENT_ID`           | Google OAuth client ID                        |
-| `GOOGLE_CLIENT_SECRET`       | Google OAuth client secret                    |
-| `RESEND_API_KEY`             | Resend API key                                |
-| `EMAIL_FROM`                 | Sender address for email OTP                  |
-| `OPEN_EXCHANGE_RATES_APP_ID` | Open Exchange Rates app ID                    |
-| `OPENAI_API_KEY`             | OpenAI API key for Telegram assistant         |
-| `TELEGRAM_BOT_TOKEN`         | Telegram bot token                            |
-| `TELEGRAM_WEBHOOK_SECRET`    | Secret used to validate Telegram webhooks     |
-| `TELEGRAM_WEBHOOK_URL`       | Public `/api/telegram/webhook` URL            |
-| `TELEGRAM_BOT_USERNAME`      | Telegram bot username, defaults to `CentaBot` |
+| Variable                  | Purpose                                       |
+| ------------------------- | --------------------------------------------- |
+| `DATABASE_URL`            | PostgreSQL connection string used by Prisma   |
+| `AUTH_SECRET`             | NextAuth v5 secret                            |
+| `NEXTAUTH_SECRET`         | Backward-compatible auth secret               |
+| `NEXTAUTH_URL`            | Canonical app URL                             |
+| `GOOGLE_CLIENT_ID`        | Google OAuth client ID                        |
+| `GOOGLE_CLIENT_SECRET`    | Google OAuth client secret                    |
+| `RESEND_API_KEY`          | Resend API key                                |
+| `EMAIL_FROM`              | Sender address for email OTP                  |
+| `OPENAI_API_KEY`          | OpenAI API key for Telegram assistant         |
+| `TELEGRAM_BOT_TOKEN`      | Telegram bot token                            |
+| `TELEGRAM_WEBHOOK_SECRET` | Secret used to validate Telegram webhooks     |
+| `TELEGRAM_WEBHOOK_URL`    | Public `/api/telegram/webhook` URL            |
+| `TELEGRAM_BOT_USERNAME`   | Telegram bot username, defaults to `CentaBot` |
 
 Secrets must not be committed. If a real secret is accidentally written to a
 tracked or shared file, rotate it in the provider dashboard.
@@ -145,3 +144,15 @@ For database-breaking regressions:
 - GitHub Actions workflows are not checked in.
 - End-to-end tests are not configured in `package.json`.
 - Vercel project settings are not represented as code.
+
+## Historical blue valuation migration
+
+1. Run `pnpm db:backfill-blue --backup-only` before the schema migration and keep the private backup outside Git.
+2. Run `pnpm db:backfill-blue --dry-run` to check historical coverage.
+3. Apply `3_historical_valuations` with `pnpm db:deploy`. It only adds fields, relaxes two legacy NOT NULL constraints, and archives each expense's old conversion and former account currency. Original expense fields are untouched.
+4. Deploy the application changes, then run `pnpm db:backfill-blue --apply`. Existing expenses display their original amounts immediately; converted totals show pending counts until the backfill finishes.
+5. Verify `originalsUnchanged: true`, `conflicts: 0`, and the pending counts. Re-run `--apply` to retry missing quotes or skipped concurrent edits. It never substitutes today's rate for a missing historical rate.
+
+All existing ARS expenses are valued using historical blue sale quotes, even when their old stored USD equivalent used an official rate. Existing non-ARS USD conversions are retained when identifiable. Old converted values remain available in the backup and `legacy_conversion`.
+
+For an app rollback, retain the new fields. New expenses may have NULL legacy conversions, so rolling back to old code requires adapting its writes and reports; do not drop the new fields or restore a whole-table backup over newer expenses. Restore individual original fields only after comparing the backup with subsequent edits.

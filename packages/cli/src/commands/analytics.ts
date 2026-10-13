@@ -80,6 +80,13 @@ const summaryCommand: CommandSpec = {
             (response.summary as Record<string, unknown>).dailyAverage ?? "",
           ),
         ],
+        [
+          "Pending conversions",
+          String(
+            (response.summary as Record<string, unknown>)
+              .pendingConversionCount ?? 0,
+          ),
+        ],
         ["Base currency", String(response.baseCurrency ?? "")],
       ],
     );
@@ -105,11 +112,12 @@ const categoriesCommand: CommandSpec = {
     }
 
     printTable(
-      ["Category", "Count", "Total"],
+      ["Category", "Count", "Total", "Pending conversions"],
       response.items.map((item) => [
         String(item.name),
         String(item.count),
         String(item.total),
+        String(item.pendingConversionCount ?? 0),
       ]),
     );
     return 0;
@@ -134,8 +142,12 @@ const trendCommand: CommandSpec = {
     }
 
     printTable(
-      ["Period", "Total"],
-      response.items.map((item) => [String(item.period), String(item.total)]),
+      ["Period", "Total", "Pending conversions"],
+      response.items.map((item) => [
+        String(item.period),
+        String(item.total),
+        String(item.pendingConversionCount ?? 0),
+      ]),
     );
     return 0;
   },
@@ -159,12 +171,19 @@ const currenciesCommand: CommandSpec = {
     }
 
     printTable(
-      ["Currency", "Count", "Original Total", "Base Total"],
+      [
+        "Currency",
+        "Count",
+        "Original Total",
+        "Base Total",
+        "Pending conversions",
+      ],
       response.items.map((item) => [
         String(item.currency),
         String(item.count),
         String(item.originalTotal),
         String(item.baseTotal),
+        String(item.pendingConversionCount ?? 0),
       ]),
     );
     return 0;

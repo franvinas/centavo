@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorized, badRequest } from "@/lib/api-utils";
 import { updateUserSchema } from "@/lib/validations/user";
-import { getExchangeRate } from "@/lib/exchange-rate";
+import { revalidatePath } from "next/cache";
 
 export async function GET(request: NextRequest) {
   const user = await getAuthUser(request);
@@ -26,39 +26,13 @@ export async function PUT(request: NextRequest) {
     return badRequest(parsed.error.issues[0]?.message ?? "Invalid input");
   }
 
-  const currentUser = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: { baseCurrency: true },
-  });
-
   const updatedUser = await prisma.user.update({
     where: { id: user.id },
     data: parsed.data,
   });
 
-  // If base currency changed, recalculate all expense base amounts
-  if (
-    parsed.data.baseCurrency &&
-    currentUser &&
-    parsed.data.baseCurrency !== currentUser.baseCurrency
-  ) {
-    const expenses = await prisma.expense.findMany({
-      where: { userId: user.id },
-    });
-
-    for (const expense of expenses) {
-      const rate = await getExchangeRate(
-        expense.currency,
-        parsed.data.baseCurrency,
-      );
-      await prisma.expense.update({
-        where: { id: expense.id },
-        data: {
-          baseAmount: parseFloat((Number(expense.amount) * rate).toFixed(2)),
-          exchangeRate: rate,
-        },
-      });
-    }
+  for (const path of ["/settings", "/dashboard", "/expenses", "/analytics"]) {
+    revalidatePath(path);
   }
 
   return NextResponse.json({ user: updatedUser });

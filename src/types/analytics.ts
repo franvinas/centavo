@@ -2,6 +2,7 @@ export interface AnalyticsSummary {
   totalSpent: number;
   transactionCount: number;
   dailyAverage: number;
+  pendingConversionCount?: number;
 }
 
 export interface CategorySpending {
@@ -11,11 +12,13 @@ export interface CategorySpending {
   icon: string;
   total: number;
   count: number;
+  pendingConversionCount?: number;
 }
 
 export interface TimeSeriesPoint {
   period: string; // "YYYY-MM"
   total: number;
+  pendingConversionCount?: number;
 }
 
 export interface CurrencySpending {
@@ -23,6 +26,7 @@ export interface CurrencySpending {
   originalTotal: number;
   baseTotal: number;
   count: number;
+  pendingConversionCount?: number;
 }
 
 export interface AnalyticsData {

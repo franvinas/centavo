@@ -33,7 +33,8 @@
     "docker:coverage": "docker compose -f docker-compose.test.yml run --rm --build coverage",
     "docker:down": "docker compose -f docker-compose.test.yml down -v",
     "telegram:webhook": "tsx src/scripts/register-webhook.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:backfill-blue": "tsx src/scripts/migrate-historical-valuations.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

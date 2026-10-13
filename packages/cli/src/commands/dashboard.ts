@@ -25,6 +25,7 @@ export const dashboardCommand: CommandSpec = {
       ["totalSpent", String(summary.totalSpent ?? "")],
       ["transactions", String(summary.transactionCount ?? "")],
       ["dailyAverage", String(summary.dailyAverage ?? "")],
+      ["pendingConversions", String(summary.pendingConversionCount ?? 0)],
       ["baseCurrency", String(summaryResponse.baseCurrency ?? "")],
     ]);
 

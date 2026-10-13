@@ -6,7 +6,8 @@ import {
   type CreateExpenseInput,
   type UpdateExpenseInput,
 } from "@/lib/validations/expense";
-import { getExchangeRate } from "@/lib/exchange-rate";
+import { buildValuation } from "./valuation";
+import { presentExpense } from "@/lib/expense-valuation";
 import {
   type ExpenseSelectorInput,
   bulkExpenseDeleteSchema,
@@ -75,20 +76,20 @@ async function createExpenseWithClient(
   db: DbClient,
   userId: string,
   input: CreateExpenseInput,
+  preparedValuation?: Awaited<ReturnType<typeof buildValuation>>,
 ) {
   await ensureCategoryBelongsToUser(db, userId, input.categoryId);
 
-  const baseCurrency = await getUserBaseCurrency(db, userId);
-  const exchangeRate = await getExchangeRate(input.currency, baseCurrency);
-  const baseAmount = parseFloat((input.amount * exchangeRate).toFixed(2));
+  const valuation =
+    preparedValuation ??
+    (await buildValuation(input.amount, input.currency, input.date));
 
   return db.expense.create({
     data: {
       userId,
       amount: input.amount,
       currency: input.currency,
-      baseAmount,
-      exchangeRate,
+      ...valuation,
       description: input.description,
       categoryId: input.categoryId,
       date: new Date(input.date),
@@ -120,19 +121,30 @@ async function buildExpenseUpdateData(
     updateData.categoryId = input.categoryId;
   }
 
-  if (input.amount !== undefined || input.currency !== undefined) {
-    const amount = input.amount ?? Number(existing.amount);
-    const currency = input.currency ?? existing.currency;
-    const baseCurrency = await getUserBaseCurrency(db, userId);
-    const exchangeRate = await getExchangeRate(currency, baseCurrency);
-
+  const amount = input.amount ?? Number(existing.amount);
+  const currency = input.currency ?? existing.currency;
+  const date = input.date ?? existing.date.toISOString().slice(0, 10);
+  const quoteChanged =
+    currency !== existing.currency ||
+    date !== existing.date.toISOString().slice(0, 10);
+  if (
+    quoteChanged ||
+    (input.amount !== undefined && amount !== Number(existing.amount))
+  ) {
+    Object.assign(
+      updateData,
+      await buildValuation(
+        amount,
+        currency,
+        date,
+        quoteChanged ? undefined : existing,
+      ),
+    );
     updateData.amount = amount;
     updateData.currency = currency;
-    updateData.baseAmount = parseFloat((amount * exchangeRate).toFixed(2));
-    updateData.exchangeRate = exchangeRate;
   }
 
-  return updateData;
+  return { updateData, updatedAt: existing.updatedAt };
 }
 
 export async function createExpenseForUser(
@@ -140,7 +152,8 @@ export async function createExpenseForUser(
   input: CreateExpenseInput,
 ) {
   const parsed = createExpenseSchema.parse(input);
-  return createExpenseWithClient(prisma, userId, parsed);
+  const expense = await createExpenseWithClient(prisma, userId, parsed);
+  return presentExpense(expense, await getUserBaseCurrency(prisma, userId));
 }
 
 export async function updateExpenseForUser(
@@ -149,18 +162,19 @@ export async function updateExpenseForUser(
   input: UpdateExpenseInput,
 ) {
   const parsed = updateExpenseSchema.parse(input);
-  const updateData = await buildExpenseUpdateData(
+  const { updateData, updatedAt } = await buildExpenseUpdateData(
     prisma,
     userId,
     expenseId,
     parsed,
   );
 
-  return prisma.expense.update({
-    where: { id: expenseId },
+  const expense = await prisma.expense.update({
+    where: { id: expenseId, userId, updatedAt },
     data: updateData,
     include: { category: true },
   });
+  return presentExpense(expense, await getUserBaseCurrency(prisma, userId));
 }
 
 export async function deleteExpenseForUser(userId: string, expenseId: string) {
@@ -177,11 +191,13 @@ export async function listExpensesForUser(
   userId: string,
   selectors: ExpenseSelectorInput = {},
 ) {
-  return prisma.expense.findMany({
+  const expenses = await prisma.expense.findMany({
     where: buildExpenseWhere(userId, selectors),
     include: { category: true },
     orderBy: [{ date: "desc" }, { createdAt: "desc" }],
   });
+  const currency = await getUserBaseCurrency(prisma, userId);
+  return expenses.map((expense) => presentExpense(expense, currency));
 }
 
 export async function bulkUpdateExpensesForUser(
@@ -204,37 +220,39 @@ export async function bulkUpdateExpensesForUser(
     };
   }
 
-  const updatedExpenses = await prisma.$transaction(async (tx) => {
-    const results = [];
-
-    for (const expense of expenses) {
-      const updateInput: UpdateExpenseInput = {
+  // Resolve external quotes before opening a database transaction.
+  const updates: Array<{
+    expense: (typeof expenses)[number];
+    updateData: Record<string, unknown>;
+  }> = [];
+  for (const expense of expenses) {
+    const { updateData } = await buildExpenseUpdateData(
+      prisma,
+      userId,
+      expense.id,
+      {
         amount: parsed.data.amount,
         currency: parsed.data.currency,
         description: parsed.data.description,
         categoryId: parsed.data.categoryId,
         date: parsed.data.date,
         notes: parsed.data.clearNotes ? "" : parsed.data.notes,
-      };
-      const updateData = await buildExpenseUpdateData(
-        tx,
-        userId,
-        expense.id,
-        updateInput,
+      },
+    );
+    if (parsed.data.clearNotes) updateData.notes = null;
+    updates.push({ expense, updateData });
+  }
+  const updatedExpenses = await prisma.$transaction(async (tx) => {
+    const results = [];
+    for (const { expense, updateData } of updates) {
+      results.push(
+        await tx.expense.update({
+          where: { id: expense.id, userId, updatedAt: expense.updatedAt },
+          data: updateData,
+          include: { category: true },
+        }),
       );
-
-      if (parsed.data.clearNotes) {
-        updateData.notes = null;
-      }
-
-      const updated = await tx.expense.update({
-        where: { id: expense.id },
-        data: updateData,
-        include: { category: true },
-      });
-      results.push(updated);
     }
-
     return results;
   });
 
@@ -242,7 +260,9 @@ export async function bulkUpdateExpensesForUser(
     preview: false,
     matched: expenses.length,
     changed: updatedExpenses.length,
-    items: updatedExpenses,
+    items: updatedExpenses.map((expense) =>
+      presentExpense(expense, expenses[0]?.baseCurrency ?? "USD"),
+    ),
   };
 }
 
@@ -315,14 +335,21 @@ export async function importExpensesForUser(
     };
   }
 
+  const displayCurrency = await getUserBaseCurrency(prisma, userId);
   if (!parsed.continueOnError) {
+    const valuations: Awaited<ReturnType<typeof buildValuation>>[] = [];
+    for (const item of parsed.items)
+      valuations.push(
+        await buildValuation(item.amount, item.currency, item.date),
+      );
     const createdExpenses = await prisma.$transaction(async (tx) => {
       const created = [];
-      for (const item of parsed.items) {
+      for (const [index, item] of parsed.items.entries()) {
         const expense = await createExpenseWithClient(
           tx,
           userId,
           createExpenseSchema.parse(item),
+          valuations[index],
         );
         created.push(expense);
       }
@@ -332,7 +359,9 @@ export async function importExpensesForUser(
     return {
       preview: false,
       created: createdExpenses.length,
-      items: createdExpenses,
+      items: createdExpenses.map((expense) =>
+        presentExpense(expense, displayCurrency),
+      ),
       errors: [],
     };
   }

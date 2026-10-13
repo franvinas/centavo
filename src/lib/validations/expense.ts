@@ -1,11 +1,20 @@
 import { z } from "zod/v4";
+import { CURRENCIES } from "@/lib/constants";
 
 export const createExpenseSchema = z.object({
-  amount: z.number().positive("Amount must be greater than 0"),
+  amount: z
+    .number()
+    .positive("Amount must be greater than 0")
+    .multipleOf(0.01, "Amount must have at most two decimals")
+    .max(9999999999.99),
   currency: z
     .string()
     .length(3, "Currency must be a 3-letter ISO code")
-    .toUpperCase(),
+    .toUpperCase()
+    .refine(
+      (currency) => CURRENCIES.includes(currency),
+      "Unsupported currency",
+    ),
   description: z
     .string()
     .trim()

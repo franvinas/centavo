@@ -53,7 +53,8 @@ function serializeExpense(e: Record<string, unknown>) {
     description: e.description,
     amount: Number(e.amount),
     currency: e.currency,
-    baseAmount: Number(e.baseAmount),
+    baseAmount: e.baseAmount == null ? null : Number(e.baseAmount),
+    conversionPending: e.conversionPending,
     date: e.date instanceof Date ? e.date.toISOString().split("T")[0] : e.date,
     category: e.category
       ? {
@@ -129,6 +130,10 @@ export async function executeTool(
       const summary = await getExpenseSummary(userId);
       return JSON.stringify({
         totalSpent: summary.totalSpent,
+        baseCurrency: summary.baseCurrency,
+        pendingConversionCount: summary.pendingConversionCount,
+        lastMonthPendingConversionCount:
+          summary.lastMonthPendingConversionCount,
         expenseCount: summary.expenseCount,
         lastMonthTotal: summary.lastMonthTotal,
         lastMonthCount: summary.lastMonthCount,

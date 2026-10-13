@@ -97,14 +97,15 @@ async function AnalyticsContent({
   } = getDateRange(timePeriod, timeFrom, timeTo);
 
   const [summary, byCategory, overTime, byCurrency] = await Promise.all([
-    getAnalyticsSummary({ userId, from, to }),
-    getSpendingByCategory({ userId, from, to }),
+    getAnalyticsSummary({ userId, from, to, baseCurrency }),
+    getSpendingByCategory({ userId, from, to, baseCurrency }),
     getSpendingOverTime({
       userId,
+      baseCurrency,
       from: timeChartFrom,
       to: timeChartTo,
     }),
-    getSpendingByCurrency({ userId, from, to }),
+    getSpendingByCurrency({ userId, from, to, baseCurrency }),
   ]);
 
   return (

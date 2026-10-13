@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { getDisplayAmount, sumDisplayAmounts } from "@/lib/expense-valuation";
 import type {
   AnalyticsSummary,
   CategorySpending,
@@ -10,117 +11,129 @@ interface AnalyticsParams {
   userId: string;
   from: Date;
   to: Date;
+  baseCurrency?: string;
 }
 
-export async function getAnalyticsSummary({
+async function getValuedExpenses({
   userId,
   from,
   to,
-}: AnalyticsParams): Promise<AnalyticsSummary> {
-  const result = await prisma.expense.aggregate({
-    where: { userId, date: { gte: from, lte: to } },
-    _sum: { baseAmount: true },
-    _count: true,
-  });
-
-  const totalSpent = Number(result._sum.baseAmount ?? 0);
-  const transactionCount = result._count;
-
-  const daysDiff = Math.max(
-    1,
-    Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)) + 1,
-  );
-  const dailyAverage = transactionCount > 0 ? totalSpent / daysDiff : 0;
-
-  return { totalSpent, transactionCount, dailyAverage };
-}
-
-export async function getSpendingByCategory({
-  userId,
-  from,
-  to,
-}: AnalyticsParams): Promise<CategorySpending[]> {
-  const groups = await prisma.expense.groupBy({
-    by: ["categoryId"],
-    where: { userId, date: { gte: from, lte: to } },
-    _sum: { baseAmount: true },
-    _count: true,
-  });
-
-  if (groups.length === 0) return [];
-
-  const categoryIds = groups.map((g) => g.categoryId);
-  const categories = await prisma.category.findMany({
-    where: { id: { in: categoryIds } },
-  });
-
-  const categoryMap = new Map(categories.map((c) => [c.id, c]));
-
-  return groups
-    .map((g) => {
-      const cat = categoryMap.get(g.categoryId);
-      return {
-        categoryId: g.categoryId,
-        name: cat?.name ?? "Unknown",
-        color: cat?.color ?? "#888888",
-        icon: cat?.icon ?? "MoreHorizontal",
-        total: Number(g._sum.baseAmount ?? 0),
-        count: g._count,
-      };
-    })
-    .sort((a, b) => b.total - a.total);
-}
-
-export async function getSpendingOverTime({
-  userId,
-  from,
-  to,
-}: AnalyticsParams): Promise<TimeSeriesPoint[]> {
+  baseCurrency,
+}: AnalyticsParams) {
+  const user = baseCurrency
+    ? null
+    : await prisma.user.findUnique({
+        where: { id: userId },
+        select: { baseCurrency: true },
+      });
   const expenses = await prisma.expense.findMany({
     where: { userId, date: { gte: from, lte: to } },
-    select: { date: true, baseAmount: true },
+    include: { category: true },
   });
+  return { expenses, currency: baseCurrency ?? user?.baseCurrency ?? "USD" };
+}
 
-  // Group by YYYY-MM
-  const monthTotals = new Map<string, number>();
-  for (const e of expenses) {
-    const d = e.date;
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    monthTotals.set(key, (monthTotals.get(key) ?? 0) + Number(e.baseAmount));
+export async function getAnalyticsSummary(
+  params: AnalyticsParams,
+): Promise<AnalyticsSummary> {
+  const { expenses, currency } = await getValuedExpenses(params);
+  const { total, pendingConversionCount } = sumDisplayAmounts(
+    expenses,
+    currency,
+  );
+  const days = Math.max(
+    1,
+    Math.round((params.to.getTime() - params.from.getTime()) / 86400000) + 1,
+  );
+  return {
+    totalSpent: total,
+    transactionCount: expenses.length,
+    dailyAverage: total / days,
+    pendingConversionCount,
+  };
+}
+
+export async function getSpendingByCategory(
+  params: AnalyticsParams,
+): Promise<CategorySpending[]> {
+  const { expenses, currency } = await getValuedExpenses(params);
+  const groups = new Map<string, CategorySpending>();
+  for (const expense of expenses) {
+    const group = groups.get(expense.categoryId) ?? {
+      categoryId: expense.categoryId,
+      name: expense.category.name,
+      color: expense.category.color,
+      icon: expense.category.icon ?? "MoreHorizontal",
+      total: 0,
+      count: 0,
+      pendingConversionCount: 0,
+    };
+    const value = getDisplayAmount(expense, currency);
+    group.count++;
+    if (value === null)
+      group.pendingConversionCount = (group.pendingConversionCount ?? 0) + 1;
+    else group.total = Math.round((group.total + value) * 100) / 100;
+    groups.set(expense.categoryId, group);
   }
+  return [...groups.values()].sort((a, b) => b.total - a.total);
+}
 
-  // Fill in zero-months between from and to
+export async function getSpendingOverTime(
+  params: AnalyticsParams,
+): Promise<TimeSeriesPoint[]> {
+  const { expenses, currency } = await getValuedExpenses(params);
+  const groups = new Map<string, TimeSeriesPoint>();
+  for (const expense of expenses) {
+    const period = expense.date.toISOString().slice(0, 7);
+    const group = groups.get(period) ?? {
+      period,
+      total: 0,
+      pendingConversionCount: 0,
+    };
+    const value = getDisplayAmount(expense, currency);
+    if (value === null)
+      group.pendingConversionCount = (group.pendingConversionCount ?? 0) + 1;
+    else group.total = Math.round((group.total + value) * 100) / 100;
+    groups.set(period, group);
+  }
   const result: TimeSeriesPoint[] = [];
-  const cursor = new Date(from.getFullYear(), from.getMonth(), 1);
-  const end = new Date(to.getFullYear(), to.getMonth(), 1);
-
+  const cursor = new Date(
+    Date.UTC(params.from.getUTCFullYear(), params.from.getUTCMonth(), 1),
+  );
+  const end = new Date(
+    Date.UTC(params.to.getUTCFullYear(), params.to.getUTCMonth(), 1),
+  );
   while (cursor <= end) {
-    const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}`;
-    result.push({ period: key, total: monthTotals.get(key) ?? 0 });
-    cursor.setMonth(cursor.getMonth() + 1);
+    const period = cursor.toISOString().slice(0, 7);
+    result.push(
+      groups.get(period) ?? { period, total: 0, pendingConversionCount: 0 },
+    );
+    cursor.setUTCMonth(cursor.getUTCMonth() + 1);
   }
-
   return result;
 }
 
-export async function getSpendingByCurrency({
-  userId,
-  from,
-  to,
-}: AnalyticsParams): Promise<CurrencySpending[]> {
-  const groups = await prisma.expense.groupBy({
-    by: ["currency"],
-    where: { userId, date: { gte: from, lte: to } },
-    _sum: { amount: true, baseAmount: true },
-    _count: true,
-  });
-
-  return groups
-    .map((g) => ({
-      currency: g.currency,
-      originalTotal: Number(g._sum.amount ?? 0),
-      baseTotal: Number(g._sum.baseAmount ?? 0),
-      count: g._count,
-    }))
-    .sort((a, b) => b.baseTotal - a.baseTotal);
+export async function getSpendingByCurrency(
+  params: AnalyticsParams,
+): Promise<CurrencySpending[]> {
+  const { expenses, currency } = await getValuedExpenses(params);
+  const groups = new Map<string, CurrencySpending>();
+  for (const expense of expenses) {
+    const group = groups.get(expense.currency) ?? {
+      currency: expense.currency,
+      originalTotal: 0,
+      baseTotal: 0,
+      count: 0,
+      pendingConversionCount: 0,
+    };
+    group.originalTotal =
+      Math.round((group.originalTotal + Number(expense.amount)) * 100) / 100;
+    group.count++;
+    const value = getDisplayAmount(expense, currency);
+    if (value === null)
+      group.pendingConversionCount = (group.pendingConversionCount ?? 0) + 1;
+    else group.baseTotal = Math.round((group.baseTotal + value) * 100) / 100;
+    groups.set(expense.currency, group);
+  }
+  return [...groups.values()].sort((a, b) => b.baseTotal - a.baseTotal);
 }

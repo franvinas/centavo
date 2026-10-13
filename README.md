@@ -57,20 +57,19 @@ Multi-user expense tracker with multi-currency support. Track spending across cu
 
    Required variables for a non-sandbox setup:
 
-   | Variable                     | Description                            |
-   | ---------------------------- | -------------------------------------- |
-   | `DATABASE_URL`               | PostgreSQL connection string           |
-   | `NEXTAUTH_URL`               | App URL (e.g. `http://localhost:3000`) |
-   | `NEXTAUTH_SECRET`            | Random secret for JWT signing          |
-   | `GOOGLE_CLIENT_ID`           | Google OAuth client ID                 |
-   | `GOOGLE_CLIENT_SECRET`       | Google OAuth client secret             |
-   | `RESEND_API_KEY`             | Resend API key for email OTP           |
-   | `OPEN_EXCHANGE_RATES_APP_ID` | Open Exchange Rates API key            |
-   | `OPENAI_API_KEY`             | OpenAI API key (Telegram assistant)    |
-   | `TELEGRAM_BOT_TOKEN`         | Telegram bot token                     |
-   | `TELEGRAM_WEBHOOK_SECRET`    | Secret used to validate webhook calls  |
-   | `TELEGRAM_WEBHOOK_URL`       | Public `/api/telegram/webhook` URL     |
-   | `TELEGRAM_BOT_USERNAME`      | Bot username (default `CentaBot`)      |
+   | Variable                  | Description                            |
+   | ------------------------- | -------------------------------------- |
+   | `DATABASE_URL`            | PostgreSQL connection string           |
+   | `NEXTAUTH_URL`            | App URL (e.g. `http://localhost:3000`) |
+   | `NEXTAUTH_SECRET`         | Random secret for JWT signing          |
+   | `GOOGLE_CLIENT_ID`        | Google OAuth client ID                 |
+   | `GOOGLE_CLIENT_SECRET`    | Google OAuth client secret             |
+   | `RESEND_API_KEY`          | Resend API key for email OTP           |
+   | `OPENAI_API_KEY`          | OpenAI API key (Telegram assistant)    |
+   | `TELEGRAM_BOT_TOKEN`      | Telegram bot token                     |
+   | `TELEGRAM_WEBHOOK_SECRET` | Secret used to validate webhook calls  |
+   | `TELEGRAM_WEBHOOK_URL`    | Public `/api/telegram/webhook` URL     |
+   | `TELEGRAM_BOT_USERNAME`   | Bot username (default `CentaBot`)      |
 
    Do not point local development commands at production databases.
 
@@ -192,7 +191,23 @@ The app uses three data layers, all scoped per authenticated user:
 
 ### Multi-Currency
 
-Each expense stores both the original amount/currency and the converted base amount/exchange rate. Rates are fetched from Open Exchange Rates (ECB data) and cached in-memory for 1 hour. Changing a user's base currency recalculates all existing expenses.
+Each expense keeps its original `amount` and `currency`, plus a fixed USD valuation and historical quote snapshots. ARS uses **dólar blue venta** from [ArgentinaDatos](https://argentinadatos.com/docs/operations/get-cotizaciones-dolares-casa), selecting the expense date or the last available earlier observation. EUR/USD uses [Frankfurter historical rates](https://frankfurter.dev/). Both providers are public and require no API key.
+
+The stored snapshots include rate, effective date, and source. Changing the account's `baseCurrency` changes presentation only; it never rewrites expenses or refreshes their rates. Expenses already in the display currency are summed directly from their originals, so ARS amounts never round-trip through USD. Changing the expense date or original currency selects a new historical snapshot; changing its amount retains its existing quote.
+
+Missing quotes leave the conversion pending. Original amounts remain available, converted totals include only valued expenses, and the UI/API/CLI/Telegram report `pendingConversionCount` for incomplete totals. The historical rate endpoint accepts `GET /api/exchange-rate?from=ARS&to=USD&date=YYYY-MM-DD`.
+
+Legacy `base_amount` and `exchange_rate` values remain in the database for audit, with their former display currency saved in `legacy_conversion`. New expenses use `usd_amount`, `usd_exchange_rate`, and `conversion_rates`; API `baseAmount` is computed for the current display preference.
+
+To backfill existing expenses after deploying the schema migration:
+
+```bash
+pnpm db:backfill-blue --backup-only # Private, gitignored expense backup
+pnpm db:backfill-blue --dry-run     # Read-only conversion preview
+pnpm db:backfill-blue --apply       # Adds valuations; preserves all originals
+```
+
+The backfill is resumable, retains successful snapshots, detects concurrent edits, and verifies a fingerprint covering original amounts, currencies, dates, categories, descriptions, notes, timestamps, and legacy conversions. Backups are stored with private permissions in `backups/`.
 
 ### Database Schema
 

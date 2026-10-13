@@ -15,6 +15,7 @@ export function CategoryBreakdown({ expenses }: CategoryBreakdownProps) {
   const totals = new Map<string, CategoryTotal>();
 
   for (const expense of expenses) {
+    if (expense.baseAmount === null) continue;
     const existing = totals.get(expense.categoryId);
     if (existing) {
       existing.total += expense.baseAmount;
@@ -28,7 +29,7 @@ export function CategoryBreakdown({ expenses }: CategoryBreakdownProps) {
   }
 
   const sorted = Array.from(totals.values()).sort((a, b) => b.total - a.total);
-  const maxTotal = sorted[0]?.total ?? 1;
+  const maxTotal = sorted[0]?.total || 1;
 
   return (
     <div className="space-y-3">
@@ -39,7 +40,7 @@ export function CategoryBreakdown({ expenses }: CategoryBreakdownProps) {
               {cat.name}
             </span>
             <span className="text-text-secondary text-sm">
-              {formatCurrency(cat.total)}
+              {formatCurrency(cat.total, expenses[0]?.baseCurrency ?? "USD")}
             </span>
           </div>
           <div className="bg-bg-muted h-2 overflow-hidden rounded-full">

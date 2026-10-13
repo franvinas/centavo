@@ -21,7 +21,12 @@ interface ExpenseRecord {
   id: string;
   amount: number | string;
   currency: string;
-  baseAmount: number | string;
+  baseAmount: number | string | null;
+  conversionPending?: boolean;
+  usdAmount?: number | string | null;
+  usdExchangeRate?: number | string | null;
+  conversionRates?: unknown;
+  legacyConversion?: unknown;
   description: string;
   date: string;
   notes?: string | null;
@@ -94,7 +99,8 @@ function mapExpenseRow(expense: ExpenseRecord) {
     description: expense.description,
     category: expense.category?.name ?? "",
     amount: formatMoney(toNumber(expense.amount), expense.currency),
-    baseAmount: String(expense.baseAmount),
+    baseAmount:
+      expense.baseAmount == null ? "pending" : String(expense.baseAmount),
   };
 }
 
@@ -390,7 +396,12 @@ const showCommand: CommandSpec = {
           response.expense.currency,
         ),
       ],
-      ["baseAmount", String(response.expense.baseAmount)],
+      [
+        "baseAmount",
+        response.expense.baseAmount == null
+          ? "pending"
+          : String(response.expense.baseAmount),
+      ],
       ["notes", response.expense.notes ?? ""],
     ]);
     return 0;
@@ -768,6 +779,10 @@ const exportCommand: CommandSpec = {
       amount: expense.amount,
       currency: expense.currency,
       baseAmount: expense.baseAmount,
+      usdAmount: expense.usdAmount,
+      usdExchangeRate: expense.usdExchangeRate,
+      conversionRates: JSON.stringify(expense.conversionRates ?? null),
+      legacyConversion: JSON.stringify(expense.legacyConversion ?? null),
       description: expense.description,
       category: expense.category?.name ?? "",
       categoryId: expense.category?.id ?? "",

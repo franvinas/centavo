@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { prisma } from "@/lib/db";
+import { presentExpense, sumDisplayAmounts } from "@/lib/expense-valuation";
 
 interface GetExpensesOptions {
   userId: string;
@@ -42,7 +43,17 @@ export async function getExpenses({
     prisma.expense.count({ where }),
   ]);
 
-  return { expenses, total, page, totalPages: Math.ceil(total / limit) };
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { baseCurrency: true },
+  });
+  const baseCurrency = user?.baseCurrency ?? "USD";
+  return {
+    expenses: expenses.map((expense) => presentExpense(expense, baseCurrency)),
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 }
 
 export async function getExpenseById(id: string, userId: string) {
@@ -55,39 +66,48 @@ export async function getExpenseById(id: string, userId: string) {
 export const getExpenseSummary = cache(async function getExpenseSummary(
   userId: string,
 ) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { baseCurrency: true },
+  });
+  const baseCurrency = user?.baseCurrency ?? "USD";
   const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+  const startOfMonth = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
+  );
+  const startOfNextMonth = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1),
+  );
+  const startOfLastMonth = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1),
+  );
 
   const [currentMonthExpenses, lastMonthExpenses] = await Promise.all([
     prisma.expense.findMany({
-      where: { userId, date: { gte: startOfMonth } },
+      where: { userId, date: { gte: startOfMonth, lt: startOfNextMonth } },
       include: { category: true },
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
     }),
     prisma.expense.findMany({
       where: {
         userId,
-        date: { gte: startOfLastMonth, lte: endOfLastMonth },
+        date: { gte: startOfLastMonth, lt: startOfMonth },
       },
     }),
   ]);
 
-  const totalSpent = currentMonthExpenses.reduce(
-    (sum, e) => sum + Number(e.baseAmount),
-    0,
-  );
-  const lastMonthTotal = lastMonthExpenses.reduce(
-    (sum, e) => sum + Number(e.baseAmount),
-    0,
-  );
-
+  const current = sumDisplayAmounts(currentMonthExpenses, baseCurrency);
+  const last = sumDisplayAmounts(lastMonthExpenses, baseCurrency);
   return {
-    totalSpent,
+    baseCurrency,
+    totalSpent: current.total,
+    pendingConversionCount: current.pendingConversionCount,
     expenseCount: currentMonthExpenses.length,
-    lastMonthTotal,
+    lastMonthTotal: last.total,
+    lastMonthPendingConversionCount: last.pendingConversionCount,
     lastMonthCount: lastMonthExpenses.length,
-    recentExpenses: currentMonthExpenses,
+    recentExpenses: currentMonthExpenses.map((expense) =>
+      presentExpense(expense, baseCurrency),
+    ),
   };
 });
