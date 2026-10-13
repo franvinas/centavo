@@ -73,9 +73,7 @@ export const bulkExpenseDeleteSchema = z
 
 export const importExpensesSchema = z
   .object({
-    items: z
-      .array(createExpenseSchema)
-      .min(1, "At least one expense is required"),
+    items: z.array(z.unknown()).min(1, "At least one expense is required"),
     continueOnError: z.boolean().optional(),
     dryRun: z.boolean().optional(),
   })

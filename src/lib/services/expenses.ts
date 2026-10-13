@@ -93,7 +93,7 @@ async function createExpenseWithClient(
       description: input.description,
       categoryId: input.categoryId,
       date: new Date(input.date),
-      notes: input.notes,
+      notes: input.notes || null,
     },
     include: { category: true },
   });
@@ -114,7 +114,7 @@ async function buildExpenseUpdateData(
   if (input.description !== undefined)
     updateData.description = input.description;
   if (input.date !== undefined) updateData.date = new Date(input.date);
-  if (input.notes !== undefined) updateData.notes = input.notes;
+  if (input.notes !== undefined) updateData.notes = input.notes || null;
 
   if (input.categoryId !== undefined) {
     await ensureCategoryBelongsToUser(db, userId, input.categoryId);
@@ -306,7 +306,7 @@ export async function bulkDeleteExpensesForUser(
 export async function importExpensesForUser(
   userId: string,
   input: {
-    items: CreateExpenseInput[];
+    items: unknown[];
     continueOnError?: boolean;
     dryRun?: boolean;
   },
@@ -314,11 +314,24 @@ export async function importExpensesForUser(
   const parsed = importExpensesSchema.parse(input);
   const errors: Array<{ index: number; message: string }> = [];
 
+  const validItems: Array<{ index: number; input: CreateExpenseInput }> = [];
+  for (const [index, item] of parsed.items.entries()) {
+    const result = createExpenseSchema.safeParse(item);
+    if (result.success) validItems.push({ index, input: result.data });
+    else
+      errors.push({
+        index,
+        message: result.error.issues[0]?.message ?? "Invalid expense",
+      });
+  }
+  // Strict imports validate every row before making any database changes.
+  if (errors.length && !parsed.continueOnError && !parsed.dryRun) {
+    throw new Error(`Row ${errors[0].index + 1}: ${errors[0].message}`);
+  }
   if (parsed.dryRun) {
-    for (const [index, item] of parsed.items.entries()) {
+    for (const { index, input } of validItems) {
       try {
-        createExpenseSchema.parse(item);
-        await ensureCategoryBelongsToUser(prisma, userId, item.categoryId);
+        await ensureCategoryBelongsToUser(prisma, userId, input.categoryId);
       } catch (error) {
         errors.push({
           index,
@@ -326,25 +339,24 @@ export async function importExpensesForUser(
         });
       }
     }
-
     return {
       preview: true,
       created: 0,
       items: [],
-      errors,
+      errors: errors.sort((a, b) => a.index - b.index),
     };
   }
 
   const displayCurrency = await getUserBaseCurrency(prisma, userId);
   if (!parsed.continueOnError) {
     const valuations: Awaited<ReturnType<typeof buildValuation>>[] = [];
-    for (const item of parsed.items)
+    for (const { input: item } of validItems)
       valuations.push(
         await buildValuation(item.amount, item.currency, item.date),
       );
     const createdExpenses = await prisma.$transaction(async (tx) => {
       const created = [];
-      for (const [index, item] of parsed.items.entries()) {
+      for (const [index, { input: item }] of validItems.entries()) {
         const expense = await createExpenseWithClient(
           tx,
           userId,
@@ -367,7 +379,7 @@ export async function importExpensesForUser(
   }
 
   const createdExpenses = [];
-  for (const [index, item] of parsed.items.entries()) {
+  for (const { index, input: item } of validItems) {
     try {
       const expense = await createExpenseForUser(userId, item);
       createdExpenses.push(expense);
@@ -383,6 +395,6 @@ export async function importExpensesForUser(
     preview: false,
     created: createdExpenses.length,
     items: createdExpenses,
-    errors,
+    errors: errors.sort((a, b) => a.index - b.index),
   };
 }

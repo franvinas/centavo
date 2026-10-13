@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, userEvent } from "@/test-utils/react-testing";
+import { render, userEvent, waitFor } from "@/test-utils/react-testing";
 import { ExpenseForm } from "../expense-form";
+import { updateExpense } from "@/lib/actions/expenses";
 import type { Category } from "@/types";
 
 // Mock browser APIs that vaul drawer library needs but jsdom doesn't support
@@ -112,6 +113,37 @@ vi.mock("next/navigation", () => ({
 describe("ExpenseForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it("sends empty notes when clearing an existing expense", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <ExpenseForm
+        categories={mockCategories}
+        expense={{
+          id: "exp-1",
+          amount: 25.5,
+          currency: "USD",
+          description: "Lunch",
+          date: "2025-01-15",
+          categoryId: "cat-1",
+          notes: "Old notes",
+        }}
+      />,
+    );
+    await user.clear(
+      container.querySelector('input[placeholder="Notes (optional)"]')!,
+    );
+    const save = Array.from(container.querySelectorAll("button")).find(
+      (b) => b.textContent === "Update Expense",
+    )!;
+    await user.click(save);
+    await waitFor(() =>
+      expect(updateExpense).toHaveBeenCalledWith(
+        "exp-1",
+        expect.objectContaining({ notes: "" }),
+      ),
+    );
   });
 
   it("renders in create mode", () => {

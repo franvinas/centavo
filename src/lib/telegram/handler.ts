@@ -17,13 +17,23 @@ async function sendReply(chatId: string, text: string) {
 
 export async function handleMessage({
   chatId,
+  senderId,
+  chatType,
   text,
   voiceFileId,
 }: {
   chatId: string;
+  senderId: string;
+  chatType: string;
   text?: string;
   voiceFileId?: string;
 }) {
+  if (
+    chatType !== "private" ||
+    senderId !== chatId ||
+    !/^[1-9]\d*$/.test(chatId)
+  )
+    return;
   try {
     // Transcribe voice message if present
     if (voiceFileId && !text) {

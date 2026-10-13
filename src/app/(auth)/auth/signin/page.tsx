@@ -5,6 +5,7 @@ import {
   useEffect,
   useCallback,
   useTransition,
+  useRef,
   Suspense,
 } from "react";
 import Image from "next/image";
@@ -32,7 +33,13 @@ function getSafeCallbackUrl(rawValue: string | null) {
     return "/dashboard";
   }
 
-  return rawValue;
+  try {
+    const url = new URL(rawValue, "https://centavo.invalid");
+    if (url.origin !== "https://centavo.invalid") return "/dashboard";
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return "/dashboard";
+  }
 }
 
 export default function SignInPage() {
@@ -64,9 +71,11 @@ function SignInContent() {
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [emailSent, setEmailSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [verifying, setVerifying] = useState(false);
+  const verificationInFlight = useRef(false);
   const [otpError, setOtpError] = useState<string | null>(null);
   const [cooldown, setCooldown] = useState(0);
 
@@ -78,22 +87,46 @@ function SignInContent() {
 
   async function handleGoogle() {
     setLoading(true);
-    await signIn("google", { callbackUrl });
+    try {
+      await signIn("google", { callbackUrl });
+    } catch {
+      setEmailError(t("errorDefault"));
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    await signIn("resend", { email, redirect: false, callbackUrl });
-    setEmailSent(true);
-    setLoading(false);
-    setCooldown(RESEND_COOLDOWN);
+    setEmailError(null);
+
+    try {
+      const result = await signIn("resend", {
+        email,
+        redirect: false,
+        callbackUrl,
+      });
+
+      if (!result || result.error || result.ok === false) {
+        setEmailError(t("errorDefault"));
+        return;
+      }
+
+      setEmailSent(true);
+      setCooldown(RESEND_COOLDOWN);
+    } catch {
+      setEmailError(t("errorDefault"));
+    } finally {
+      setLoading(false);
+    }
   }
 
   const handleVerify = useCallback(
     async (code: string) => {
-      if (code.length !== 6) return;
+      if (code.length !== 6 || verificationInFlight.current) return;
+      verificationInFlight.current = true;
       setVerifying(true);
       setOtpError(null);
 
@@ -103,16 +136,23 @@ function SignInContent() {
           `&email=${encodeURIComponent(email)}` +
           `&callbackUrl=${encodeURIComponent(callbackUrl)}`;
         const res = await fetch(verifyUrl, { redirect: "follow" });
+        const finalUrl = new URL(res.url, window.location.origin);
+        const verificationFailed =
+          !res.ok ||
+          finalUrl.pathname === "/auth/signin" ||
+          Boolean(finalUrl.searchParams.get("error"));
 
-        if (res.ok || res.redirected) {
-          router.push(callbackUrl);
-          router.refresh();
-        } else {
+        if (verificationFailed) {
           setOtpError(t("errorInvalidCode"));
-          setVerifying(false);
+          return;
         }
+
+        router.push(callbackUrl);
+        router.refresh();
       } catch {
         setOtpError(t("errorDefault"));
+      } finally {
+        verificationInFlight.current = false;
         setVerifying(false);
       }
     },
@@ -133,7 +173,21 @@ function SignInContent() {
     setCooldown(RESEND_COOLDOWN);
     setOtp("");
     setOtpError(null);
-    await signIn("resend", { email, redirect: false, callbackUrl });
+
+    try {
+      const result = await signIn("resend", {
+        email,
+        redirect: false,
+        callbackUrl,
+      });
+      if (result?.error) {
+        setOtpError(t("errorDefault"));
+        setCooldown(0);
+      }
+    } catch {
+      setOtpError(t("errorDefault"));
+      setCooldown(0);
+    }
   }
 
   function handleBack() {
@@ -220,7 +274,9 @@ function SignInContent() {
               )}
 
               {otpError && (
-                <p className="mt-4 text-sm text-red-600">{otpError}</p>
+                <p role="alert" className="mt-4 text-sm text-red-600">
+                  {otpError}
+                </p>
               )}
 
               <div className="mt-6 space-y-2">
@@ -228,7 +284,7 @@ function SignInContent() {
                   variant="ghost"
                   size="sm"
                   onClick={handleResend}
-                  disabled={cooldown > 0}
+                  disabled={cooldown > 0 || verifying}
                   className="w-full text-sm"
                 >
                   {cooldown > 0
@@ -237,6 +293,7 @@ function SignInContent() {
                 </Button>
                 <button
                   onClick={handleBack}
+                  disabled={verifying}
                   className="text-text-secondary hover:text-text-primary inline-flex items-center gap-1 text-sm"
                 >
                   <ArrowLeft className="h-3 w-3" />
@@ -284,11 +341,20 @@ function SignInContent() {
               <form onSubmit={handleEmail} className="space-y-3">
                 <Input
                   type="email"
+                  disabled={loading}
                   placeholder={t("emailPlaceholder")}
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setEmailError(null);
+                  }}
                   required
                 />
+                {emailError && (
+                  <p role="alert" className="text-sm text-red-600">
+                    {emailError}
+                  </p>
+                )}
                 <Button
                   type="submit"
                   disabled={loading || !email}

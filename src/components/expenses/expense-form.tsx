@@ -126,7 +126,7 @@ export function ExpenseForm({
         description,
         categoryId,
         date,
-        notes: notes || undefined,
+        notes,
       };
 
       if (expense) {

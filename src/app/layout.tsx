@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
+import { CachePrivacy } from "@/components/cache-privacy";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -41,6 +42,7 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body className={`${outfit.variable} font-sans antialiased`}>
+        <CachePrivacy />
         <NextIntlClientProvider messages={messages} locale={locale}>
           {children}
         </NextIntlClientProvider>

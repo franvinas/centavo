@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { signOut } from "next-auth/react";
+import { clearLegacyCaches } from "@/lib/cache-privacy";
 import { updateUser } from "@/lib/actions/user";
 import { updateLocale } from "@/lib/actions/locale";
 import { CURRENCIES } from "@/lib/constants";
@@ -222,7 +223,11 @@ export function SettingsClient({ user }: SettingsClientProps) {
       <Button
         variant="outline"
         className="border-status-negative text-status-negative hover:bg-status-negative/10 w-full"
-        onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+        onClick={async () => {
+          if ("caches" in window)
+            await clearLegacyCaches(window.caches).catch(() => {});
+          await signOut({ callbackUrl: "/auth/signin" });
+        }}
       >
         <LogOut className="mr-2 h-4 w-4" />
         {t("signOut")}

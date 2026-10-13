@@ -63,10 +63,6 @@ async function previewAndConfirm(
     );
   }
 
-  if (getBooleanOption({ preview: payload.preview }, "preview")) {
-    return false;
-  }
-
   return maybeConfirm("Proceed with this change?", yes);
 }
 
@@ -74,6 +70,7 @@ async function parseImportItems(
   format: string,
   file: string | undefined,
   fromStdin: boolean,
+  tolerateErrors = false,
 ) {
   const raw = await readInputFile(file, fromStdin);
 
@@ -82,7 +79,14 @@ async function parseImportItems(
       .split(/\r?\n/)
       .map((line) => line.trim())
       .filter(Boolean)
-      .map((line) => JSON.parse(line) as Record<string, string>);
+      .map((line, index) => {
+        try {
+          return JSON.parse(line) as unknown;
+        } catch {
+          if (tolerateErrors) return null;
+          throw new Error(`Invalid JSONL on row ${index + 1}`);
+        }
+      });
   }
 
   if (format === "csv") {
@@ -539,7 +543,7 @@ const editCommand: CommandSpec = {
       const confirmed = await previewAndConfirm(
         context.baseUrl,
         "/api/expenses/bulk-update",
-        { ...payload, preview: true },
+        payload,
         json,
         false,
       );
@@ -862,7 +866,17 @@ const importCommand: CommandSpec = {
     const format = getStringOption(input.options, "format") ?? "csv";
     const filePath = getStringOption(input.options, "file");
     const fromStdin = getBooleanOption(input.options, "stdin");
-    const rows = await parseImportItems(format, filePath, fromStdin);
+    const continueOnError = getBooleanOption(
+      input.options,
+      "continue-on-error",
+    );
+    const dryRun = getBooleanOption(input.options, "dry-run");
+    const rows = await parseImportItems(
+      format,
+      filePath,
+      fromStdin,
+      continueOnError || dryRun,
+    );
     const categories = await createApiClient({ baseUrl: context.baseUrl }).then(
       (api) =>
         api.request<{ categories: Array<{ id: string; name: string }> }>(
@@ -879,7 +893,10 @@ const importCommand: CommandSpec = {
       categories.categories.map((category) => category.id),
     );
 
-    const items = rows.map((row) => {
+    const items = rows.map((value) => {
+      if (!value || typeof value !== "object" || Array.isArray(value))
+        return value;
+      const row = value as Record<string, unknown>;
       const categoryValue = row.categoryId || row.category;
       const normalizedCategory =
         typeof categoryValue === "string"
@@ -890,18 +907,12 @@ const importCommand: CommandSpec = {
           ? categoryValue
           : categoryNameMap.get(normalizedCategory);
 
-      if (!categoryId) {
-        throw new Error(
-          `Unknown category for import row: ${String(categoryValue ?? "")}`,
-        );
-      }
-
       return {
         amount: Number(row.amount),
-        currency: String(row.currency),
-        description: String(row.description),
-        categoryId,
-        date: String(row.date),
+        currency: String(row.currency ?? ""),
+        description: String(row.description ?? ""),
+        categoryId: categoryId ?? "",
+        date: String(row.date ?? ""),
         notes:
           row.notes === undefined || row.notes === ""
             ? undefined
@@ -916,8 +927,8 @@ const importCommand: CommandSpec = {
         method: "POST",
         json: {
           items,
-          dryRun: getBooleanOption(input.options, "dry-run"),
-          continueOnError: getBooleanOption(input.options, "continue-on-error"),
+          dryRun,
+          continueOnError,
         },
       },
     );

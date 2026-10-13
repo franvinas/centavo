@@ -38,8 +38,37 @@ describe("handleMessage", () => {
     vi.clearAllMocks();
   });
 
+  it("blocks direct handler calls from groups before linking or accessing data", async () => {
+    await handleMessage({
+      chatId: "-100123",
+      senderId: "123456",
+      chatType: "group",
+      text: "/start abc123",
+    });
+    expect(prismaMock.telegramLinkToken.findUnique).not.toHaveBeenCalled();
+    expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
+    expect(mockChat).not.toHaveBeenCalled();
+    expect(mockSendMessage).not.toHaveBeenCalled();
+  });
+
+  it("blocks forged private sender identities", async () => {
+    await handleMessage({
+      chatId: "123456",
+      senderId: "654321",
+      chatType: "private",
+      text: "show expenses",
+    });
+    expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
+    expect(mockChat).not.toHaveBeenCalled();
+  });
+
   it("handles /start without payload", async () => {
-    await handleMessage({ chatId: "123456", text: "/start" });
+    await handleMessage({
+      chatId: "123456",
+      senderId: "123456",
+      chatType: "private",
+      text: "/start",
+    });
 
     expect(mockSendMessage).toHaveBeenCalledWith(
       "123456",
@@ -62,7 +91,12 @@ describe("handleMessage", () => {
       count: 1,
     } as never);
 
-    await handleMessage({ chatId: "123456", text: "/start abc123" });
+    await handleMessage({
+      chatId: "123456",
+      senderId: "123456",
+      chatType: "private",
+      text: "/start abc123",
+    });
 
     expect(prismaMock.telegramLinkToken.findUnique).toHaveBeenCalledWith({
       where: { token: "abc123" },
@@ -84,7 +118,12 @@ describe("handleMessage", () => {
   it("replies with not-linked message for unknown chat", async () => {
     prismaMock.user.findUnique.mockResolvedValue(null);
 
-    await handleMessage({ chatId: "123456", text: "spent 25 on lunch" });
+    await handleMessage({
+      chatId: "123456",
+      senderId: "123456",
+      chatType: "private",
+      text: "spent 25 on lunch",
+    });
 
     expect(mockSendMessage).toHaveBeenCalledWith(
       "123456",
@@ -127,7 +166,12 @@ describe("handleMessage", () => {
 
     mockSaveMessages.mockResolvedValue(undefined);
 
-    await handleMessage({ chatId: "123456", text: "spent 25 on lunch" });
+    await handleMessage({
+      chatId: "123456",
+      senderId: "123456",
+      chatType: "private",
+      text: "spent 25 on lunch",
+    });
 
     expect(mockChat).toHaveBeenCalledWith(
       expect.objectContaining({ userId: "user-1" }),
@@ -145,7 +189,12 @@ describe("handleMessage", () => {
   it("sends fallback message on error", async () => {
     prismaMock.user.findUnique.mockRejectedValue(new Error("DB error"));
 
-    await handleMessage({ chatId: "123456", text: "spent 25 on lunch" });
+    await handleMessage({
+      chatId: "123456",
+      senderId: "123456",
+      chatType: "private",
+      text: "spent 25 on lunch",
+    });
 
     expect(mockSendMessage).toHaveBeenCalledWith(
       "123456",
