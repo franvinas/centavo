@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser, unauthorized } from "@/lib/api-utils";
 import { getSpendingOverTime } from "@/lib/data/analytics";
-import { getUserBaseCurrency, parseAnalyticsQuery } from "../_lib";
+import {
+  getAnalyticsPreferences,
+  getUserBaseCurrency,
+  parseAnalyticsQuery,
+} from "../_lib";
 
 export async function GET(request: NextRequest) {
   const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
+  const preferences = await getAnalyticsPreferences(user.id);
   const parsed = parseAnalyticsQuery(
     request.nextUrl.searchParams,
     "last-12-months",
+    preferences.timezone,
+    preferences.locale,
   );
   if ("error" in parsed) return parsed.error;
 

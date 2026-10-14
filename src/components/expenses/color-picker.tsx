@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { Check } from "lucide-react";
 
 const COLORS = [
@@ -23,6 +25,7 @@ interface ColorPickerProps {
 }
 
 export function ColorPicker({ value, onChange }: ColorPickerProps) {
+  const t = useTranslations("categories");
   return (
     <div className="grid grid-cols-6 gap-2">
       {COLORS.map((color) => (
@@ -32,7 +35,7 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
           onClick={() => onChange(color)}
           className="flex h-9 w-9 items-center justify-center rounded-full transition-transform hover:scale-110"
           style={{ backgroundColor: color }}
-          aria-label={`Select color ${color}`}
+          aria-label={t("selectColor", { color })}
         >
           {value === color && <Check className="h-4 w-4 text-white" />}
         </button>

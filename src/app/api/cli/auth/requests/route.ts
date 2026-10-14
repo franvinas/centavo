@@ -1,3 +1,4 @@
+import { cleanupExpiredAuthRecords, limitRequest } from "@/lib/rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 import {
   CLI_AUTH_POLL_INTERVAL_SECONDS,
@@ -7,6 +8,9 @@ import { badRequest } from "@/lib/api-utils";
 import { createCliAuthRequestSchema } from "@/lib/validations/cli-auth";
 
 export async function POST(request: NextRequest) {
+  const blocked = await limitRequest(request, "cli-create", 10, 3600);
+  if (blocked) return blocked;
+  await cleanupExpiredAuthRecords();
   const body = await request.json().catch(() => ({}));
   const parsed = createCliAuthRequestSchema.safeParse(body);
 

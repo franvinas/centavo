@@ -6,6 +6,8 @@ import { badRequest } from "@/lib/api-utils";
 export function parseAnalyticsQuery(
   searchParams: URLSearchParams,
   defaultPeriod: string,
+  timezone = "UTC",
+  locale = "en",
 ):
   | {
       error: ReturnType<typeof badRequest>;
@@ -33,6 +35,8 @@ export function parseAnalyticsQuery(
     period,
     parsed.data.from,
     parsed.data.to,
+    timezone,
+    locale,
   );
 
   return {
@@ -50,4 +54,12 @@ export async function getUserBaseCurrency(userId: string) {
   });
 
   return user?.baseCurrency ?? "USD";
+}
+
+export async function getAnalyticsPreferences(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { timezone: true, locale: true },
+  });
+  return { timezone: user?.timezone ?? "UTC", locale: user?.locale ?? "en" };
 }

@@ -59,6 +59,8 @@ export default async function AnalyticsPage({
       <AnalyticsContent
         userId={user.id}
         baseCurrency={user.baseCurrency}
+        timezone={user.timezone ?? "UTC"}
+        locale={user.locale}
         period={period}
         customFrom={customFrom}
         customTo={customTo}
@@ -73,6 +75,8 @@ export default async function AnalyticsPage({
 async function AnalyticsContent({
   userId,
   baseCurrency,
+  timezone,
+  locale,
   period,
   customFrom,
   customTo,
@@ -82,6 +86,8 @@ async function AnalyticsContent({
 }: {
   userId: string;
   baseCurrency: string;
+  timezone: string;
+  locale: string;
   period: string;
   customFrom: string | undefined;
   customTo: string | undefined;
@@ -89,12 +95,18 @@ async function AnalyticsContent({
   timeFrom: string | undefined;
   timeTo: string | undefined;
 }) {
-  const { from, to, label } = getDateRange(period, customFrom, customTo);
+  const { from, to, label } = getDateRange(
+    period,
+    customFrom,
+    customTo,
+    timezone,
+    locale,
+  );
   const {
     from: timeChartFrom,
     to: timeChartTo,
     label: timePeriodLabel,
-  } = getDateRange(timePeriod, timeFrom, timeTo);
+  } = getDateRange(timePeriod, timeFrom, timeTo, timezone, locale);
 
   const [summary, byCategory, overTime, byCurrency] = await Promise.all([
     getAnalyticsSummary({ userId, from, to, baseCurrency }),

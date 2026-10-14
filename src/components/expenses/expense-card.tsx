@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import type { Expense } from "@/types";
 import {
   formatCurrency,
@@ -14,10 +14,12 @@ interface ExpenseCardProps {
 }
 
 export function ExpenseCard({ expense }: ExpenseCardProps) {
+  const locale = useLocale();
   const t = useTranslations("dates");
   const te = useTranslations("expenses");
 
   const labels: DateLabels = {
+    locale,
     today: t("today"),
     yesterday: t("yesterday"),
     daysAgo: (count: number) => t("daysAgo", { count }),

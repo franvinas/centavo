@@ -1,3 +1,4 @@
+import { checkpointResponse, executeDurableTool } from "./durable";
 import OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { tools } from "./tools/definitions";
@@ -101,6 +102,7 @@ export async function chat(
   context: ChatContext,
   conversationHistory: ChatCompletionMessageParam[],
   userMessage: string,
+  updateId?: number,
 ): Promise<ChatResult> {
   const client = getOpenAI();
   const newMessages: ChatResult["newMessages"] = [];
@@ -123,17 +125,22 @@ export async function chat(
   ];
 
   for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
-    const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages,
-      tools,
-      tool_choice: "auto",
-    });
+    const generate = async () => {
+      const response = await client.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages,
+        tools,
+        tool_choice: "auto",
+      });
 
-    const choice = response.choices[0];
-    if (!choice?.message) break;
-
-    const assistantMsg = choice.message;
+      const message = response.choices[0]?.message;
+      if (!message) throw new Error("Empty model response");
+      return message;
+    };
+    const assistantMsg =
+      updateId === undefined
+        ? await generate()
+        : await checkpointResponse(updateId, i, generate);
 
     const functionCalls = assistantMsg.tool_calls?.filter(
       (tc): tc is Extract<typeof tc, { type: "function" }> =>
@@ -161,16 +168,22 @@ export async function chat(
       });
 
       // Execute each tool call
-      for (const toolCall of functionCalls) {
+      for (const [toolIndex, toolCall] of functionCalls.entries()) {
         let result: string;
         try {
           const args = JSON.parse(toolCall.function.arguments);
-          result = await executeTool(
-            context.userId,
-            toolCall.function.name,
-            args,
-          );
+          const execute = () =>
+            executeTool(context.userId, toolCall.function.name, args);
+          result =
+            updateId === undefined
+              ? await execute()
+              : await executeDurableTool(
+                  updateId,
+                  `${i}:${toolIndex}`,
+                  execute,
+                );
         } catch (error) {
+          if (updateId !== undefined) throw error;
           result = JSON.stringify({
             error:
               error instanceof Error ? error.message : "Tool execution failed",

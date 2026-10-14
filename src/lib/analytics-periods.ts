@@ -1,3 +1,5 @@
+import { todayInTimezone, parseDateOnly } from "@/lib/date-only";
+
 export interface PeriodPreset {
   key: string;
   labelKey: string;
@@ -22,17 +24,22 @@ export function getDateRange(
   preset: string,
   customFrom?: string,
   customTo?: string,
+  timezone = "UTC",
+  locale = "en",
 ): DateRange {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const today = todayInTimezone(timezone);
+  const spanish = locale === "es";
 
   switch (preset) {
     case "this-month": {
-      const from = new Date(today.getFullYear(), today.getMonth(), 1);
+      const from = new Date(
+        Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1),
+      );
       return {
         from,
         to: today,
-        label: today.toLocaleDateString("en-US", {
+        label: today.toLocaleDateString(locale, {
+          timeZone: "UTC",
           month: "long",
           year: "numeric",
         }),
@@ -40,40 +47,67 @@ export function getDateRange(
     }
 
     case "last-3-months": {
-      const from = new Date(today.getFullYear(), today.getMonth() - 2, 1);
-      return { from, to: today, label: "Last 3 Months" };
+      const from = new Date(
+        Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - 2, 1),
+      );
+      return {
+        from,
+        to: today,
+        label: spanish ? "Últimos 3 meses" : "Last 3 Months",
+      };
     }
 
     case "last-6-months": {
-      const from = new Date(today.getFullYear(), today.getMonth() - 5, 1);
-      return { from, to: today, label: "Last 6 Months" };
+      const from = new Date(
+        Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - 5, 1),
+      );
+      return {
+        from,
+        to: today,
+        label: spanish ? "Últimos 6 meses" : "Last 6 Months",
+      };
     }
 
     case "last-12-months": {
-      const from = new Date(today.getFullYear(), today.getMonth() - 11, 1);
-      return { from, to: today, label: "Last 12 Months" };
+      const from = new Date(
+        Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - 11, 1),
+      );
+      return {
+        from,
+        to: today,
+        label: spanish ? "Últimos 12 meses" : "Last 12 Months",
+      };
     }
 
     case "this-year": {
-      const from = new Date(today.getFullYear(), 0, 1);
-      return { from, to: today, label: `${today.getFullYear()}` };
+      const from = new Date(Date.UTC(today.getUTCFullYear(), 0, 1));
+      return { from, to: today, label: `${today.getUTCFullYear()}` };
     }
 
     case "custom": {
-      if (customFrom && customTo) {
-        const from = new Date(customFrom + "T00:00:00");
-        const to = new Date(customTo + "T00:00:00");
+      const from = parseDateOnly(customFrom);
+      const to = parseDateOnly(customTo);
+      if (from && to && from <= to) {
         return {
           from,
           to,
-          label: `${from.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${to.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`,
+          label: `${from.toLocaleDateString(locale, {
+            timeZone: "UTC",
+            month: "short",
+            day: "numeric",
+          })} – ${to.toLocaleDateString(locale, {
+            timeZone: "UTC",
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })}`,
         };
       }
       // Fallback to this month if custom dates are missing
-      return getDateRange("this-month");
+      return getDateRange("this-month", undefined, undefined, timezone, locale);
     }
 
     default:
-      return getDateRange("this-month");
+      return getDateRange("this-month", undefined, undefined, timezone, locale);
   }
 }

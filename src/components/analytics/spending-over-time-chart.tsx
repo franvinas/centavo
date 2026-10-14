@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import type { TimeSeriesPoint } from "@/types/analytics";
 import { formatCurrency } from "@/lib/format";
 
@@ -19,10 +19,11 @@ interface SpendingOverTimeChartProps {
   onBarClick?: (period: string) => void;
 }
 
-function formatMonth(period: string): string {
+function formatMonth(period: string, locale: string): string {
   const [year, month] = period.split("-");
-  const date = new Date(Number(year), Number(month) - 1);
-  return date.toLocaleDateString("en-US", {
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, 1));
+  return date.toLocaleDateString(locale, {
+    timeZone: "UTC",
     month: "short",
     year: "2-digit",
   });
@@ -37,12 +38,13 @@ function CustomTooltip({
   payload?: Array<{ payload: TimeSeriesPoint }>;
   baseCurrency: string;
 }) {
+  const locale = useLocale();
   if (!active || !payload?.length) return null;
   const item = payload[0].payload;
   return (
     <div className="bg-bg-surface shadow-card rounded-lg border px-3 py-2 text-sm">
       <p className="text-text-primary font-medium">
-        {formatMonth(item.period)}
+        {formatMonth(item.period, locale)}
       </p>
       <p className="text-text-secondary">
         {formatCurrency(item.total, baseCurrency)}
@@ -56,6 +58,7 @@ export function SpendingOverTimeChart({
   baseCurrency,
   onBarClick,
 }: SpendingOverTimeChartProps) {
+  const locale = useLocale();
   const t = useTranslations("analytics");
 
   if (data.length === 0) {
@@ -68,7 +71,7 @@ export function SpendingOverTimeChart({
 
   const chartData = data.map((d) => ({
     ...d,
-    label: formatMonth(d.period),
+    label: formatMonth(d.period, locale),
   }));
 
   return (

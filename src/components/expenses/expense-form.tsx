@@ -74,7 +74,23 @@ export function ExpenseForm({
   const [deleteDrawerOpen, setDeleteDrawerOpen] = useState(false);
   const t = useTranslations("expenses");
 
-  const isDirty = Boolean(amount || description || notes || categoryId);
+  const [initial, setInitial] = useState({
+    amount,
+    currency,
+    description,
+    date,
+    notes,
+    categoryId,
+  });
+  const isDirty =
+    JSON.stringify({
+      amount,
+      currency,
+      description,
+      date,
+      notes,
+      categoryId,
+    }) !== JSON.stringify(initial);
 
   const currencySymbol = CURRENCY_SYMBOLS[currency] ?? "$";
 
@@ -119,22 +135,35 @@ export function ExpenseForm({
   function handleSave() {
     if (!isValid) return;
 
+    setError("");
     startTransition(async () => {
-      const data = {
-        amount: parseFloat(amount),
-        currency,
-        description,
-        categoryId,
-        date,
-        notes,
-      };
+      try {
+        const data = {
+          amount: parseFloat(amount),
+          currency,
+          description,
+          categoryId,
+          date,
+          notes,
+        };
 
-      if (expense) {
-        await updateExpense(expense.id, data);
-      } else {
-        await createExpense(data);
+        if (expense) {
+          await updateExpense(expense.id, data);
+        } else {
+          await createExpense(data);
+        }
+        setInitial({
+          amount,
+          currency,
+          description,
+          date,
+          notes,
+          categoryId,
+        });
+        router.push("/dashboard");
+      } catch {
+        setError(t("saveError"));
       }
-      router.push("/dashboard");
     });
   }
 
@@ -144,9 +173,9 @@ export function ExpenseForm({
       try {
         await deleteExpense(expense!.id);
         router.push("/expenses");
-      } catch (e) {
+      } catch {
         setDeleteDrawerOpen(false);
-        setError(e instanceof Error ? e.message : "Failed to delete expense");
+        setError(t("deleteError"));
       }
     });
   }
@@ -159,7 +188,7 @@ export function ExpenseForm({
       >
         {/* Header */}
         <div className="mb-2 flex items-center justify-between">
-          <button onClick={() => router.back()} aria-label="Close">
+          <button onClick={() => router.back()} aria-label={t("close")}>
             <X className="text-text-primary h-6 w-6" />
           </button>
           <h1 className="text-text-primary text-base font-semibold">
@@ -303,6 +332,14 @@ export function ExpenseForm({
                 ? t("updateExpense")
                 : t("saveExpense")}
           </Button>
+          {error && (
+            <p
+              role="alert"
+              className="text-status-negative mt-2 text-center text-sm"
+            >
+              {error}
+            </p>
+          )}
           {expense && (
             <>
               <Button
@@ -314,14 +351,6 @@ export function ExpenseForm({
                 <Trash2 className="mr-2 h-5 w-5" />
                 {t("deleteExpense")}
               </Button>
-              {error && (
-                <p
-                  role="alert"
-                  className="text-status-negative mt-2 text-center text-sm"
-                >
-                  {error}
-                </p>
-              )}
               <DeleteConfirmDrawer
                 open={deleteDrawerOpen}
                 onOpenChange={setDeleteDrawerOpen}

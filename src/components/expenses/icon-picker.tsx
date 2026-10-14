@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { categoryIconMap, availableIcons } from "@/lib/category-icon-map";
 
 interface IconPickerProps {
@@ -9,6 +11,7 @@ interface IconPickerProps {
 }
 
 export function IconPicker({ value, onChange, color }: IconPickerProps) {
+  const t = useTranslations("categories");
   return (
     <div className="grid grid-cols-5 gap-2">
       {availableIcons.map((iconName) => {
@@ -23,7 +26,7 @@ export function IconPicker({ value, onChange, color }: IconPickerProps) {
               selected ? "border-current" : "border-border-subtle"
             }`}
             style={{ color: selected ? color : undefined }}
-            aria-label={`Select icon ${iconName}`}
+            aria-label={t("selectIcon", { icon: t(`icons.${iconName}`) })}
           >
             {Icon && (
               <Icon

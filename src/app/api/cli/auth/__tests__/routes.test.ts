@@ -20,6 +20,7 @@ const routeParams = { params: Promise.resolve({ id: "req-1" }) };
 
 beforeEach(() => {
   resetPrismaMock();
+  prismaMock.$queryRaw.mockResolvedValue([{ count: 1, retryAfter: 60 }]);
   mockUnauthenticated();
 });
 

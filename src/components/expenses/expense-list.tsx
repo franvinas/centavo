@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import type { Expense } from "@/types";
 import { ExpenseCard } from "./expense-card";
 import { SwipeableExpenseCard } from "./swipeable-expense-card";
@@ -22,10 +22,12 @@ function groupByDate(expenses: Expense[]): Map<string, Expense[]> {
 }
 
 export function ExpenseList({ expenses }: ExpenseListProps) {
+  const locale = useLocale();
   const t = useTranslations("dates");
   const grouped = groupByDate(expenses);
 
   const labels: DateLabels = {
+    locale,
     today: t("today"),
     yesterday: t("yesterday"),
     daysAgo: (count: number) => t("daysAgo", { count }),

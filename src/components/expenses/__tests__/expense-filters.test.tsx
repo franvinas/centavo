@@ -120,3 +120,11 @@ describe("ExpenseFilters", () => {
     expect(props.onDateRangeChange).not.toHaveBeenCalled();
   });
 });
+
+it("ignores invalid date parameters instead of crashing the filter UI", () => {
+  const { container } = renderFilters({
+    dateFrom: "garbage",
+    dateTo: "2026-02-30",
+  });
+  expect(container.textContent).toContain("Date range");
+});

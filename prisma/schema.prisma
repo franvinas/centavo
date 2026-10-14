@@ -181,3 +181,29 @@ model CliToken {
   @@index([userId, revokedAt])
   @@map("cli_tokens")
 }
+
+model TelegramUpdate {
+  id BigInt @id
+  status String @default("pending")
+  leaseUntil DateTime? @map("lease_until")
+  responses Json @default("[]")
+  completedAt DateTime? @map("completed_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  tools TelegramToolReceipt[]
+  @@map("telegram_updates")
+}
+model TelegramToolReceipt {
+  key String @id
+  updateId BigInt @map("update_id")
+  result String
+  update TelegramUpdate @relation(fields: [updateId], references: [id], onDelete: Cascade)
+  @@map("telegram_tool_receipts")
+}
+
+model RateLimit {
+ key String @id
+ count Int
+ expiresAt DateTime @db.Timestamptz @map("expires_at")
+ @@index([expiresAt], map: "rate_limits_expiry")
+ @@map("rate_limits")
+}

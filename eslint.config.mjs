@@ -13,6 +13,10 @@ const eslintConfig = defineConfig([
     "build/**",
     "packages/*/dist/**",
     "next-env.d.ts",
+    "coverage/**",
+    "src/generated/**",
+    "public/sw.js",
+    "public/swe-worker-*.js",
   ]),
 ]);
 

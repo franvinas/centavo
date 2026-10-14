@@ -1,14 +1,16 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
 export function DesktopFab() {
+  const t = useTranslations("expenses");
   return (
     <Link
       href="/expenses/new"
       className="bg-accent-primary fixed right-6 bottom-6 z-50 hidden h-16 w-16 items-center justify-center rounded-full shadow-[0_4px_16px_rgba(61,138,90,0.25),0_2px_8px_rgba(61,138,90,0.19)] transition-transform hover:scale-105 md:flex"
-      aria-label="Add expense"
+      aria-label={t("addExpense")}
     >
       <Plus className="h-7 w-7 text-white" />
     </Link>

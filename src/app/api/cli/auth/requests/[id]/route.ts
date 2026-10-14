@@ -1,3 +1,4 @@
+import { limitRequest } from "@/lib/rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 import { getCliAuthRequest } from "@/lib/cli-auth";
 import { badRequest, notFound } from "@/lib/api-utils";
@@ -6,6 +7,8 @@ import { cliAuthRequestCodeSchema } from "@/lib/validations/cli-auth";
 type RouteParams = { params: Promise<{ id: string }> };
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
+  const blocked = await limitRequest(request, "cli-poll", 120, 60);
+  if (blocked) return blocked;
   const { id } = await params;
   const parsed = cliAuthRequestCodeSchema.safeParse({
     code: request.nextUrl.searchParams.get("code") ?? "",

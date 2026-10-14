@@ -1,6 +1,8 @@
 import { after, NextRequest } from "next/server";
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { POST } from "../route";
+import { claimUpdate, finishUpdate } from "@/lib/telegram/durable";
+import { limitRequest } from "@/lib/rate-limit";
 import { handleMessage } from "@/lib/telegram/handler";
 
 vi.mock("next/server", async (original) => ({
@@ -10,8 +12,12 @@ vi.mock("next/server", async (original) => ({
 vi.mock("@/lib/telegram/handler", () => ({
   handleMessage: vi.fn().mockResolvedValue(undefined),
 }));
-vi.mock("@/lib/telegram/dedup", () => ({
-  isDuplicate: vi.fn().mockReturnValue(false),
+vi.mock("@/lib/telegram/durable", () => ({
+  claimUpdate: vi.fn().mockResolvedValue("claimed"),
+  finishUpdate: vi.fn().mockResolvedValue(undefined),
+}));
+vi.mock("@/lib/rate-limit", () => ({
+  limitRequest: vi.fn().mockResolvedValue(null),
 }));
 const message = {
   chat: { id: 123, type: "private" },
@@ -67,6 +73,7 @@ describe("Telegram webhook privacy", () => {
     const response = await POST(request({ update_id: 4, message }));
     expect(response.status).toBe(200);
     expect(handleMessage).toHaveBeenCalledWith({
+      updateId: 4,
       chatId: "123",
       senderId: "123",
       chatType: "private",
@@ -105,4 +112,27 @@ describe("Telegram webhook privacy", () => {
     );
     expect(after).not.toHaveBeenCalled();
   });
+});
+
+it("acknowledges completed updates without repeating effects", async () => {
+  vi.mocked(claimUpdate).mockResolvedValueOnce("complete");
+  expect((await POST(request({ update_id: 100, message }))).status).toBe(200);
+  expect(handleMessage).not.toHaveBeenCalled();
+});
+it("returns 503 on concurrent processing so Telegram retries", async () => {
+  vi.mocked(claimUpdate).mockResolvedValueOnce("busy");
+  expect((await POST(request({ update_id: 101, message }))).status).toBe(503);
+  expect(handleMessage).not.toHaveBeenCalled();
+});
+it("does not acknowledge failed work and releases for retry", async () => {
+  vi.mocked(handleMessage).mockRejectedValueOnce(new Error("network"));
+  expect((await POST(request({ update_id: 102, message }))).status).toBe(503);
+  expect(finishUpdate).toHaveBeenCalledWith(102, false);
+});
+it("enforces abuse limits before processing", async () => {
+  vi.mocked(limitRequest).mockResolvedValueOnce(
+    new Response(null, { status: 429 }) as never,
+  );
+  expect((await POST(request({ update_id: 103, message }))).status).toBe(429);
+  expect(handleMessage).not.toHaveBeenCalled();
 });

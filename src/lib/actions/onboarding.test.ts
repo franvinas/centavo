@@ -39,6 +39,12 @@ import { completeOnboarding } from "./onboarding";
 describe("completeOnboarding", () => {
   beforeEach(() => {
     resetPrismaMock();
+    prismaMock.$transaction.mockImplementation(
+      async (callback) =>
+        (callback as (tx: typeof prismaMock) => Promise<unknown>)(
+          prismaMock,
+        ) as never,
+    );
     vi.clearAllMocks();
   });
 
@@ -83,6 +89,7 @@ describe("completeOnboarding", () => {
     });
     expect(getDefaultCategories).toHaveBeenCalledWith("es");
     expect(prismaMock.category.createMany).toHaveBeenCalledWith({
+      skipDuplicates: true,
       data: [
         {
           userId: "user-1",
@@ -107,7 +114,7 @@ describe("completeOnboarding", () => {
       }),
     ).rejects.toThrow("redirect:/dashboard");
 
-    expect(getDefaultCategories).not.toHaveBeenCalled();
+    expect(getDefaultCategories).toHaveBeenCalled();
     expect(prismaMock.category.createMany).not.toHaveBeenCalled();
   });
 });

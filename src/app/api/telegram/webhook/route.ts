@@ -1,7 +1,10 @@
-import { after, NextRequest, NextResponse } from "next/server";
-import { isDuplicate } from "@/lib/telegram/dedup";
+import { NextRequest, NextResponse } from "next/server";
+import { claimUpdate, finishUpdate } from "@/lib/telegram/durable";
+import { limitRequest } from "@/lib/rate-limit";
 import { handleMessage } from "@/lib/telegram/handler";
 import { z } from "zod/v4";
+
+export const maxDuration = 300;
 
 const privateMessageSchema = z
   .object({
@@ -42,11 +45,6 @@ export async function POST(req: NextRequest) {
   const message = privateMessageSchema.safeParse(update.message);
   if (!message.success) return NextResponse.json({ ok: true });
 
-  // Dedup by update_id
-  if (isDuplicate(update.update_id)) {
-    return NextResponse.json({ ok: true });
-  }
-
   const text = message.data.text;
   const voiceFileId = message.data.voice?.file_id;
   const chatId = message.data.chat.id.toString();
@@ -54,15 +52,33 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  // Return 200 immediately, process in background
-  after(() =>
-    handleMessage({
-      chatId,
-      senderId: message.data.from.id.toString(),
-      chatType: "private",
-      text,
-      voiceFileId,
-    }),
-  );
-  return NextResponse.json({ ok: true });
+  const blocked = await limitRequest(req, "telegram-chat", 30, 60, chatId);
+  if (blocked) return blocked;
+  try {
+    const claimed = await claimUpdate(update.update_id);
+    if (claimed === "complete") return NextResponse.json({ ok: true });
+    if (claimed === "busy")
+      return NextResponse.json(
+        { error: "Update in progress" },
+        { status: 503, headers: { "Retry-After": "10" } },
+      );
+    try {
+      await handleMessage({
+        updateId: update.update_id,
+        chatId,
+        senderId: message.data.from.id.toString(),
+        chatType: "private",
+        text,
+        voiceFileId,
+      });
+      await finishUpdate(update.update_id, true);
+    } catch (error) {
+      await finishUpdate(update.update_id, false);
+      throw error;
+    }
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Telegram update failed", error);
+    return NextResponse.json({ error: "Please retry" }, { status: 503 });
+  }
 }

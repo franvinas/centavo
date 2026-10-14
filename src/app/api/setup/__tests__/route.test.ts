@@ -13,6 +13,12 @@ function createRequest(
 
 beforeEach(() => {
   resetPrismaMock();
+  prismaMock.$transaction.mockImplementation(
+    async (callback) =>
+      (callback as (tx: typeof prismaMock) => Promise<unknown>)(
+        prismaMock,
+      ) as never,
+  );
 });
 
 describe("POST /api/setup", () => {

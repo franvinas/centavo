@@ -1,6 +1,8 @@
+"use client";
+import { useTranslations } from "next-intl";
 import type { CurrencySpending } from "@/types/analytics";
 import { ConversionNotice } from "@/components/expenses/conversion-notice";
-import { formatCurrency, formatNumber } from "@/lib/format";
+import { formatCurrency } from "@/lib/format";
 
 interface CurrencyBreakdownProps {
   data: CurrencySpending[];
@@ -11,10 +13,11 @@ export function CurrencyBreakdown({
   data,
   baseCurrency,
 }: CurrencyBreakdownProps) {
+  const t = useTranslations("analytics");
   if (data.length === 0) {
     return (
       <p className="text-text-tertiary py-12 text-center text-sm">
-        No spending data for this period.
+        {t("noSpendingData")}
       </p>
     );
   }
@@ -48,7 +51,7 @@ export function CurrencyBreakdown({
           </div>
           <ConversionNotice count={item.pendingConversionCount ?? 0} />
           <p className="text-text-tertiary mt-0.5 text-xs">
-            {formatNumber(item.count)} transaction{item.count !== 1 ? "s" : ""}
+            {t("transactionCount", { count: item.count })}
           </p>
         </div>
       ))}

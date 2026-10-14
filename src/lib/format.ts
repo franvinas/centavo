@@ -35,6 +35,7 @@ function diffInDays(dateString: string): number {
 }
 
 export interface DateLabels {
+  locale?: string;
   today: string;
   yesterday: string;
   daysAgo: (count: number) => string;
@@ -58,7 +59,7 @@ export function formatRelativeDate(
 
   const date = parseLocalDate(dateString);
   const now = new Date();
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(labels.locale ?? "en-US", {
     month: "short",
     day: "numeric",
     year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
@@ -75,7 +76,7 @@ export function formatDateGroup(
   if (days === 1) return labels.yesterday;
 
   const date = parseLocalDate(dateString);
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(labels.locale ?? "en-US", {
     weekday: "long",
     month: "short",
     day: "numeric",

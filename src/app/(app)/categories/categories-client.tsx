@@ -44,6 +44,7 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
   const t = useTranslations("categories");
 
   function openCreate() {
+    setError("");
     setEditing(null);
     setName("");
     setColor("#E67E22");
@@ -52,6 +53,7 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
   }
 
   function openEdit(category: Category) {
+    setError("");
     setEditing(category);
     setName(category.name);
     setColor(category.color);
@@ -62,14 +64,19 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
   function handleSave() {
     if (!name.trim()) return;
 
+    setError("");
     startTransition(async () => {
-      if (editing) {
-        await updateCategory(editing.id, { name, color, icon });
-      } else {
-        await createCategory({ name, color, icon });
+      try {
+        if (editing) {
+          await updateCategory(editing.id, { name, color, icon });
+        } else {
+          await createCategory({ name, color, icon });
+        }
+        setDialogOpen(false);
+        router.refresh();
+      } catch {
+        setError(t("saveError"));
       }
-      setDialogOpen(false);
-      router.refresh();
     });
   }
 
@@ -87,10 +94,10 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
         setDeleteDrawerOpen(false);
         setDeletingCategoryId(null);
         router.refresh();
-      } catch (e) {
+      } catch {
         setDeleteDrawerOpen(false);
         setDeletingCategoryId(null);
-        setError(e instanceof Error ? e.message : "Failed to delete category");
+        setError(t("deleteError"));
       }
     });
   }
@@ -121,6 +128,11 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-2">
+              {error && (
+                <p role="alert" className="text-status-negative text-sm">
+                  {error}
+                </p>
+              )}
               <Input
                 placeholder={t("namePlaceholder")}
                 value={name}
@@ -150,7 +162,7 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
         </Dialog>
       </div>
 
-      {error && (
+      {error && !dialogOpen && (
         <p role="alert" className="text-status-negative text-sm">
           {error}
         </p>
@@ -178,7 +190,7 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
               <button
                 onClick={() => openEdit(cat)}
                 className="text-text-tertiary hover:text-text-secondary p-1.5"
-                aria-label={`Edit ${cat.name}`}
+                aria-label={t("editNamed", { name: cat.name })}
               >
                 <Pencil className="h-4 w-4" />
               </button>
@@ -186,7 +198,7 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
                 onClick={() => openDeleteDrawer(cat.id)}
                 disabled={isPending}
                 className="text-text-tertiary hover:text-status-negative p-1.5"
-                aria-label={`Delete ${cat.name}`}
+                aria-label={t("deleteNamed", { name: cat.name })}
               >
                 <Trash2 className="h-4 w-4" />
               </button>

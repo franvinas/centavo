@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
@@ -73,7 +74,7 @@ function DialogContent({
             className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
           >
             <XIcon />
-            <span className="sr-only">Close</span>
+            <LocalizedClose />
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>
@@ -111,7 +112,9 @@ function DialogFooter({
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close asChild>
-          <Button variant="outline">Close</Button>
+          <Button variant="outline">
+            <LocalizedClose visible />
+          </Button>
         </DialogPrimitive.Close>
       )}
     </div>
@@ -156,3 +159,8 @@ export {
   DialogTitle,
   DialogTrigger,
 };
+
+function LocalizedClose({ visible = false }: { visible?: boolean }) {
+  const t = useTranslations("common");
+  return <span className={visible ? undefined : "sr-only"}>{t("close")}</span>;
+}

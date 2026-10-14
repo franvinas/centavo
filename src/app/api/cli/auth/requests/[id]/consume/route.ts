@@ -1,3 +1,4 @@
+import { limitRequest } from "@/lib/rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { badRequest, notFound } from "@/lib/api-utils";
@@ -7,6 +8,8 @@ import { consumeCliAuthRequestSchema } from "@/lib/validations/cli-auth";
 type RouteParams = { params: Promise<{ id: string }> };
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
+  const blocked = await limitRequest(request, "cli-poll", 120, 60);
+  if (blocked) return blocked;
   const { id } = await params;
   const body = await request.json().catch(() => ({}));
   const parsed = consumeCliAuthRequestSchema.safeParse(body);

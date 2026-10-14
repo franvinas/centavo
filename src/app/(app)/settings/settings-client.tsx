@@ -40,49 +40,65 @@ export function SettingsClient({ user }: SettingsClientProps) {
   const t = useTranslations("settings");
 
   function handleSave() {
+    setLinkError("");
     startTransition(async () => {
-      await updateUser({ name, baseCurrency });
-      setSaved(true);
-      router.refresh();
-      setTimeout(() => setSaved(false), 2000);
+      try {
+        await updateUser({ name, baseCurrency });
+        setSaved(true);
+        router.refresh();
+        setTimeout(() => setSaved(false), 2000);
+      } catch {
+        setLinkError(t("saveError"));
+      }
     });
   }
 
   function handleLocaleChange(locale: string) {
     startTransition(async () => {
-      await updateLocale(locale);
-      router.refresh();
+      try {
+        await updateLocale(locale);
+        router.refresh();
+      } catch {
+        setLinkError(t("saveError"));
+      }
     });
   }
 
   function handleTelegramLink() {
     setLinkError("");
     startTransition(async () => {
-      const res = await fetch("/api/telegram/link", {
-        method: "POST",
-      });
+      try {
+        const res = await fetch("/api/telegram/link", {
+          method: "POST",
+        });
 
-      if (res.ok) {
-        const data = (await res.json()) as { url?: string };
-        if (data.url) {
-          window.open(data.url, "_blank", "noopener,noreferrer");
+        if (res.ok) {
+          const data = (await res.json()) as { url?: string };
+          if (data.url) {
+            window.open(data.url, "_blank", "noopener,noreferrer");
+          }
+
+          setTimeout(() => {
+            router.refresh();
+          }, 2000);
+        } else {
+          setLinkError(t("connectionError"));
         }
-
-        setTimeout(() => {
-          router.refresh();
-        }, 2000);
-      } else {
-        const data = await res.json();
-        setLinkError(data.error ?? "Failed to start Telegram connection");
+      } catch {
+        setLinkError(t("connectionError"));
       }
     });
   }
 
   function handleTelegramUnlink() {
     startTransition(async () => {
-      const res = await fetch("/api/telegram/link", { method: "DELETE" });
-      if (res.ok) {
-        router.refresh();
+      try {
+        const res = await fetch("/api/telegram/link", { method: "DELETE" });
+        if (res.ok) {
+          router.refresh();
+        } else setLinkError(t("connectionError"));
+      } catch {
+        setLinkError(t("connectionError"));
       }
     });
   }
@@ -111,7 +127,7 @@ export function SettingsClient({ user }: SettingsClientProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="text-base font-medium"
-              aria-label="Display name"
+              aria-label={t("name")}
               autoComplete="name"
             />
             <p className="text-text-tertiary mt-1 text-sm">{user.email}</p>
@@ -200,7 +216,9 @@ export function SettingsClient({ user }: SettingsClientProps) {
               {t("telegramConnectHelp")}
             </p>
             {linkError && (
-              <p className="text-status-negative text-sm">{linkError}</p>
+              <p role="alert" className="text-status-negative text-sm">
+                {linkError}
+              </p>
             )}
           </div>
         )}

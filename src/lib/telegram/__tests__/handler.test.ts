@@ -177,6 +177,7 @@ describe("handleMessage", () => {
       expect.objectContaining({ userId: "user-1" }),
       [],
       "spent 25 on lunch",
+      undefined,
     );
     expect(mockSaveMessages).toHaveBeenCalledWith("user-1", expect.any(Array));
     expect(mockSendMessage).toHaveBeenCalledWith(

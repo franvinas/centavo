@@ -1,3 +1,4 @@
+import { getExpenseDb } from "@/lib/expense-db";
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/db";
 import {
@@ -152,8 +153,11 @@ export async function createExpenseForUser(
   input: CreateExpenseInput,
 ) {
   const parsed = createExpenseSchema.parse(input);
-  const expense = await createExpenseWithClient(prisma, userId, parsed);
-  return presentExpense(expense, await getUserBaseCurrency(prisma, userId));
+  const expense = await createExpenseWithClient(getExpenseDb(), userId, parsed);
+  return presentExpense(
+    expense,
+    await getUserBaseCurrency(getExpenseDb(), userId),
+  );
 }
 
 export async function updateExpenseForUser(
@@ -163,27 +167,30 @@ export async function updateExpenseForUser(
 ) {
   const parsed = updateExpenseSchema.parse(input);
   const { updateData, updatedAt } = await buildExpenseUpdateData(
-    prisma,
+    getExpenseDb(),
     userId,
     expenseId,
     parsed,
   );
 
-  const expense = await prisma.expense.update({
+  const expense = await getExpenseDb().expense.update({
     where: { id: expenseId, userId, updatedAt },
     data: updateData,
     include: { category: true },
   });
-  return presentExpense(expense, await getUserBaseCurrency(prisma, userId));
+  return presentExpense(
+    expense,
+    await getUserBaseCurrency(getExpenseDb(), userId),
+  );
 }
 
 export async function deleteExpenseForUser(userId: string, expenseId: string) {
-  const existing = await prisma.expense.findFirst({
+  const existing = await getExpenseDb().expense.findFirst({
     where: { id: expenseId, userId },
   });
   if (!existing) throw new Error("Expense not found");
 
-  await prisma.expense.delete({ where: { id: expenseId } });
+  await getExpenseDb().expense.delete({ where: { id: expenseId } });
   return { success: true };
 }
 
@@ -196,7 +203,7 @@ export async function listExpensesForUser(
     include: { category: true },
     orderBy: [{ date: "desc" }, { createdAt: "desc" }],
   });
-  const currency = await getUserBaseCurrency(prisma, userId);
+  const currency = await getUserBaseCurrency(getExpenseDb(), userId);
   return expenses.map((expense) => presentExpense(expense, currency));
 }
 
@@ -347,7 +354,7 @@ export async function importExpensesForUser(
     };
   }
 
-  const displayCurrency = await getUserBaseCurrency(prisma, userId);
+  const displayCurrency = await getUserBaseCurrency(getExpenseDb(), userId);
   if (!parsed.continueOnError) {
     const valuations: Awaited<ReturnType<typeof buildValuation>>[] = [];
     for (const { input: item } of validItems)

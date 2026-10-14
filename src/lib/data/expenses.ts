@@ -1,3 +1,8 @@
+import {
+  parseDateOnly,
+  positiveInteger,
+  todayInTimezone,
+} from "@/lib/date-only";
 import { cache } from "react";
 import { prisma } from "@/lib/db";
 import { presentExpense, sumDisplayAmounts } from "@/lib/expense-valuation";
@@ -21,12 +26,16 @@ export async function getExpenses({
   page = 1,
   limit = 50,
 }: GetExpensesOptions) {
+  page = positiveInteger(page, 1, 1_000_000);
+  limit = positiveInteger(limit, 50, 100);
+  const fromDate = parseDateOnly(from);
+  const toDate = parseDateOnly(to);
   const where: Record<string, unknown> = { userId };
 
-  if (from || to) {
+  if (fromDate || toDate) {
     where.date = {
-      ...(from ? { gte: new Date(from) } : {}),
-      ...(to ? { lte: new Date(to) } : {}),
+      ...(fromDate ? { gte: fromDate } : {}),
+      ...(toDate ? { lte: toDate } : {}),
     };
   }
   if (categoryId) where.categoryId = categoryId;
@@ -45,7 +54,7 @@ export async function getExpenses({
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { baseCurrency: true },
+    select: { baseCurrency: true, timezone: true },
   });
   const baseCurrency = user?.baseCurrency ?? "USD";
   return {
@@ -68,10 +77,10 @@ export const getExpenseSummary = cache(async function getExpenseSummary(
 ) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { baseCurrency: true },
+    select: { baseCurrency: true, timezone: true },
   });
   const baseCurrency = user?.baseCurrency ?? "USD";
-  const now = new Date();
+  const now = todayInTimezone(user?.timezone ?? "UTC");
   const startOfMonth = new Date(
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
   );

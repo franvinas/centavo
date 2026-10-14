@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db";
+import { getExpenseDb } from "@/lib/expense-db";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 const MAX_HISTORY = 20;
@@ -7,7 +7,7 @@ const PRUNE_THRESHOLD = 50;
 export async function getConversationHistory(
   userId: string,
 ): Promise<ChatCompletionMessageParam[]> {
-  const messages = await prisma.telegramMessage.findMany({
+  const messages = await getExpenseDb().telegramMessage.findMany({
     where: { userId, role: { in: ["user", "assistant"] } },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: MAX_HISTORY,
@@ -41,7 +41,7 @@ export async function saveMessages(
 
   if (persistable.length === 0) return;
 
-  await prisma.telegramMessage.createMany({
+  await getExpenseDb().telegramMessage.createMany({
     data: persistable.map((msg) => ({
       userId,
       role: msg.role,
@@ -50,16 +50,18 @@ export async function saveMessages(
   });
 
   // Prune old messages
-  const count = await prisma.telegramMessage.count({ where: { userId } });
+  const count = await getExpenseDb().telegramMessage.count({
+    where: { userId },
+  });
   if (count > PRUNE_THRESHOLD) {
-    const toKeep = await prisma.telegramMessage.findMany({
+    const toKeep = await getExpenseDb().telegramMessage.findMany({
       where: { userId },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: MAX_HISTORY,
       select: { id: true },
     });
     const keepIds = toKeep.map((m) => m.id);
-    await prisma.telegramMessage.deleteMany({
+    await getExpenseDb().telegramMessage.deleteMany({
       where: { userId, id: { notIn: keepIds } },
     });
   }

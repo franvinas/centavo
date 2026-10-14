@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, userEvent, waitFor } from "@/test-utils/react-testing";
+import {
+  render,
+  userEvent,
+  waitFor,
+  cleanup,
+} from "@/test-utils/react-testing";
 import { ExpenseForm } from "../expense-form";
 import { updateExpense } from "@/lib/actions/expenses";
 import type { Category } from "@/types";
@@ -24,6 +29,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  cleanup();
   vi.restoreAllMocks();
 });
 
@@ -327,4 +333,56 @@ describe("ExpenseForm", () => {
     expect(mockDeleteExpense).toHaveBeenCalledWith("exp-1");
     expect(mockRouter.push).toHaveBeenCalledWith("/expenses");
   });
+});
+
+it("does not warn about unsaved changes for an untouched existing expense", async () => {
+  const add = vi.spyOn(window, "addEventListener");
+  render(
+    <ExpenseForm
+      categories={mockCategories}
+      expense={{
+        id: "exp-1",
+        amount: 25,
+        currency: "USD",
+        description: "Lunch",
+        date: "2026-10-14T00:00:00.000Z",
+        categoryId: "cat-1",
+        notes: "",
+      }}
+    />,
+  );
+  expect(
+    add.mock.calls.filter(([event]) => String(event) === "beforeunload"),
+  ).toHaveLength(0);
+  const user = userEvent.setup();
+  await user.type(
+    document.querySelector('input[placeholder="Description"]')!,
+    " changed",
+  );
+  expect(
+    add.mock.calls.filter(([event]) => String(event) === "beforeunload"),
+  ).toHaveLength(1);
+});
+it("shows an inline error after an expense save fails, preserving its values", async () => {
+  vi.mocked(updateExpense).mockRejectedValueOnce(new Error("private details"));
+  const { getByRole, findByRole } = render(
+    <ExpenseForm
+      categories={mockCategories}
+      expense={{
+        id: "exp-1",
+        amount: 25,
+        currency: "USD",
+        description: "Lunch",
+        date: "2026-10-14T00:00:00.000Z",
+        categoryId: "cat-1",
+      }}
+    />,
+  );
+  await userEvent
+    .setup()
+    .click(getByRole("button", { name: /update expense/i }));
+  expect(await findByRole("alert")).toHaveTextContent(
+    "Unable to save the expense",
+  );
+  expect(document.body).not.toHaveTextContent("private details");
 });

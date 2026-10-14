@@ -1,3 +1,4 @@
+import { positiveInteger } from "@/lib/date-only";
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser, unauthorized, badRequest } from "@/lib/api-utils";
 import { createExpenseSchema } from "@/lib/validations/expense";
@@ -13,11 +14,8 @@ export async function GET(request: NextRequest) {
   const to = searchParams.get("to");
   const categoryId = searchParams.get("categoryId");
   const search = searchParams.get("search");
-  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
-  const limit = Math.min(
-    100,
-    Math.max(1, parseInt(searchParams.get("limit") ?? "50")),
-  );
+  const page = positiveInteger(searchParams.get("page"), 1, 1_000_000);
+  const limit = positiveInteger(searchParams.get("limit"), 50, 100);
 
   const { expenses, total, totalPages } = await getExpenses({
     userId: user.id,

@@ -1,8 +1,9 @@
 "use client";
 
+import { parseDateOnly } from "@/lib/date-only";
 import * as React from "react";
 import { CalendarIcon } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { es } from "react-day-picker/locale";
 
 import { cn } from "@/lib/utils";
@@ -30,11 +31,12 @@ export function DatePicker({
   className,
 }: DatePickerProps) {
   const locale = useLocale();
+  const t = useTranslations("common");
   const [open, setOpen] = React.useState(false);
 
   // Parse ISO date string (YYYY-MM-DD) to Date in local timezone
   const selected = React.useMemo(() => {
-    if (!value) return undefined;
+    if (!parseDateOnly(value)) return undefined;
     const [y, m, d] = value.split("-").map(Number);
     return new Date(y, m - 1, d);
   }, [value]);
@@ -60,7 +62,7 @@ export function DatePicker({
           )}
         >
           <CalendarIcon className="mr-2 size-4" />
-          {formatted ?? <span>{placeholder ?? "Pick a date"}</span>}
+          {formatted ?? <span>{placeholder ?? t("pickDate")}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">

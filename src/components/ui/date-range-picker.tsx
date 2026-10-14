@@ -1,8 +1,9 @@
 "use client";
 
+import { parseDateOnly } from "@/lib/date-only";
 import * as React from "react";
 import { CalendarIcon } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { DateRange } from "react-day-picker";
 import { es } from "react-day-picker/locale";
 
@@ -18,7 +19,7 @@ import {
 const rdpLocales: Record<string, object> = { es };
 
 function parseIso(value: string): Date | undefined {
-  if (!value) return undefined;
+  if (!parseDateOnly(value)) return undefined;
   const [y, m, d] = value.split("-").map(Number);
   return new Date(y, m - 1, d);
 }
@@ -60,6 +61,7 @@ export function DateRangePicker({
   className,
 }: DateRangePickerProps) {
   const locale = useLocale();
+  const t = useTranslations("common");
   const [open, setOpen] = React.useState(false);
   const [hoveredDay, setHoveredDay] = React.useState<Date | undefined>();
 
@@ -106,7 +108,7 @@ export function DateRangePicker({
           )}
         >
           <CalendarIcon className="mr-2 size-4" />
-          {formatted ?? <span>{placeholder ?? "Pick dates"}</span>}
+          {formatted ?? <span>{placeholder ?? t("pickDates")}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">

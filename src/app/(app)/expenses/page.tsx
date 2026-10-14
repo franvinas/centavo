@@ -1,3 +1,4 @@
+import { positiveInteger } from "@/lib/date-only";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/data/user";
 import { getExpenses } from "@/lib/data/expenses";
@@ -20,7 +21,7 @@ export default async function ExpensesPage({
     categoryId: params.categoryId,
     from: params.from,
     to: params.to,
-    page: params.page ? parseInt(params.page) : 1,
+    page: positiveInteger(params.page, 1, 1_000_000),
   });
 
   const categories = await getCategories(user.id);

@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import { useTranslations } from "next-intl";
 import type { CategorySpending } from "@/types/analytics";
-import { formatCurrency, formatNumber } from "@/lib/format";
+import { formatCurrency } from "@/lib/format";
 
 interface CategoryPieChartProps {
   data: CategorySpending[];
@@ -26,14 +26,15 @@ function CustomTooltip({
   payload?: Array<{ payload: CategorySpending }>;
   baseCurrency: string;
 }) {
+  const t = useTranslations("analytics");
   if (!active || !payload?.length) return null;
   const item = payload[0].payload;
   return (
     <div className="bg-bg-surface shadow-card rounded-lg border px-3 py-2 text-sm">
       <p className="text-text-primary font-medium">{item.name}</p>
       <p className="text-text-secondary">
-        {formatCurrency(item.total, baseCurrency)} ({formatNumber(item.count)}{" "}
-        expense{item.count !== 1 ? "s" : ""})
+        {formatCurrency(item.total, baseCurrency)} (
+        {t("expenseCount", { count: item.count })})
       </p>
     </div>
   );
