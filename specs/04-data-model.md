@@ -79,7 +79,7 @@ Category 1 --- * Expense
   - `baseAmount` + `exchangeRate`: the converted value in the user's base currency
 - Exchange rates are fetched at the time of expense creation
 - If the expense currency equals the base currency, `exchangeRate = 1` and `baseAmount = amount`
-- Exchange rate source: Open Exchange Rates API (`OPEN_EXCHANGE_RATES_APP_ID` env var), cached 1 hour in-memory
+- Exchange rate sources (no API keys): argentinadatos.com dólar blue `venta` for ARS and frankfurter.dev for USD→EUR, cached 1 hour in-memory. The latest quote on or before the expense date is used.
 
 ## Indexes
 
