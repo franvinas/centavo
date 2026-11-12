@@ -69,10 +69,13 @@ All three layers authenticate via `src/lib/auth.ts` (NextAuth). All data is scop
 
 ### Multi-Currency
 
-- Each expense stores `amount` + `currency` (original) and `baseAmount` + `exchangeRate` (converted to user's `baseCurrency`)
-- Exchange rates from Open Exchange Rates API (`OPEN_EXCHANGE_RATES_APP_ID` env var), cached 1 hour in-memory (`src/lib/exchange-rate.ts`)
+- Each expense stores the original `amount` + `currency` (never rewritten) plus a valuation snapshot from the expense date: `usdAmount`, `usdExchangeRate` and `conversionRates` (units per USD for USD/ARS/EUR, each with its effective date and source). Built by `buildValuation()` in `src/lib/services/valuation.ts`.
+- Rates (`src/lib/exchange-rate.ts`, no API keys, cached 1 hour in-memory):
+  - ARS: argentinadatos.com dólar blue, `venta` price
+  - EUR: frankfurter.dev USD→EUR
+  - The latest quote on or before the expense date is used (weekends/holidays or a not-yet-published quote fall back to the previous day — intentional)
+- Display amounts are computed at read time in `src/lib/expense-valuation.ts` (`usdAmount × rate`), so changing the user's `baseCurrency` does not rewrite stored expenses. `baseAmount`/`exchangeRate` columns are legacy, kept for audit only.
 - Supported currencies: `["USD", "EUR", "ARS"]` (defined in `src/lib/constants.ts`)
-- Changing user's base currency recalculates all expense `baseAmount` values
 
 ### Validation
 
