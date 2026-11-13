@@ -26,7 +26,8 @@ describe("category form recovery", () => {
     ).not.toBeInTheDocument();
     expect(screen.getByPlaceholderText("Category name")).toHaveValue("Food");
     vi.mocked(createCategory).mockResolvedValueOnce(undefined);
-    await user.click(screen.getByRole("button", { name: "Create" }));
+    // The alert can render while the transition is still pending ("Saving...").
+    await user.click(await screen.findByRole("button", { name: "Create" }));
     expect(createCategory).toHaveBeenCalledTimes(2);
   });
 });
