@@ -70,4 +70,16 @@ describe("ExpenseCard", () => {
     const icon = container.querySelector('[data-slot="category-chip"] svg');
     expect(icon).toHaveStyle({ color: "#E8855B" });
   });
+
+  it("shows the category emoji instead of an icon", () => {
+    const expense = createMockExpense({
+      category: { id: "c-emoji", name: "Pizza", icon: "🍕", color: "#C0392B" },
+    });
+    const { container } = render(<ExpenseCard expense={expense} />);
+    const chip = container.querySelector<HTMLElement>(
+      '[data-slot="category-chip"]',
+    );
+    expect(chip?.querySelector("[data-emoji-icon]")).toHaveTextContent("🍕");
+    expect(chip?.querySelector("svg")).toBeNull();
+  });
 });

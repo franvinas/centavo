@@ -16,8 +16,12 @@ import {
 import { DeleteConfirmDrawer } from "@/components/ui/delete-confirm-drawer";
 import { ColorPicker } from "@/components/expenses/color-picker";
 import { IconPicker } from "@/components/expenses/icon-picker";
-import { categoryIconMap } from "@/lib/category-icon-map";
 import { PageHeader } from "@/components/layout/page-header";
+import {
+  CategoryIcon,
+  categoryTileStyle,
+} from "@/components/categories/category-icon";
+import { isValidCategoryIcon } from "@/lib/category-icon";
 import {
   createCategory,
   updateCategory,
@@ -58,7 +62,10 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
     setEditing(category);
     setName(category.name);
     setColor(category.color);
-    setIcon(category.icon);
+    // Legacy rows may hold free text; fall back to a valid icon so saving works.
+    setIcon(
+      isValidCategoryIcon(category.icon) ? category.icon : "MoreHorizontal",
+    );
     setDialogOpen(true);
   }
 
@@ -141,14 +148,10 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
               <div
                 aria-hidden="true"
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors"
-                style={{ backgroundColor: color + "1F" }}
+                style={categoryTileStyle(icon, color)}
+                data-testid="category-preview"
               >
-                {(() => {
-                  const PreviewIcon = categoryIconMap[icon];
-                  return PreviewIcon ? (
-                    <PreviewIcon className="h-5 w-5" style={{ color }} />
-                  ) : null;
-                })()}
+                <CategoryIcon icon={icon} color={color} />
               </div>
               <Input
                 placeholder={t("namePlaceholder")}
@@ -191,7 +194,6 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
 
       <div className="grid gap-2.5 sm:grid-cols-2 md:gap-3 xl:grid-cols-3">
         {initialCategories.map((cat) => {
-          const Icon = categoryIconMap[cat.icon];
           return (
             <div
               key={cat.id}
@@ -199,11 +201,9 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
             >
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                style={{ backgroundColor: cat.color + "1F" }}
+                style={categoryTileStyle(cat.icon, cat.color)}
               >
-                {Icon && (
-                  <Icon className="h-5 w-5" style={{ color: cat.color }} />
-                )}
+                <CategoryIcon icon={cat.icon} color={cat.color} />
               </div>
               <span className="text-text-primary min-w-0 flex-1 truncate text-[15px] font-medium">
                 {cat.name}

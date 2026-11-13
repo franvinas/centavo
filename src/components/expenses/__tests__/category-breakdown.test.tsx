@@ -121,4 +121,23 @@ describe("CategoryBreakdown", () => {
     const { container } = render(<CategoryBreakdown expenses={[]} />);
     expect(container.querySelector(".space-y-3")?.children).toHaveLength(0);
   });
+
+  it("shows the category emoji in the breakdown row", () => {
+    const expenses = [
+      createMockExpense({
+        categoryId: "cat-e",
+        category: {
+          id: "cat-e",
+          name: "Coffee",
+          icon: "☕",
+          color: "#795548",
+        },
+        baseAmount: 10,
+      }),
+    ];
+    const { container } = render(<CategoryBreakdown expenses={expenses} />);
+    expect(container.querySelector("[data-emoji-icon]")).toHaveTextContent(
+      "☕",
+    );
+  });
 });

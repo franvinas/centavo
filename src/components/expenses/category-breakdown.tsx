@@ -1,6 +1,8 @@
 import type { Expense } from "@/types";
 import { formatCurrency } from "@/lib/format";
 import { categoryIconMap } from "@/lib/category-icon-map";
+import { isEmojiIcon } from "@/lib/category-icon";
+import { categoryTileStyle } from "@/components/categories/category-icon";
 
 interface CategoryBreakdownProps {
   expenses: Expense[];
@@ -44,9 +46,17 @@ export function CategoryBreakdown({ expenses }: CategoryBreakdownProps) {
           <div key={cat.name} className="flex items-center gap-3 py-0.5">
             <div
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]"
-              style={{ backgroundColor: `${cat.color}1F` }}
+              style={categoryTileStyle(cat.icon, cat.color)}
             >
-              {Icon ? (
+              {isEmojiIcon(cat.icon) ? (
+                <span
+                  aria-hidden="true"
+                  data-emoji-icon
+                  className="text-lg leading-none"
+                >
+                  {cat.icon}
+                </span>
+              ) : Icon ? (
                 <Icon
                   className="h-[18px] w-[18px]"
                   style={{ color: cat.color }}
