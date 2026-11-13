@@ -7,8 +7,6 @@ improve reliability, deployability, local development, or product quality.
 
 - Rotate secrets that were present in `.env.local` and verify providers use the
   new values.
-- Bring Prisma migrations back in sync with `prisma/schema.prisma` so a fresh
-  database created only from migrations matches the current app schema.
 - Decide and document the production migration policy: keep manual migrations or
   add an explicitly triggered GitHub Action.
 - Update Vercel project settings documentation with production URL, project
@@ -48,5 +46,8 @@ improve reliability, deployability, local development, or product quality.
   PostgreSQL) on Node 24, matching the Vercel runtime.
 - Removed the unused Open Exchange Rates config; rates come from argentinadatos
   (dólar blue venta) and frankfurter (USD→EUR) without API keys.
+- Verified Prisma migrations match `prisma/schema.prisma` (empty
+  `prisma migrate diff` from a fresh database); CI applies migrations with
+  `db:deploy` before the test suite.
 - CI audit fails only on high/critical runtime advisories; Dependabot raises
   update PRs and alerts for the rest.
