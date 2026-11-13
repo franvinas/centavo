@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
 import { CURRENCIES } from "@/lib/constants";
+import { tagListSchema } from "@/lib/validations/tag";
 
 export const createExpenseSchema = z.object({
   amount: z
@@ -23,6 +24,7 @@ export const createExpenseSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),
   date: z.string().date("Invalid date format"),
   notes: z.string().trim().max(500).optional(),
+  tags: tagListSchema.optional(),
 });
 
 export const updateExpenseSchema = createExpenseSchema.partial();

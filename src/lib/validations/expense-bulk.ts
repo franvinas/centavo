@@ -1,10 +1,13 @@
 import { z } from "zod/v4";
 import { createExpenseSchema } from "@/lib/validations/expense";
+import { tagFilterSchema, tagListSchema } from "@/lib/validations/tag";
 
 const expenseSelectorBaseSchema = z.object({
   ids: z.array(z.string().min(1)).min(1).optional(),
   search: z.string().trim().min(1).optional(),
   categoryId: z.string().min(1).optional(),
+  // Matches expenses carrying any of these tags (OR).
+  tags: tagFilterSchema.optional(),
   from: z.string().date("Invalid from date").optional(),
   to: z.string().date("Invalid to date").optional(),
   before: z.string().date("Invalid before date").optional(),
@@ -17,6 +20,7 @@ export const expenseSelectorSchema = expenseSelectorBaseSchema.refine(
       value.ids?.length ||
       value.search ||
       value.categoryId ||
+      value.tags?.length ||
       value.from ||
       value.to ||
       value.before ||
@@ -42,6 +46,8 @@ export const bulkExpenseUpdateSchema = z
         date: createExpenseSchema.shape.date.optional(),
         notes: createExpenseSchema.shape.notes.optional(),
         clearNotes: z.boolean().optional(),
+        addTags: tagListSchema.optional(),
+        removeTags: tagListSchema.optional(),
       })
       .refine(
         (value) =>
@@ -52,7 +58,9 @@ export const bulkExpenseUpdateSchema = z
             value.categoryId !== undefined ||
             value.date !== undefined ||
             value.notes !== undefined ||
-            value.clearNotes,
+            value.clearNotes ||
+            value.addTags?.length ||
+            value.removeTags?.length,
           ),
         {
           message: "At least one update field is required",
@@ -60,7 +68,12 @@ export const bulkExpenseUpdateSchema = z
       )
       .refine((value) => !(value.notes !== undefined && value.clearNotes), {
         message: "Cannot set notes and clear them at the same time",
-      }),
+      })
+      .refine(
+        (value) =>
+          !value.addTags?.some((tag) => value.removeTags?.includes(tag)),
+        { message: "Cannot add and remove the same tag" },
+      ),
   })
   .strict();
 

@@ -152,6 +152,65 @@ describe("ExpenseForm", () => {
     );
   });
 
+  it("collects tags as chips in create mode", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <ExpenseForm
+        categories={mockCategories}
+        tagSuggestions={["japan trip"]}
+      />,
+    );
+    await user.type(container.querySelector("#expense-amount")!, "12.5");
+    await user.type(
+      container.querySelector('input[placeholder="Description"]')!,
+      "Taxi",
+    );
+    await user.type(
+      container.querySelector('input[aria-label="Tags"]')!,
+      "Japan Trip{Enter}work{Enter}",
+    );
+    expect(
+      Array.from(container.querySelectorAll('[data-slot="tag-chip"]')).map(
+        (chip) => chip.textContent,
+      ),
+    ).toEqual(["#japan trip", "#work"]);
+  });
+
+  it("keeps existing tags and sends edits on update", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <ExpenseForm
+        categories={mockCategories}
+        expense={{
+          id: "exp-1",
+          amount: 25.5,
+          currency: "USD",
+          description: "Lunch",
+          date: "2025-01-15",
+          categoryId: "cat-1",
+          tags: ["food", "work"],
+        }}
+      />,
+    );
+    await user.click(
+      container.querySelector('button[aria-label="Remove tag work"]')!,
+    );
+    await user.type(
+      container.querySelector('input[aria-label="Tags"]')!,
+      "team{Enter}",
+    );
+    const save = Array.from(container.querySelectorAll("button")).find(
+      (b) => b.textContent === "Update Expense",
+    )!;
+    await user.click(save);
+    await waitFor(() =>
+      expect(updateExpense).toHaveBeenCalledWith(
+        "exp-1",
+        expect.objectContaining({ tags: ["food", "team"] }),
+      ),
+    );
+  });
+
   it("renders in create mode", () => {
     const { container } = render(<ExpenseForm categories={mockCategories} />);
 

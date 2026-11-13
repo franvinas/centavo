@@ -261,5 +261,6 @@ function mapExpense(e: any): Expense {
     date: e.date.toISOString(),
     categoryId: e.categoryId,
     category: e.category as Category,
+    tags: (e.tags ?? []).map((tag: { name: string }) => tag.name),
   };
 }

@@ -12,6 +12,11 @@ export async function GET(request: NextRequest) {
     ids: ids.length > 0 ? ids : undefined,
     search: request.nextUrl.searchParams.get("search") ?? undefined,
     categoryId: request.nextUrl.searchParams.get("categoryId") ?? undefined,
+    tags:
+      [
+        ...request.nextUrl.searchParams.getAll("tags"),
+        ...request.nextUrl.searchParams.getAll("tag"),
+      ].join(",") || undefined,
     from: request.nextUrl.searchParams.get("from") ?? undefined,
     to: request.nextUrl.searchParams.get("to") ?? undefined,
     before: request.nextUrl.searchParams.get("before") ?? undefined,

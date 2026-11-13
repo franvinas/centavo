@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/data/user";
 import { getExpenses } from "@/lib/data/expenses";
 import { getCategories } from "@/lib/data/categories";
+import { getTagNames } from "@/lib/data/tags";
+import { parseTagFilter } from "@/lib/validations/tag";
 import { ExpensesClient } from "./expenses-client";
 import type { Expense, Category } from "@/types";
 
@@ -15,16 +17,27 @@ export default async function ExpensesPage({
   if (!user) redirect("/auth/signin");
 
   const params = await searchParams;
-  const { expenses, total, page, totalPages } = await getExpenses({
+  const {
+    expenses,
+    total,
+    totalAmount,
+    pendingConversionCount,
+    page,
+    totalPages,
+  } = await getExpenses({
     userId: user.id,
     search: params.search,
     categoryId: params.categoryId,
+    tags: parseTagFilter(params.tags),
     from: params.from,
     to: params.to,
     page: positiveInteger(params.page, 1, 1_000_000),
   });
 
-  const categories = await getCategories(user.id);
+  const [categories, tagNames] = await Promise.all([
+    getCategories(user.id),
+    getTagNames(user.id),
+  ]);
 
   const mappedExpenses: Expense[] = expenses.map((e) => ({
     id: e.id,
@@ -37,6 +50,7 @@ export default async function ExpensesPage({
     date: e.date.toISOString(),
     categoryId: e.categoryId,
     category: e.category as Category,
+    tags: e.tags.map((tag) => tag.name),
   }));
 
   const mappedCategories: Category[] = categories.map((c) => ({
@@ -50,7 +64,11 @@ export default async function ExpensesPage({
     <ExpensesClient
       expenses={mappedExpenses}
       categories={mappedCategories}
+      tagNames={tagNames}
       total={total}
+      totalAmount={totalAmount}
+      pendingConversionCount={pendingConversionCount}
+      baseCurrency={user.baseCurrency}
       page={page}
       totalPages={totalPages}
     />

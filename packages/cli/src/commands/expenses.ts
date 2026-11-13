@@ -34,6 +34,19 @@ interface ExpenseRecord {
     id: string;
     name: string;
   };
+  tags?: Array<{ id: string; name: string }>;
+}
+
+const tagFilterOption = {
+  name: "tag",
+  description: "Filter by tag (repeatable; matches any).",
+  type: "string",
+  placeholder: "tag",
+  multiple: true,
+} as const;
+
+function tagNames(expense: ExpenseRecord) {
+  return (expense.tags ?? []).map((tag) => tag.name);
 }
 
 function toNumber(value: number | string | null | undefined) {
@@ -102,6 +115,7 @@ function mapExpenseRow(expense: ExpenseRecord) {
     date: String(expense.date).slice(0, 10),
     description: expense.description,
     category: expense.category?.name ?? "",
+    tags: tagNames(expense).join(", "),
     amount: formatMoney(toNumber(expense.amount), expense.currency),
     baseAmount:
       expense.baseAmount == null ? "pending" : String(expense.baseAmount),
@@ -110,7 +124,7 @@ function mapExpenseRow(expense: ExpenseRecord) {
 
 function printExpenses(expenses: ExpenseRecord[]) {
   printTable(
-    ["ID", "Date", "Description", "Category", "Amount", "Base"],
+    ["ID", "Date", "Description", "Category", "Tags", "Amount", "Base"],
     expenses.map((expense) => {
       const row = mapExpenseRow(expense);
       return [
@@ -118,6 +132,7 @@ function printExpenses(expenses: ExpenseRecord[]) {
         row.date,
         row.description,
         row.category,
+        row.tags,
         row.amount,
         row.baseAmount,
       ];
@@ -171,6 +186,11 @@ async function buildEditPayload(
   if (getBooleanOption(input.options, "clear-notes")) {
     data.clearNotes = true;
   }
+
+  const addTags = getStringArrayOption(input.options, "add-tag");
+  const removeTags = getStringArrayOption(input.options, "remove-tag");
+  if (addTags.length) data.addTags = addTags;
+  if (removeTags.length) data.removeTags = removeTags;
 
   if (!ids?.length && categoryValue) {
     const selectors = buildSelectorPayload(input.options);
@@ -228,6 +248,13 @@ const addCommand: CommandSpec = {
       placeholder: "text",
     },
     {
+      name: "tag",
+      description: "Tag the expense (repeatable).",
+      type: "string",
+      placeholder: "tag",
+      multiple: true,
+    },
+    {
       name: "json",
       description: "Print machine-readable JSON output.",
       type: "boolean",
@@ -235,6 +262,7 @@ const addCommand: CommandSpec = {
   ],
   examples: [
     "centavo expense add --amount 12.50 --description Coffee --category Food",
+    "centavo expense add --amount 80 --description Hotel --category Travel --tag japan-trip --tag reimbursable",
   ],
   run: async (context, input) => {
     const amount = getNumberOption(input.options, "amount");
@@ -262,6 +290,7 @@ const addCommand: CommandSpec = {
             getStringOption(input.options, "date") ??
             new Date().toISOString().slice(0, 10),
           notes: getStringOption(input.options, "notes"),
+          tags: getStringArrayOption(input.options, "tag"),
         },
       },
     );
@@ -307,6 +336,7 @@ const listCommand: CommandSpec = {
       type: "string",
       placeholder: "date",
     },
+    tagFilterOption,
     {
       name: "page",
       description: "Page number.",
@@ -338,6 +368,8 @@ const listCommand: CommandSpec = {
       if (value) search.set(key, value);
     }
     if (categoryId) search.set("categoryId", categoryId);
+    const tags = getStringArrayOption(input.options, "tag");
+    if (tags.length) search.set("tags", tags.join(","));
     const page = getNumberOption(input.options, "page");
     const limit = getNumberOption(input.options, "limit");
     if (page !== undefined) search.set("page", String(page));
@@ -348,6 +380,8 @@ const listCommand: CommandSpec = {
       total: number;
       page: number;
       totalPages: number;
+      totalAmount?: number;
+      pendingConversionCount?: number;
     }>(`/api/expenses?${search.toString()}`, {
       method: "GET",
     });
@@ -358,6 +392,15 @@ const listCommand: CommandSpec = {
     }
 
     process.stdout.write(`Found ${response.total} expense(s).\n`);
+    if (response.totalAmount !== undefined) {
+      const { baseCurrency } = await getCurrentUser(context.baseUrl);
+      const pending = response.pendingConversionCount ?? 0;
+      process.stdout.write(
+        `Total: ${formatMoney(response.totalAmount, baseCurrency)}${
+          pending ? ` (${pending} pending conversion)` : ""
+        }\n`,
+      );
+    }
     printExpenses(response.expenses);
     return 0;
   },
@@ -393,6 +436,7 @@ const showCommand: CommandSpec = {
       ["date", String(response.expense.date).slice(0, 10)],
       ["description", response.expense.description],
       ["category", response.expense.category?.name ?? ""],
+      ["tags", tagNames(response.expense).join(", ")],
       [
         "amount",
         formatMoney(
@@ -498,6 +542,21 @@ const editCommand: CommandSpec = {
       description: "Clear notes on matched expenses.",
       type: "boolean",
     },
+    tagFilterOption,
+    {
+      name: "add-tag",
+      description: "Add a tag to matched expenses (repeatable).",
+      type: "string",
+      placeholder: "tag",
+      multiple: true,
+    },
+    {
+      name: "remove-tag",
+      description: "Remove a tag from matched expenses (repeatable).",
+      type: "string",
+      placeholder: "tag",
+      multiple: true,
+    },
     {
       name: "set",
       description:
@@ -525,6 +584,7 @@ const editCommand: CommandSpec = {
   examples: [
     "centavo expense edit exp_123 --amount 14.50",
     "centavo expense edit --search Uber --set notes='work trip' --preview",
+    "centavo expense edit --search Hotel --from 2026-03-01 --add-tag japan-trip",
   ],
   notes: [
     "In batch mode, --category selects matching expenses. Use --set category=<value> to change the category.",
@@ -626,6 +686,7 @@ const deleteCommand: CommandSpec = {
       type: "string",
       placeholder: "date",
     },
+    tagFilterOption,
     {
       name: "preview",
       description: "Preview matches without deleting.",
@@ -739,6 +800,7 @@ const exportCommand: CommandSpec = {
       type: "string",
       placeholder: "date",
     },
+    tagFilterOption,
     {
       name: "format",
       description: "Output format.",
@@ -765,7 +827,9 @@ const exportCommand: CommandSpec = {
 
     const search = new URLSearchParams();
     for (const [key, value] of Object.entries(selectors)) {
-      if (Array.isArray(value)) {
+      if (key === "tags" && Array.isArray(value)) {
+        search.set("tags", value.join(","));
+      } else if (Array.isArray(value)) {
         for (const item of value) search.append("id", String(item));
       } else {
         search.set(key, String(value));
@@ -792,6 +856,7 @@ const exportCommand: CommandSpec = {
       categoryId: expense.category?.id ?? "",
       date: String(expense.date).slice(0, 10),
       notes: expense.notes ?? "",
+      tags: tagNames(expense).join("; "),
     }));
 
     let output = "";
@@ -917,6 +982,11 @@ const importCommand: CommandSpec = {
           row.notes === undefined || row.notes === ""
             ? undefined
             : String(row.notes),
+        // "a; b" in CSV, an array or string in JSONL. The API normalizes it.
+        tags:
+          row.tags === undefined || row.tags === null || row.tags === ""
+            ? undefined
+            : row.tags,
       };
     });
 

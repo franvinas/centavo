@@ -89,7 +89,18 @@
     "close": "Cerrar",
     "saveError": "No se pudo guardar el gasto. Revisá los datos e intentá de nuevo.",
     "deleteError": "No se pudo eliminar el gasto. Intentá de nuevo.",
-    "currency": "Moneda"
+    "currency": "Moneda",
+    "tags": "Tags",
+    "addTagsPlaceholder": "Agregar tags…",
+    "addTag": "Agregar tag “{tag}”",
+    "removeTag": "Quitar tag {tag}",
+    "tagLimit": "Hasta {max} tags por gasto",
+    "allTags": "Todos los tags",
+    "selectedTags": "{count, plural, =1 {# tag} other {# tags}}",
+    "noTagsYet": "Todavía no hay tags. Agregalos al crear un gasto.",
+    "filterByTag": "Ver gastos con el tag {tag}",
+    "filteredTotal": "Total {amount}",
+    "clearTags": "Quitar tags"
   },
   "categories": {
     "title": "Categorías",
@@ -192,7 +203,22 @@
     "signOut": "Cerrar sesión",
     "saveError": "No se pudieron guardar los cambios. Intentá de nuevo.",
     "connectionError": "No se pudo actualizar la conexión con Telegram. Intentá de nuevo.",
-    "name": "Nombre"
+    "name": "Nombre",
+    "tags": "Tags",
+    "tagsHint": "Renombrá, fusioná o eliminá tus tags. Un gasto con varios tags cuenta en cada uno.",
+    "noTags": "Todavía no usaste tags. Agregalos al crear un gasto.",
+    "tagExpenses": "{count, plural, =1 {# gasto} other {# gastos}}",
+    "tagPending": "{count} sin conversión",
+    "viewTagExpenses": "Ver gastos con el tag {tag}",
+    "renameTag": "Renombrar {tag}",
+    "deleteTag": "Eliminar {tag}",
+    "tagName": "Nombre del tag",
+    "saveTag": "Guardar",
+    "cancel": "Cancelar",
+    "mergeWarning": "#{tag} ya existe. Al guardar se fusionan los dos tags.",
+    "tagError": "No se pudo actualizar el tag. Intentá de nuevo.",
+    "confirmDeleteTag": "¿Eliminar el tag #{tag}?",
+    "confirmDeleteTagHint": "{count, plural, =0 {Ningún gasto lo usa.} =1 {# gasto conserva sus datos y solo pierde este tag.} other {# gastos conservan sus datos y solo pierden este tag.}}"
   },
   "dates": {
     "today": "Hoy",

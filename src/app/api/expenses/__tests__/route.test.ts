@@ -67,6 +67,26 @@ describe("GET /api/expenses", () => {
     );
   });
 
+  it("filters by any of the given tags and returns the filtered total", async () => {
+    mockAuth();
+    prismaMock.expense.findMany.mockResolvedValue([] as never);
+    prismaMock.expense.count.mockResolvedValue(0 as never);
+
+    const res = await GET(
+      createRequest("/api/expenses?tags=Trip,%23work&tag=home&tag=trip"),
+    );
+    const body = await res.json();
+
+    expect(prismaMock.expense.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          tags: { some: { tag: { name: { in: ["trip", "work", "home"] } } } },
+        }),
+      }),
+    );
+    expect(body).toMatchObject({ totalAmount: 0, pendingConversionCount: 0 });
+  });
+
   it("handles pagination params", async () => {
     mockAuth();
     prismaMock.expense.findMany.mockResolvedValue([] as never);

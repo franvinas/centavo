@@ -97,15 +97,29 @@ describe("getExpenses", () => {
 
 describe("getExpenseById", () => {
   it("returns expense for matching id and userId", async () => {
-    const expense = createPrismaExpense();
+    const expense = createPrismaExpense({
+      tags: [
+        {
+          expenseId: "exp-1",
+          tagId: "tag-1",
+          tag: { id: "tag-1", name: "trip" },
+        },
+      ],
+    });
     prismaMock.expense.findFirst.mockResolvedValue(expense as never);
 
     const result = await getExpenseById("exp-1", "user-1");
 
-    expect(result).toEqual(expense);
+    expect(result).toEqual({
+      ...expense,
+      tags: [{ id: "tag-1", name: "trip" }],
+    });
     expect(prismaMock.expense.findFirst).toHaveBeenCalledWith({
       where: { id: "exp-1", userId: "user-1" },
-      include: { category: true },
+      include: {
+        category: true,
+        tags: expect.objectContaining({ orderBy: { tag: { name: "asc" } } }),
+      },
     });
   });
 

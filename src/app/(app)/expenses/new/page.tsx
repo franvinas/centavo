@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/data/user";
 import { getCategories } from "@/lib/data/categories";
+import { getTagNames } from "@/lib/data/tags";
 import { ExpenseForm } from "@/components/expenses/expense-form";
 import type { Category } from "@/types";
 
@@ -8,7 +9,10 @@ export default async function NewExpensePage() {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/signin");
 
-  const categories = await getCategories(user.id);
+  const [categories, tagNames] = await Promise.all([
+    getCategories(user.id),
+    getTagNames(user.id),
+  ]);
   const mapped: Category[] = categories.map((c) => ({
     id: c.id,
     name: c.name,
@@ -17,6 +21,10 @@ export default async function NewExpensePage() {
   }));
 
   return (
-    <ExpenseForm categories={mapped} defaultCurrency={user.baseCurrency} />
+    <ExpenseForm
+      categories={mapped}
+      tagSuggestions={tagNames}
+      defaultCurrency={user.baseCurrency}
+    />
   );
 }

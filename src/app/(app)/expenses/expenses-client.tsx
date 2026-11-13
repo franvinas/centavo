@@ -6,13 +6,20 @@ import { useTranslations } from "next-intl";
 import { ExpenseFilters } from "@/components/expenses/expense-filters";
 import { ExpenseList } from "@/components/expenses/expense-list";
 import { PageHeader } from "@/components/layout/page-header";
+import { ConversionNotice } from "@/components/expenses/conversion-notice";
 import { ChevronLeft, ChevronRight, SearchX } from "lucide-react";
 import type { Expense, Category } from "@/types";
+import { formatCurrency } from "@/lib/format";
+import { parseTagFilter } from "@/lib/validations/tag";
 
 interface ExpensesClientProps {
   expenses: Expense[];
   categories: Category[];
+  tagNames?: string[];
   total: number;
+  totalAmount?: number;
+  pendingConversionCount?: number;
+  baseCurrency?: string;
   page: number;
   totalPages: number;
 }
@@ -20,7 +27,11 @@ interface ExpensesClientProps {
 export function ExpensesClient({
   expenses,
   categories,
+  tagNames = [],
   total,
+  totalAmount,
+  pendingConversionCount = 0,
+  baseCurrency = "USD",
   page,
   totalPages,
 }: ExpensesClientProps) {
@@ -32,6 +43,15 @@ export function ExpensesClient({
   const [search, setSearch] = useState(urlSearch);
   const [previousUrlSearch, setPreviousUrlSearch] = useState(urlSearch);
   const searchTimeout = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const selectedTags = parseTagFilter(searchParams.get("tags")) ?? [];
+  const hasFilters = Boolean(
+    urlSearch ||
+    searchParams.get("categoryId") ||
+    searchParams.get("from") ||
+    searchParams.get("to") ||
+    selectedTags.length,
+  );
 
   if (urlSearch !== previousUrlSearch) {
     setPreviousUrlSearch(urlSearch);
@@ -78,7 +98,29 @@ export function ExpensesClient({
 
   return (
     <div className="animate-page-in space-y-5">
-      <PageHeader title={t("title")} subtitle={t("found", { count: total })} />
+      <PageHeader
+        title={t("title")}
+        subtitle={
+          hasFilters && totalAmount !== undefined && total > 0 ? (
+            <>
+              {t("found", { count: total })}
+              {" · "}
+              <span
+                data-slot="filtered-total"
+                className="text-text-primary font-semibold tabular-nums"
+              >
+                {t("filteredTotal", {
+                  amount: formatCurrency(totalAmount, baseCurrency),
+                })}
+              </span>
+            </>
+          ) : (
+            t("found", { count: total })
+          )
+        }
+      />
+
+      {hasFilters && <ConversionNotice count={pendingConversionCount} />}
 
       <ExpenseFilters
         search={search}
@@ -97,9 +139,21 @@ export function ExpensesClient({
         onClearAll={() => {
           cancelPendingSearch();
           setSearch("");
-          updateParams({ search: "", categoryId: "", from: "", to: "" });
+          updateParams({
+            search: "",
+            categoryId: "",
+            from: "",
+            to: "",
+            tags: "",
+          });
         }}
         categories={categories}
+        tagNames={tagNames}
+        selectedTags={selectedTags}
+        onTagsChange={(tags) => {
+          cancelPendingSearch();
+          updateParams({ search, tags: tags.join(",") });
+        }}
       />
 
       <div

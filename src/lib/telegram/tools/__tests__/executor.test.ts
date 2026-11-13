@@ -49,6 +49,7 @@ describe("executeTool", () => {
       baseCurrency: "USD",
       conversionPending: false,
       legacyConversion: null,
+      tags: [],
       usdAmount: null,
       usdExchangeRate: null,
       conversionRates: null,
@@ -98,6 +99,7 @@ describe("executeTool", () => {
           baseCurrency: "USD",
           conversionPending: false,
           legacyConversion: null,
+          tags: [],
           usdAmount: null,
           usdExchangeRate: null,
           conversionRates: null,
@@ -121,6 +123,8 @@ describe("executeTool", () => {
       total: 1,
       page: 1,
       totalPages: 1,
+      totalAmount: 25,
+      pendingConversionCount: 0,
     });
 
     const result = JSON.parse(
@@ -148,6 +152,7 @@ describe("executeTool", () => {
         baseCurrency: "USD",
         conversionPending: false,
         legacyConversion: null,
+        tags: [],
         usdAmount: null,
         usdExchangeRate: null,
         conversionRates: null,
