@@ -198,9 +198,9 @@ function SignInContent() {
   }
 
   return (
-    <div className="bg-bg-primary flex min-h-screen items-center justify-center px-6">
+    <div className="bg-bg-primary flex min-h-[100dvh] items-center justify-center px-5 py-16">
       {/* Language switcher */}
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-1">
+      <div className="bg-bg-surface border-border-subtle/60 fixed top-[calc(1rem+env(safe-area-inset-top))] right-4 z-50 flex items-center gap-1 rounded-full border py-1 pr-1 pl-2.5">
         <Globe className="text-text-tertiary h-4 w-4" />
         {locales.map((loc) => (
           <button
@@ -214,7 +214,7 @@ function SignInContent() {
               }
             }}
             disabled={isLocaleChanging}
-            className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+            className={`rounded-full px-2.5 py-1 text-xs font-semibold transition-colors ${
               currentLocale === loc
                 ? "bg-accent-primary text-white"
                 : "text-text-secondary hover:bg-bg-muted hover:text-text-primary"
@@ -225,7 +225,7 @@ function SignInContent() {
         ))}
       </div>
 
-      <div className="w-full max-w-sm">
+      <div className="animate-page-in relative w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
           <Image
@@ -235,26 +235,28 @@ function SignInContent() {
             height={56}
             className="rounded-xl"
           />
-          <h1 className="text-text-primary mt-4 text-2xl font-semibold">
+          <h1 className="text-text-primary mt-5 text-[26px] font-semibold tracking-tight">
             {t("welcome")}
           </h1>
           <p className="text-text-secondary mt-1 text-sm">{t("tagline")}</p>
         </div>
 
         {errorMessage && !emailSent && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="bg-status-negative/10 text-status-negative mb-4 rounded-xl px-4 py-3 text-sm">
             {errorMessage}
           </div>
         )}
 
-        <div className="bg-bg-surface shadow-card rounded-lg p-5">
+        <div className="bg-bg-surface shadow-card border-border-subtle/60 rounded-3xl border p-6">
           {emailSent ? (
             <div className="text-center">
-              <Mail className="text-accent-primary mx-auto h-10 w-10" />
+              <div className="bg-accent-soft mx-auto flex h-14 w-14 items-center justify-center rounded-2xl">
+                <Mail className="text-accent-primary h-7 w-7" />
+              </div>
               <h2 className="text-text-primary mt-3 text-lg font-semibold">
                 {t("enterCode")}
               </h2>
-              <p className="text-text-secondary mt-1 text-sm">
+              <p className="text-text-secondary mt-1 text-sm text-balance break-words">
                 {t("codeSent", { email })}
               </p>
 
@@ -274,7 +276,7 @@ function SignInContent() {
               )}
 
               {otpError && (
-                <p role="alert" className="mt-4 text-sm text-red-600">
+                <p role="alert" className="text-status-negative mt-4 text-sm">
                   {otpError}
                 </p>
               )}
@@ -308,7 +310,7 @@ function SignInContent() {
                 onClick={handleGoogle}
                 disabled={loading}
                 variant="outline"
-                className="w-full"
+                className="border-border-subtle bg-bg-surface hover:bg-bg-muted/60 h-12 w-full rounded-xl text-[15px] font-medium shadow-none md:h-11"
               >
                 <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                   <path
@@ -331,7 +333,7 @@ function SignInContent() {
                 {t("continueGoogle")}
               </Button>
 
-              <div className="my-4 flex items-center gap-3">
+              <div className="my-5 flex items-center gap-3">
                 <Separator className="bg-border-subtle flex-1" />
                 <span className="text-text-tertiary text-xs">{t("or")}</span>
                 <Separator className="bg-border-subtle flex-1" />
@@ -349,16 +351,17 @@ function SignInContent() {
                     setEmailError(null);
                   }}
                   required
+                  className="border-border-subtle h-12 rounded-xl px-3.5 md:h-11"
                 />
                 {emailError && (
-                  <p role="alert" className="text-sm text-red-600">
+                  <p role="alert" className="text-status-negative text-sm">
                     {emailError}
                   </p>
                 )}
                 <Button
                   type="submit"
                   disabled={loading || !email}
-                  className="bg-accent-primary hover:bg-accent-primary/90 w-full text-white"
+                  className="bg-accent-primary hover:bg-accent-hover h-12 w-full rounded-xl text-[15px] font-semibold text-white md:h-11"
                 >
                   {t("continueEmail")}
                 </Button>

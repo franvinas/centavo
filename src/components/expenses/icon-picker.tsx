@@ -13,7 +13,7 @@ interface IconPickerProps {
 export function IconPicker({ value, onChange, color }: IconPickerProps) {
   const t = useTranslations("categories");
   return (
-    <div className="grid grid-cols-5 gap-2">
+    <div className="grid grid-cols-6 gap-2">
       {availableIcons.map((iconName) => {
         const Icon = categoryIconMap[iconName];
         const selected = value === iconName;
@@ -22,10 +22,14 @@ export function IconPicker({ value, onChange, color }: IconPickerProps) {
             key={iconName}
             type="button"
             onClick={() => onChange(iconName)}
-            className={`flex h-10 w-10 items-center justify-center rounded-md border-2 transition-colors ${
-              selected ? "border-current" : "border-border-subtle"
+            aria-pressed={selected}
+            className={`flex aspect-square w-full max-w-11 items-center justify-center justify-self-center rounded-xl transition-colors ${
+              selected ? "ring-2 ring-current ring-inset" : "hover:bg-bg-muted"
             }`}
-            style={{ color: selected ? color : undefined }}
+            style={{
+              color: selected ? color : undefined,
+              backgroundColor: selected ? `${color}1F` : undefined,
+            }}
             aria-label={t("selectIcon", { icon: t(`icons.${iconName}`) })}
           >
             {Icon && (

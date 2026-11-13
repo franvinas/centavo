@@ -2,12 +2,12 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, MessageCircle } from "lucide-react";
+import { LogOut, Send, Check, Coins, Languages } from "lucide-react";
+import { PageHeader } from "@/components/layout/page-header";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import { signOut } from "next-auth/react";
 import { clearLegacyCaches } from "@/lib/cache-privacy";
 import { updateUser } from "@/lib/actions/user";
@@ -105,93 +105,104 @@ export function SettingsClient({ user }: SettingsClientProps) {
 
   const hasChanges = name !== user.name || baseCurrency !== user.baseCurrency;
 
+  const card =
+    "bg-bg-surface shadow-card border-border-subtle/60 rounded-2xl border p-5 md:p-6";
+  const segment = (active: boolean) =>
+    `h-9 flex-1 rounded-[10px] px-4 text-sm font-semibold transition-all sm:flex-none ${
+      active
+        ? "bg-bg-surface text-text-primary shadow-subtle"
+        : "text-text-tertiary hover:text-text-secondary"
+    }`;
+
   return (
-    <div className="mx-auto max-w-lg space-y-6">
-      <div>
-        <h1 className="text-text-primary text-2xl font-semibold">
-          {t("title")}
-        </h1>
-        <p className="text-text-secondary mt-1 text-sm">{t("subtitle")}</p>
-      </div>
+    <div className="animate-page-in max-w-2xl space-y-5">
+      <PageHeader title={t("title")} subtitle={t("subtitle")} />
 
       {/* Profile */}
-      <div className="bg-bg-surface shadow-card rounded-lg p-6">
+      <section className={card}>
         <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16">
-            <AvatarFallback className="bg-accent-light text-accent-primary text-lg font-semibold">
+          <Avatar className="h-14 w-14 shrink-0 md:h-16 md:w-16">
+            <AvatarFallback className="bg-accent-light text-accent-primary text-xl font-semibold">
               {(name || "U").charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
+            <label
+              htmlFor="settings-name"
+              className="text-text-tertiary mb-1 block text-xs font-medium"
+            >
+              {t("name")}
+            </label>
             <Input
+              id="settings-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="text-base font-medium"
+              className="border-border-subtle h-11 rounded-xl px-3.5 text-base font-medium md:h-10"
               aria-label={t("name")}
               autoComplete="name"
             />
-            <p className="text-text-tertiary mt-1 text-sm">{user.email}</p>
+            <p className="text-text-tertiary mt-1.5 truncate text-sm">
+              {user.email}
+            </p>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Currency */}
-      <div className="bg-bg-surface shadow-card rounded-lg p-6">
-        <h2 className="text-text-primary mb-3 text-base font-semibold">
-          {t("baseCurrency")}
-        </h2>
+      <section className={card}>
+        <SectionTitle icon={Coins}>{t("baseCurrency")}</SectionTitle>
         <p className="text-text-secondary mb-4 text-sm">{t("currencyHint")}</p>
-        <div className="flex flex-wrap gap-2">
+        <div
+          role="radiogroup"
+          aria-label={t("baseCurrency")}
+          className="bg-bg-muted flex rounded-xl p-1 sm:inline-flex"
+        >
           {CURRENCIES.map((cur) => (
             <button
               key={cur}
+              role="radio"
+              aria-checked={baseCurrency === cur}
               onClick={() => setBaseCurrency(cur)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                baseCurrency === cur
-                  ? "bg-accent-primary text-white"
-                  : "bg-bg-muted text-text-secondary hover:bg-border-subtle"
-              }`}
+              className={segment(baseCurrency === cur)}
             >
               {cur}
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* Language */}
-      <div className="bg-bg-surface shadow-card rounded-lg p-6">
-        <h2 className="text-text-primary mb-3 text-base font-semibold">
-          {t("language")}
-        </h2>
+      <section className={card}>
+        <SectionTitle icon={Languages}>{t("language")}</SectionTitle>
         <p className="text-text-secondary mb-4 text-sm">{t("languageHint")}</p>
-        <div className="flex flex-wrap gap-2">
+        <div
+          role="radiogroup"
+          aria-label={t("language")}
+          className="bg-bg-muted flex rounded-xl p-1 sm:inline-flex"
+        >
           {locales.map((loc) => (
             <button
               key={loc}
+              role="radio"
+              aria-checked={user.locale === loc}
               onClick={() => handleLocaleChange(loc)}
               disabled={isPending}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                user.locale === loc
-                  ? "bg-accent-primary text-white"
-                  : "bg-bg-muted text-text-secondary hover:bg-border-subtle"
-              }`}
+              className={segment(user.locale === loc)}
             >
               {LOCALE_LABELS[loc]}
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* Telegram */}
-      <div className="bg-bg-surface shadow-card rounded-lg p-6">
-        <h2 className="text-text-primary mb-3 text-base font-semibold">
-          <MessageCircle className="mr-2 inline-block h-4 w-4" />
-          {t("telegram")}
-        </h2>
+      <section className={card}>
+        <SectionTitle icon={Send}>{t("telegram")}</SectionTitle>
         <p className="text-text-secondary mb-4 text-sm">{t("telegramHint")}</p>
         {user.telegramChatId ? (
-          <div className="flex items-center justify-between">
-            <span className="bg-accent-light text-accent-primary rounded-full px-3 py-1 text-sm font-medium">
+          <div className="flex items-center justify-between gap-3">
+            <span className="bg-accent-soft text-accent-primary inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium">
+              <Check className="h-4 w-4" />
               {t("telegramLinked")}
             </span>
             <Button
@@ -199,17 +210,19 @@ export function SettingsClient({ user }: SettingsClientProps) {
               size="sm"
               onClick={handleTelegramUnlink}
               disabled={isPending}
+              className="border-border-subtle h-9 rounded-xl"
             >
               {t("unlinkButton")}
             </Button>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Button
               onClick={handleTelegramLink}
               disabled={isPending}
-              className="bg-accent-primary hover:bg-accent-primary/90 text-white"
+              className="bg-accent-primary hover:bg-accent-hover h-11 w-full rounded-xl font-semibold text-white sm:w-auto md:h-10"
             >
+              <Send className="h-4 w-4" />
               {t("linkButton")}
             </Button>
             <p className="text-text-tertiary text-xs">
@@ -222,34 +235,51 @@ export function SettingsClient({ user }: SettingsClientProps) {
             )}
           </div>
         )}
-      </div>
-
-      {/* Save */}
-      {hasChanges && (
-        <Button
-          onClick={handleSave}
-          disabled={isPending}
-          className="bg-accent-primary hover:bg-accent-primary/90 w-full text-white"
-        >
-          {isPending ? t("saving") : saved ? t("saved") : t("save")}
-        </Button>
-      )}
-
-      <Separator className="bg-border-subtle" />
+      </section>
 
       {/* Sign out */}
-      <Button
-        variant="outline"
-        className="border-status-negative text-status-negative hover:bg-status-negative/10 w-full"
-        onClick={async () => {
-          if ("caches" in window)
-            await clearLegacyCaches(window.caches).catch(() => {});
-          await signOut({ callbackUrl: "/auth/signin" });
-        }}
-      >
-        <LogOut className="mr-2 h-4 w-4" />
-        {t("signOut")}
-      </Button>
+      <div className="pt-2">
+        <Button
+          variant="ghost"
+          className="text-status-negative hover:bg-status-negative/10 hover:text-status-negative h-12 w-full rounded-xl text-[15px] font-semibold md:h-11"
+          onClick={async () => {
+            if ("caches" in window)
+              await clearLegacyCaches(window.caches).catch(() => {});
+            await signOut({ callbackUrl: "/auth/signin" });
+          }}
+        >
+          <LogOut className="h-4 w-4" />
+          {t("signOut")}
+        </Button>
+      </div>
+
+      {/* Save — floats above the bottom nav while there are unsaved changes */}
+      {hasChanges && (
+        <div className="animate-page-in sticky bottom-[calc(88px+env(safe-area-inset-bottom))] z-30 md:bottom-6">
+          <Button
+            onClick={handleSave}
+            disabled={isPending}
+            className="bg-accent-primary hover:bg-accent-hover shadow-fab h-12 w-full rounded-xl text-[15px] font-semibold text-white"
+          >
+            {isPending ? t("saving") : saved ? t("saved") : t("save")}
+          </Button>
+        </div>
+      )}
     </div>
+  );
+}
+
+function SectionTitle({
+  icon: Icon,
+  children,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  children: React.ReactNode;
+}) {
+  return (
+    <h2 className="text-text-primary mb-1.5 flex items-center gap-2 text-[15px] font-semibold">
+      <Icon className="text-text-tertiary h-4 w-4" />
+      {children}
+    </h2>
   );
 }

@@ -53,7 +53,9 @@
     "emptySubtitle": "Comienza a registrar tus gastos hoy",
     "emptyTitle": "Agrega tu primer gasto",
     "emptyDescription": "Toca el botón de abajo para empezar a registrar a dónde va tu dinero",
-    "addExpense": "Agregar gasto"
+    "addExpense": "Agregar gasto",
+    "expenseCount": "Gastos",
+    "lastMonth": "Mes pasado"
   },
   "expenses": {
     "title": "Todos los gastos",
@@ -86,7 +88,8 @@
     "conversionPending": "Conversión pendiente",
     "close": "Cerrar",
     "saveError": "No se pudo guardar el gasto. Revisá los datos e intentá de nuevo.",
-    "deleteError": "No se pudo eliminar el gasto. Intentá de nuevo."
+    "deleteError": "No se pudo eliminar el gasto. Intentá de nuevo.",
+    "currency": "Moneda"
   },
   "categories": {
     "title": "Categorías",
@@ -206,6 +209,9 @@
     "tryAgain": "Intentar de nuevo",
     "close": "Cerrar",
     "pickDates": "Elegir fechas",
-    "pickDate": "Elegir una fecha"
+    "pickDate": "Elegir una fecha",
+    "notFoundTitle": "No encontramos esta página",
+    "notFoundDescription": "Puede que el enlace esté mal o que el contenido ya no exista.",
+    "backHome": "Volver al panel"
   }
 }

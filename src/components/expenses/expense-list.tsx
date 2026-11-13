@@ -36,11 +36,11 @@ export function ExpenseList({ expenses }: ExpenseListProps) {
   return (
     <div className="space-y-4">
       {Array.from(grouped.entries()).map(([dateKey, group]) => (
-        <div key={dateKey}>
-          <p className="text-text-tertiary mb-1 text-xs font-medium">
+        <section key={dateKey}>
+          <h3 className="text-text-tertiary mb-1 px-0 text-xs font-medium tracking-wide first-letter:uppercase md:px-0">
             {formatDateGroup(group[0].date, labels)}
-          </p>
-          <div className="divide-border-subtle divide-y">
+          </h3>
+          <div className="-mx-2 md:mx-0">
             {group.map((expense) => (
               <div key={expense.id}>
                 {/* Swipeable on mobile */}
@@ -52,7 +52,7 @@ export function ExpenseList({ expenses }: ExpenseListProps) {
               </div>
             ))}
           </div>
-        </div>
+        </section>
       ))}
     </div>
   );

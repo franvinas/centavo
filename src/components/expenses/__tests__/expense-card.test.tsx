@@ -56,7 +56,7 @@ describe("ExpenseCard", () => {
     expect(link).toHaveAttribute("href", "/expenses/exp-123");
   });
 
-  it("shows category dot with correct color", () => {
+  it("shows category icon with correct color", () => {
     const expense = createMockExpense({
       category: {
         id: "cat-1",
@@ -67,7 +67,7 @@ describe("ExpenseCard", () => {
     });
     const { container } = render(<ExpenseCard expense={expense} />);
 
-    const dot = container.querySelector(".rounded-full");
-    expect(dot).toHaveStyle({ backgroundColor: "#E8855B" });
+    const icon = container.querySelector('[data-slot="category-chip"] svg');
+    expect(icon).toHaveStyle({ color: "#E8855B" });
   });
 });

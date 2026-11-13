@@ -15,7 +15,7 @@ describe("SummaryCards", () => {
       />,
     );
 
-    const cards = container.querySelectorAll(".rounded-lg");
+    const cards = container.querySelectorAll(".rounded-2xl");
     expect(cards).toHaveLength(3);
 
     expect(container.textContent).toContain("$1,234.56");

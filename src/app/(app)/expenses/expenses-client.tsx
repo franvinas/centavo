@@ -5,6 +5,8 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { ExpenseFilters } from "@/components/expenses/expense-filters";
 import { ExpenseList } from "@/components/expenses/expense-list";
+import { PageHeader } from "@/components/layout/page-header";
+import { ChevronLeft, ChevronRight, SearchX } from "lucide-react";
 import type { Expense, Category } from "@/types";
 
 interface ExpensesClientProps {
@@ -24,7 +26,7 @@ export function ExpensesClient({
 }: ExpensesClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
   const t = useTranslations("expenses");
   const urlSearch = searchParams.get("search") ?? "";
   const [search, setSearch] = useState(urlSearch);
@@ -75,15 +77,8 @@ export function ExpensesClient({
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-text-primary text-2xl font-semibold">
-          {t("title")}
-        </h1>
-        <p className="text-text-secondary mt-1 text-sm">
-          {t("found", { count: total })}
-        </p>
-      </div>
+    <div className="animate-page-in space-y-5">
+      <PageHeader title={t("title")} subtitle={t("found", { count: total })} />
 
       <ExpenseFilters
         search={search}
@@ -107,18 +102,26 @@ export function ExpensesClient({
         categories={categories}
       />
 
-      <div className="bg-bg-surface shadow-card rounded-lg p-5">
+      <div
+        aria-busy={isPending}
+        className={`bg-bg-surface shadow-card border-border-subtle/60 rounded-2xl border p-4 transition-opacity md:p-6 ${
+          isPending ? "opacity-60" : ""
+        }`}
+      >
         {expenses.length === 0 ? (
-          <p className="text-text-tertiary py-8 text-center text-sm">
-            {t("noExpenses")}
-          </p>
+          <div className="flex flex-col items-center gap-3 py-12 text-center">
+            <div className="bg-bg-muted flex h-12 w-12 items-center justify-center rounded-full">
+              <SearchX className="text-text-tertiary h-5 w-5" />
+            </div>
+            <p className="text-text-secondary text-sm">{t("noExpenses")}</p>
+          </div>
         ) : (
           <ExpenseList expenses={expenses} />
         )}
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4">
+        <nav className="flex items-center justify-between gap-3 md:justify-center md:gap-4">
           <button
             onClick={() => {
               const params = new URLSearchParams(searchParams.toString());
@@ -128,11 +131,12 @@ export function ExpensesClient({
               });
             }}
             disabled={page <= 1}
-            className="text-accent-primary disabled:text-text-tertiary text-sm font-medium"
+            className="border-border-subtle bg-bg-surface text-text-primary hover:bg-bg-muted inline-flex h-10 items-center gap-1 rounded-xl border pr-4 pl-3 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-40"
           >
+            <ChevronLeft className="h-4 w-4" />
             {t("previous")}
           </button>
-          <span className="text-text-secondary text-sm">
+          <span className="text-text-secondary text-sm tabular-nums">
             {t("page", { page, totalPages })}
           </span>
           <button
@@ -144,11 +148,12 @@ export function ExpensesClient({
               });
             }}
             disabled={page >= totalPages}
-            className="text-accent-primary disabled:text-text-tertiary text-sm font-medium"
+            className="border-border-subtle bg-bg-surface text-text-primary hover:bg-bg-muted inline-flex h-10 items-center gap-1 rounded-xl border pr-3 pl-4 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-40"
           >
             {t("next")}
+            <ChevronRight className="h-4 w-4" />
           </button>
-        </div>
+        </nav>
       )}
     </div>
   );

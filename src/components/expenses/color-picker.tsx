@@ -33,8 +33,13 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
           key={color}
           type="button"
           onClick={() => onChange(color)}
-          className="flex h-9 w-9 items-center justify-center rounded-full transition-transform hover:scale-110"
-          style={{ backgroundColor: color }}
+          className={`flex h-9 w-9 items-center justify-center justify-self-center rounded-full transition-all hover:scale-110 ${value === color ? "ring-offset-bg-surface ring-2 ring-offset-2" : ""}`}
+          style={
+            {
+              backgroundColor: color,
+              "--tw-ring-color": color,
+            } as React.CSSProperties
+          }
           aria-label={t("selectColor", { color })}
         >
           {value === color && <Check className="h-4 w-4 text-white" />}

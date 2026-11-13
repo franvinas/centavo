@@ -17,6 +17,7 @@ import { DeleteConfirmDrawer } from "@/components/ui/delete-confirm-drawer";
 import { ColorPicker } from "@/components/expenses/color-picker";
 import { IconPicker } from "@/components/expenses/icon-picker";
 import { categoryIconMap } from "@/lib/category-icon-map";
+import { PageHeader } from "@/components/layout/page-header";
 import {
   createCategory,
   updateCategory,
@@ -103,93 +104,113 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-text-primary text-2xl font-semibold">
-            {t("title")}
-          </h1>
-          <p className="text-text-secondary mt-1 text-sm">{t("subtitle")}</p>
-        </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button
-              onClick={openCreate}
-              className="bg-accent-primary hover:bg-accent-primary/90 text-white"
-            >
-              <Plus className="mr-1.5 h-4 w-4" />
-              {t("add")}
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {editing ? t("editCategory") : t("newCategory")}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 pt-2">
-              {error && (
-                <p role="alert" className="text-status-negative text-sm">
-                  {error}
-                </p>
-              )}
+    <div className="animate-page-in space-y-5 md:space-y-6">
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <PageHeader
+          title={t("title")}
+          subtitle={t("subtitle")}
+          actions={
+            <DialogTrigger asChild>
+              <Button
+                onClick={openCreate}
+                className="bg-accent-primary hover:bg-accent-hover h-10 rounded-xl px-4 font-semibold text-white md:h-10"
+              >
+                <Plus className="h-4 w-4" strokeWidth={2.5} />
+                {t("add")}
+              </Button>
+            </DialogTrigger>
+          }
+        />
+        <DialogContent className="gap-5 rounded-3xl p-6 sm:max-w-md">
+          <DialogHeader className="text-left">
+            <DialogTitle className="text-lg">
+              {editing ? t("editCategory") : t("newCategory")}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-5">
+            {error && (
+              <p
+                role="alert"
+                className="bg-status-negative/10 text-status-negative rounded-xl px-4 py-3 text-sm"
+              >
+                {error}
+              </p>
+            )}
+            {/* Name field with live icon/color preview */}
+            <div className="border-border-subtle focus-within:border-ring focus-within:ring-ring/50 flex items-center gap-3 rounded-2xl border p-2 pr-3 transition-shadow focus-within:ring-[3px]">
+              <div
+                aria-hidden="true"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors"
+                style={{ backgroundColor: color + "1F" }}
+              >
+                {(() => {
+                  const PreviewIcon = categoryIconMap[icon];
+                  return PreviewIcon ? (
+                    <PreviewIcon className="h-5 w-5" style={{ color }} />
+                  ) : null;
+                })()}
+              </div>
               <Input
                 placeholder={t("namePlaceholder")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="h-10 border-0 bg-transparent px-0 text-[15px] font-medium shadow-none focus-visible:ring-0 md:h-10 md:text-[15px]"
               />
-              <div>
-                <p className="text-text-secondary mb-2 text-sm font-medium">
-                  {t("color")}
-                </p>
-                <ColorPicker value={color} onChange={setColor} />
-              </div>
-              <div>
-                <p className="text-text-secondary mb-2 text-sm font-medium">
-                  {t("icon")}
-                </p>
-                <IconPicker value={icon} onChange={setIcon} color={color} />
-              </div>
-              <Button
-                onClick={handleSave}
-                disabled={!name.trim() || isPending}
-                className="bg-accent-primary hover:bg-accent-primary/90 w-full text-white"
-              >
-                {isPending ? t("saving") : editing ? t("update") : t("create")}
-              </Button>
             </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+            <div>
+              <p className="text-text-tertiary mb-2.5 text-xs font-semibold tracking-wide uppercase">
+                {t("color")}
+              </p>
+              <ColorPicker value={color} onChange={setColor} />
+            </div>
+            <div>
+              <p className="text-text-tertiary mb-2.5 text-xs font-semibold tracking-wide uppercase">
+                {t("icon")}
+              </p>
+              <IconPicker value={icon} onChange={setIcon} color={color} />
+            </div>
+            <Button
+              onClick={handleSave}
+              disabled={!name.trim() || isPending}
+              className="bg-accent-primary hover:bg-accent-hover h-12 w-full rounded-xl text-[15px] font-semibold text-white md:h-11"
+            >
+              {isPending ? t("saving") : editing ? t("update") : t("create")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {error && !dialogOpen && (
-        <p role="alert" className="text-status-negative text-sm">
+        <p
+          role="alert"
+          className="bg-status-negative/10 text-status-negative rounded-xl px-4 py-3 text-sm"
+        >
           {error}
         </p>
       )}
 
-      <div className="space-y-2">
+      <div className="grid gap-2.5 sm:grid-cols-2 md:gap-3 xl:grid-cols-3">
         {initialCategories.map((cat) => {
           const Icon = categoryIconMap[cat.icon];
           return (
             <div
               key={cat.id}
-              className="bg-bg-surface shadow-subtle flex items-center gap-3 rounded-lg p-4"
+              className="group bg-bg-surface shadow-card border-border-subtle/60 flex items-center gap-3 rounded-2xl border py-3 pr-2 pl-3.5 transition-shadow hover:shadow-[0_1px_2px_#1a19180a,0_8px_24px_#1a19180f]"
             >
               <div
-                className="flex h-10 w-10 items-center justify-center rounded-lg"
-                style={{ backgroundColor: cat.color + "1A" }}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                style={{ backgroundColor: cat.color + "1F" }}
               >
                 {Icon && (
                   <Icon className="h-5 w-5" style={{ color: cat.color }} />
                 )}
               </div>
-              <span className="text-text-primary flex-1 text-sm font-medium">
+              <span className="text-text-primary min-w-0 flex-1 truncate text-[15px] font-medium">
                 {cat.name}
               </span>
               <button
                 onClick={() => openEdit(cat)}
-                className="text-text-tertiary hover:text-text-secondary p-1.5"
+                className="text-text-tertiary hover:text-text-primary hover:bg-bg-muted flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
                 aria-label={t("editNamed", { name: cat.name })}
               >
                 <Pencil className="h-4 w-4" />
@@ -197,7 +218,7 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
               <button
                 onClick={() => openDeleteDrawer(cat.id)}
                 disabled={isPending}
-                className="text-text-tertiary hover:text-status-negative p-1.5"
+                className="text-text-tertiary hover:text-status-negative hover:bg-status-negative/10 flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
                 aria-label={t("deleteNamed", { name: cat.name })}
               >
                 <Trash2 className="h-4 w-4" />

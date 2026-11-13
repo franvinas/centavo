@@ -77,7 +77,7 @@ export function OTPInput({
   }
 
   return (
-    <div className="flex justify-center gap-2">
+    <div className="flex justify-center gap-2 sm:gap-2.5">
       {digits.map((digit, i) => (
         <input
           key={i}
@@ -94,7 +94,7 @@ export function OTPInput({
           onKeyDown={(e) => handleKeyDown(i, e)}
           onPaste={handlePaste}
           onFocus={(e) => e.target.select()}
-          className="border-border-subtle bg-bg-primary text-text-primary focus:border-accent-primary focus:ring-accent-primary/20 h-12 w-10 rounded-lg border text-center text-lg font-semibold transition outline-none focus:ring-2 disabled:opacity-50"
+          className="border-border-subtle bg-bg-primary text-text-primary focus:border-accent-primary focus:ring-accent-primary/20 h-14 w-11 rounded-xl border text-center text-xl font-semibold tabular-nums transition outline-none focus:ring-2 disabled:opacity-50"
           aria-label={`Digit ${i + 1}`}
         />
       ))}
