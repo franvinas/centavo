@@ -57,7 +57,8 @@ const addCommand: CommandSpec = {
     },
     {
       name: "icon",
-      description: "Optional icon name.",
+      description:
+        "Optional icon name (e.g. UtensilsCrossed) or a single emoji.",
       type: "string",
       placeholder: "icon",
     },

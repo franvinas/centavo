@@ -15,7 +15,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { categoryIconMap } from "@/lib/category-icon-map";
+import {
+  CategoryIcon,
+  categoryTileStyle,
+} from "@/components/categories/category-icon";
 import type { Category } from "@/types";
 
 interface CategoryPickerProps {
@@ -68,7 +71,6 @@ function CategoryList({
   return (
     <>
       {categories.map((cat) => {
-        const Icon = categoryIconMap[cat.icon];
         const isSelected = cat.id === selectedId;
         return (
           <button
@@ -83,14 +85,13 @@ function CategoryList({
           >
             <span
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]"
-              style={{ backgroundColor: `${cat.color}1F` }}
+              style={categoryTileStyle(cat.icon, cat.color)}
             >
-              {Icon && (
-                <Icon
-                  className="h-[18px] w-[18px]"
-                  style={{ color: cat.color }}
-                />
-              )}
+              <CategoryIcon
+                icon={cat.icon}
+                color={cat.color}
+                className="h-[18px] w-[18px]"
+              />
             </span>
             <span className="text-text-primary flex-1 text-left text-sm font-medium">
               {cat.name}

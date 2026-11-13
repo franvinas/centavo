@@ -1,12 +1,17 @@
 import { z } from "zod/v4";
 
+import { isValidCategoryIcon } from "@/lib/category-icon";
+
 export const createCategorySchema = z.object({
   name: z
     .string()
     .min(1, "Category name is required")
     .max(50, "Category name must be under 50 characters"),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid hex color"),
-  icon: z.string().optional(),
+  icon: z
+    .string()
+    .refine(isValidCategoryIcon, "Icon must be a built-in icon or one emoji")
+    .optional(),
 });
 
 export const updateCategorySchema = createCategorySchema.partial();

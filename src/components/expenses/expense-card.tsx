@@ -4,6 +4,8 @@ import { useTranslations } from "next-intl";
 import type { Expense } from "@/types";
 import { formatCurrency } from "@/lib/format";
 import { categoryIconMap } from "@/lib/category-icon-map";
+import { isEmojiIcon } from "@/lib/category-icon";
+import { categoryTileStyle } from "@/components/categories/category-icon";
 import Link from "next/link";
 
 interface ExpenseCardProps {
@@ -20,14 +22,23 @@ export function CategoryIconChip({
   size?: "sm" | "md";
 }) {
   const Icon = icon ? categoryIconMap[icon] : undefined;
+  const emoji = isEmojiIcon(icon);
   const box = size === "sm" ? "h-8 w-8 rounded-[9px]" : "h-10 w-10 rounded-xl";
   return (
     <div
       data-slot="category-chip"
       className={`flex shrink-0 items-center justify-center ${box}`}
-      style={{ backgroundColor: `${color}1F` }}
+      style={categoryTileStyle(icon, color)}
     >
-      {Icon ? (
+      {emoji ? (
+        <span
+          aria-hidden="true"
+          data-emoji-icon
+          className={`leading-none ${size === "sm" ? "text-base" : "text-lg"}`}
+        >
+          {icon}
+        </span>
+      ) : Icon ? (
         <Icon
           className={size === "sm" ? "h-4 w-4" : "h-[18px] w-[18px]"}
           style={{ color }}
