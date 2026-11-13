@@ -34,19 +34,23 @@ function TriggerContent({
   return (
     <>
       <Tag className="text-text-tertiary h-5 w-5 shrink-0" />
-      <span className="border-border-subtle flex flex-1 items-center justify-between border-b py-2">
+      <span className="flex min-h-12 min-w-0 flex-1 items-center justify-between gap-2">
         {selected ? (
-          <span className="flex items-center gap-2">
+          <span className="flex min-w-0 items-center gap-2">
             <span
-              className="inline-block h-2.5 w-2.5 rounded-full"
+              className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
               style={{ backgroundColor: selected.color }}
             />
-            <span className="text-text-primary text-sm">{selected.name}</span>
+            <span className="text-text-primary truncate text-[15px]">
+              {selected.name}
+            </span>
           </span>
         ) : (
-          <span className="text-text-tertiary text-sm">{placeholder}</span>
+          <span className="text-muted-foreground text-[15px]">
+            {placeholder}
+          </span>
         )}
-        <ChevronRight className="text-text-tertiary h-4 w-4" />
+        <ChevronRight className="text-text-tertiary h-4 w-4 shrink-0" />
       </span>
     </>
   );
@@ -71,11 +75,23 @@ function CategoryList({
             key={cat.id}
             type="button"
             onClick={() => onSelect(cat.id)}
-            className="hover:bg-bg-muted flex w-full items-center gap-3 rounded-lg px-2 py-3"
+            className={`flex w-full items-center gap-3 rounded-xl px-2 py-2 transition-colors ${
+              isSelected
+                ? "bg-accent-soft"
+                : "hover:bg-bg-muted active:bg-bg-muted"
+            }`}
           >
-            {Icon && (
-              <Icon className="h-5 w-5 shrink-0" style={{ color: cat.color }} />
-            )}
+            <span
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]"
+              style={{ backgroundColor: `${cat.color}1F` }}
+            >
+              {Icon && (
+                <Icon
+                  className="h-[18px] w-[18px]"
+                  style={{ color: cat.color }}
+                />
+              )}
+            </span>
             <span className="text-text-primary flex-1 text-left text-sm font-medium">
               {cat.name}
             </span>
@@ -115,14 +131,14 @@ export function CategoryPicker({
   };
 
   const searchInput = (
-    <div className="bg-bg-muted flex items-center gap-2 rounded-lg px-3 py-2">
+    <div className="bg-bg-muted focus-within:ring-ring/40 flex h-11 items-center gap-2 rounded-xl px-3 focus-within:ring-2 md:h-10">
       <Search className="text-text-tertiary h-4 w-4 shrink-0" />
       <input
         type="text"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder={t("searchCategories")}
-        className="text-text-primary placeholder:text-text-tertiary w-full bg-transparent text-sm outline-none"
+        className="text-text-primary placeholder:text-text-tertiary w-full bg-transparent text-base outline-none md:text-sm"
       />
     </div>
   );
@@ -130,10 +146,13 @@ export function CategoryPicker({
   return (
     <>
       {/* Mobile: Drawer */}
-      <div className="md:hidden">
+      <div className="min-w-0 flex-1 md:hidden">
         <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
           <DrawerTrigger asChild>
-            <button type="button" className="flex w-full items-center gap-3">
+            <button
+              type="button"
+              className="flex w-full min-w-0 items-center gap-3 text-left outline-none"
+            >
               <TriggerContent
                 selected={selected}
                 placeholder={t("selectCategory")}
@@ -143,12 +162,12 @@ export function CategoryPicker({
 
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>{t("category")}</DrawerTitle>
+              <DrawerTitle className="text-lg">{t("category")}</DrawerTitle>
             </DrawerHeader>
 
             <div className="px-4 pb-2">{searchInput}</div>
 
-            <div className="max-h-[60vh] overflow-y-auto px-4 pb-6">
+            <div className="max-h-[60vh] overflow-y-auto px-4 pt-1 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
               <CategoryList
                 categories={filtered}
                 selectedId={selectedId}
@@ -160,10 +179,13 @@ export function CategoryPicker({
       </div>
 
       {/* Desktop: Popover */}
-      <div className="hidden md:block">
+      <div className="hidden min-w-0 flex-1 md:block">
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
-            <button type="button" className="flex w-full items-center gap-3">
+            <button
+              type="button"
+              className="flex w-full min-w-0 items-center gap-3 text-left outline-none"
+            >
               <TriggerContent
                 selected={selected}
                 placeholder={t("selectCategory")}
@@ -171,7 +193,11 @@ export function CategoryPicker({
             </button>
           </PopoverTrigger>
 
-          <PopoverContent align="start" className="w-72 p-0">
+          <PopoverContent
+            align="start"
+            sideOffset={8}
+            className="w-80 rounded-2xl p-0"
+          >
             <div className="p-3">{searchInput}</div>
 
             <div className="max-h-64 overflow-y-auto px-2 pb-2">

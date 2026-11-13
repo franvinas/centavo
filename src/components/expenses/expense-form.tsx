@@ -2,14 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import {
-  X,
-  Calendar,
-  FileText,
-  StickyNote,
-  ChevronDown,
-  Trash2,
-} from "lucide-react";
+import { X, Calendar, FileText, StickyNote, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,7 +48,6 @@ export function ExpenseForm({
   const [currency, setCurrency] = useState(
     expense?.currency ?? defaultCurrency,
   );
-  const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
   const [description, setDescription] = useState(expense?.description ?? "");
   const [date, setDate] = useState(() => {
     // For existing expenses the date comes from the DB as UTC midnight,
@@ -180,151 +172,168 @@ export function ExpenseForm({
     });
   }
 
+  const fieldRow =
+    "focus-within:bg-bg-muted/50 flex min-h-[56px] items-center gap-3 px-4 transition-colors";
+  const fieldInput =
+    "h-12 border-0 bg-transparent px-0 text-[15px] shadow-none focus-visible:ring-0 md:h-12 md:text-[15px]";
+
   return (
-    <div className="bg-bg-primary flex h-[100dvh] flex-col">
-      <div
-        ref={containerRef}
-        className="bg-bg-surface shadow-card mx-auto w-full max-w-md rounded-lg p-5"
-      >
+    <div className="bg-bg-surface fixed inset-0 z-40 flex flex-col md:static md:z-auto md:block md:bg-transparent">
+      <div className="md:border-border-subtle/60 md:bg-bg-surface md:shadow-elevated animate-page-in flex min-h-0 flex-1 flex-col md:mx-auto md:mt-2 md:max-w-[520px] md:rounded-3xl md:border">
         {/* Header */}
-        <div className="mb-2 flex items-center justify-between">
-          <button onClick={() => router.back()} aria-label={t("close")}>
-            <X className="text-text-primary h-6 w-6" />
+        <div className="grid shrink-0 grid-cols-[40px_1fr_40px] items-center px-3 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-1 md:px-5 md:pt-5">
+          <button
+            onClick={() => router.back()}
+            aria-label={t("close")}
+            className="text-text-primary hover:bg-bg-muted active:bg-bg-muted flex h-10 w-10 items-center justify-center rounded-full transition-colors"
+          >
+            <X className="h-[22px] w-[22px]" />
           </button>
-          <h1 className="text-text-primary text-base font-semibold">
+          <h1 className="text-text-primary text-center text-base font-semibold">
             {expense ? t("editExpense") : t("addExpense")}
           </h1>
-          <div className="w-6" />
+          <div />
         </div>
-        {/* Amount hero */}
-        <div className="flex flex-col items-center py-4">
-          {/* Hidden span for measuring full display width */}
-          <span
-            ref={measureRef}
-            aria-hidden="true"
-            className="pointer-events-none absolute left-[-9999px] whitespace-pre"
-            style={{ fontSize: "48px" }}
-          >
-            <span className="font-medium">{currencySymbol}</span>
-            <span className="font-bold">{displayAmount || "0.00"}</span>
-          </span>
-          <label htmlFor="expense-amount" className="sr-only">
-            {t("amount")}
-          </label>
-          {/* Centered amount display — tap anywhere to focus the hidden input */}
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 md:px-8">
+          {/* Amount hero */}
           <div
-            className="flex w-full cursor-text justify-center"
-            onClick={() => inputRef.current?.focus()}
+            ref={containerRef}
+            className="flex flex-col items-center pt-8 pb-7 md:pt-6"
           >
+            {/* Hidden span for measuring full display width */}
+            <span
+              ref={measureRef}
+              aria-hidden="true"
+              className="pointer-events-none absolute left-[-9999px] whitespace-pre"
+              style={{ fontSize: "48px" }}
+            >
+              <span className="font-medium">{currencySymbol}</span>
+              <span className="font-bold">{displayAmount || "0.00"}</span>
+            </span>
+            <label htmlFor="expense-amount" className="sr-only">
+              {t("amount")}
+            </label>
+            {/* Centered amount display — tap anywhere to focus the hidden input */}
             <div
-              className="relative flex items-baseline justify-center"
-              style={{
-                width: measuredWidth > 0 ? `${measuredWidth}px` : "auto",
-                transform: `scale(${scale})`,
-                transformOrigin: "center",
-              }}
+              className="flex w-full cursor-text justify-center"
+              onClick={() => inputRef.current?.focus()}
             >
-              <span className="text-text-tertiary text-5xl leading-none font-medium">
-                {currencySymbol}
-              </span>
-              <span className="text-text-primary text-5xl leading-none font-bold">
-                {displayAmount || (
-                  <span className="text-text-tertiary">0.00</span>
-                )}
-              </span>
-              {/* Invisible input overlaid to capture keyboard input */}
-              <input
-                ref={inputRef}
-                id="expense-amount"
-                type="text"
-                inputMode="decimal"
-                value={displayAmount}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/,/g, "");
-                  if (/^\d*\.?\d{0,2}$/.test(val)) setAmount(val);
+              <div
+                className="relative flex items-baseline justify-center tabular-nums"
+                style={{
+                  width: measuredWidth > 0 ? `${measuredWidth}px` : "auto",
+                  transform: `scale(${scale})`,
+                  transformOrigin: "center",
                 }}
-                autoComplete="off"
-                className="absolute inset-0 caret-transparent opacity-0"
-                aria-label={t("amount")}
-              />
+              >
+                <span className="text-text-tertiary text-5xl leading-none font-medium">
+                  {currencySymbol}
+                </span>
+                <span className="text-text-primary text-5xl leading-none font-bold tracking-tight">
+                  {displayAmount || (
+                    <span className="text-border-subtle">0.00</span>
+                  )}
+                </span>
+                {/* Invisible input overlaid to capture keyboard input */}
+                <input
+                  ref={inputRef}
+                  id="expense-amount"
+                  type="text"
+                  inputMode="decimal"
+                  value={displayAmount}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/,/g, "");
+                    if (/^\d*\.?\d{0,2}$/.test(val)) setAmount(val);
+                  }}
+                  autoComplete="off"
+                  className="absolute inset-0 caret-transparent opacity-0"
+                  aria-label={t("amount")}
+                />
+              </div>
             </div>
-          </div>
-          <div className="relative mt-2">
-            <button
-              type="button"
-              onClick={() => setShowCurrencyPicker((v) => !v)}
-              className="bg-bg-muted flex items-center gap-1 rounded-full px-3 py-1"
+
+            {/* Currency segmented control */}
+            <div
+              role="radiogroup"
+              aria-label={t("currency")}
+              className="bg-bg-muted mt-5 inline-flex rounded-full p-1"
             >
-              <span className="text-text-secondary text-sm font-medium">
-                {currency}
-              </span>
-              <ChevronDown className="text-text-tertiary h-3.5 w-3.5" />
-            </button>
-            {showCurrencyPicker && (
-              <div className="bg-bg-surface border-border-subtle absolute top-full z-10 mt-1 flex flex-wrap gap-1.5 rounded-xl border p-3 shadow-lg">
-                {CURRENCIES.map((code) => (
+              {CURRENCIES.map((code) => {
+                const active = currency === code;
+                return (
                   <button
                     key={code}
                     type="button"
-                    onClick={() => {
-                      setCurrency(code);
-                      setShowCurrencyPicker(false);
-                    }}
-                    className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                      currency === code
-                        ? "bg-accent-primary text-white"
-                        : "bg-bg-muted text-text-secondary hover:bg-border-subtle"
+                    role="radio"
+                    aria-checked={active}
+                    onClick={() => setCurrency(code)}
+                    className={`h-8 rounded-full px-4 text-[13px] font-semibold transition-all ${
+                      active
+                        ? "bg-bg-surface text-text-primary shadow-subtle"
+                        : "text-text-tertiary hover:text-text-secondary"
                     }`}
                   >
                     {code}
                   </button>
-                ))}
-              </div>
-            )}
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Form fields */}
+          <div className="border-border-subtle divide-border-subtle divide-y overflow-hidden rounded-2xl border">
+            <div className={fieldRow}>
+              <FileText className="text-text-tertiary h-5 w-5 shrink-0" />
+              <Input
+                placeholder={t("description")}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className={fieldInput}
+              />
+            </div>
+            <div className={fieldRow}>
+              <Calendar className="text-text-tertiary h-5 w-5 shrink-0" />
+              <DatePicker
+                value={date}
+                onChange={setDate}
+                showIcon={false}
+                className="text-text-primary h-12 border-0 bg-transparent px-0 text-[15px] shadow-none hover:bg-transparent focus-visible:ring-0 has-[>svg]:px-0 md:h-12"
+              />
+            </div>
+            <div className={fieldRow}>
+              <CategoryPicker
+                categories={categories}
+                selectedId={categoryId}
+                onSelect={setCategoryId}
+              />
+            </div>
+            <div className={fieldRow}>
+              <StickyNote className="text-text-tertiary h-5 w-5 shrink-0" />
+              <Input
+                placeholder={t("notesPlaceholder")}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className={fieldInput}
+              />
+            </div>
           </div>
         </div>
 
-        {/* Form fields */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <FileText className="text-text-tertiary h-5 w-5 shrink-0" />
-            <Input
-              placeholder={t("description")}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="border-border-subtle border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
-            />
-          </div>
-          <div className="flex items-center gap-3">
-            <Calendar className="text-text-tertiary h-5 w-5 shrink-0" />
-            <DatePicker
-              value={date}
-              onChange={setDate}
-              className="border-border-subtle border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
-            />
-          </div>
-          <div className="flex items-center gap-3">
-            <StickyNote className="text-text-tertiary h-5 w-5 shrink-0" />
-            <Input
-              placeholder={t("notesPlaceholder")}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="border-border-subtle border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
-            />
-          </div>
-          <CategoryPicker
-            categories={categories}
-            selectedId={categoryId}
-            onSelect={setCategoryId}
-          />
-        </div>
-
-        {/* Save button */}
-        <div className="pt-2">
+        {/* Actions */}
+        <div className="shrink-0 px-5 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:px-8 md:pt-6 md:pb-8">
+          {error && (
+            <p
+              role="alert"
+              className="bg-status-negative/10 text-status-negative mb-3 rounded-xl px-4 py-3 text-center text-sm"
+            >
+              {error}
+            </p>
+          )}
           <Button
             onClick={handleSave}
             disabled={!isValid || isPending}
-            className="bg-accent-primary hover:bg-accent-primary/90 h-14 w-full rounded-md text-base font-semibold text-white disabled:opacity-50"
+            className="bg-accent-primary hover:bg-accent-hover shadow-fab h-14 w-full rounded-2xl text-base font-semibold text-white transition-all active:scale-[0.99] disabled:opacity-40 disabled:shadow-none md:h-12 md:rounded-xl"
           >
             {isPending
               ? t("saving")
@@ -332,23 +341,15 @@ export function ExpenseForm({
                 ? t("updateExpense")
                 : t("saveExpense")}
           </Button>
-          {error && (
-            <p
-              role="alert"
-              className="text-status-negative mt-2 text-center text-sm"
-            >
-              {error}
-            </p>
-          )}
           {expense && (
             <>
               <Button
                 variant="ghost"
                 onClick={() => setDeleteDrawerOpen(true)}
                 disabled={isPending}
-                className="text-status-negative hover:bg-status-negative/10 hover:text-status-negative mt-3 h-12 w-full text-base font-semibold"
+                className="text-status-negative hover:bg-status-negative/10 hover:text-status-negative mt-2 h-12 w-full rounded-2xl text-[15px] font-semibold md:rounded-xl"
               >
-                <Trash2 className="mr-2 h-5 w-5" />
+                <Trash2 className="mr-1 h-[18px] w-[18px]" />
                 {t("deleteExpense")}
               </Button>
               <DeleteConfirmDrawer

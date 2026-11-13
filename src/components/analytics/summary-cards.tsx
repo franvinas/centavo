@@ -28,16 +28,22 @@ export function SummaryCards({ summary, baseCurrency }: SummaryCardsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      {cards.map((card) => (
+    <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-3">
+      {cards.map((card, i) => (
         <div
           key={card.label}
-          className="bg-bg-surface shadow-card rounded-lg p-5"
+          className={`bg-bg-surface shadow-card border-border-subtle/60 min-w-0 rounded-2xl border p-4 md:p-5 ${
+            i === 0 ? "col-span-2 lg:col-span-1" : ""
+          }`}
         >
-          <p className="text-text-secondary text-sm font-medium">
+          <p className="text-text-secondary truncate text-[13px] font-medium">
             {card.label}
           </p>
-          <p className="text-text-primary mt-1 text-2xl font-bold tabular-nums">
+          <p
+            className={`text-text-primary mt-1.5 truncate font-bold tracking-tight tabular-nums ${
+              i === 0 ? "text-[26px] md:text-2xl" : "text-xl md:text-2xl"
+            }`}
+          >
             {card.value}
           </p>
         </div>

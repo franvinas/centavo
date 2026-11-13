@@ -4,12 +4,63 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { desktopNavItems, desktopBottomNavItems } from "@/lib/nav-config";
-import { Separator } from "@/components/ui/separator";
+import { Plus } from "lucide-react";
+import {
+  desktopNavItems,
+  desktopBottomNavItems,
+  type NavItem,
+} from "@/lib/nav-config";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface DesktopSidebarProps {
   user: { name: string; email: string } | null;
+}
+
+function isActive(pathname: string, href: string) {
+  if (pathname === href) return true;
+  // Keep "All expenses" highlighted while viewing/editing a single expense.
+  return (
+    href === "/expenses" &&
+    pathname.startsWith("/expenses/") &&
+    pathname !== "/expenses/new"
+  );
+}
+
+function SidebarLink({
+  item,
+  active,
+  label,
+}: {
+  item: NavItem;
+  active: boolean;
+  label: string;
+}) {
+  return (
+    <Link
+      href={item.href}
+      aria-current={active ? "page" : undefined}
+      className={`group relative flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-sm font-medium transition-colors ${
+        active
+          ? "bg-accent-soft text-accent-primary"
+          : "text-text-secondary hover:bg-bg-muted/70 hover:text-text-primary"
+      }`}
+    >
+      {active && (
+        <span
+          aria-hidden="true"
+          className="bg-accent-primary absolute top-1/2 -left-3 h-5 w-1 -translate-y-1/2 rounded-r-full"
+        />
+      )}
+      <item.icon
+        className={`h-[18px] w-[18px] transition-colors ${
+          active
+            ? "text-accent-primary"
+            : "text-text-tertiary group-hover:text-text-secondary"
+        }`}
+      />
+      {label}
+    </Link>
+  );
 }
 
 export function DesktopSidebar({ user }: DesktopSidebarProps) {
@@ -21,70 +72,73 @@ export function DesktopSidebar({ user }: DesktopSidebarProps) {
   return (
     <aside className="border-border-subtle bg-bg-surface fixed top-0 left-0 z-40 hidden h-screen w-[260px] flex-col border-r md:flex">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-6 py-6">
+      <Link
+        href="/dashboard"
+        className="flex items-center gap-2.5 px-6 pt-7 pb-6"
+      >
         <Image
           src="/icons/centavo-logo.svg"
-          alt="Centavo"
-          width={36}
-          height={36}
+          alt=""
+          width={32}
+          height={32}
           className="rounded-lg"
         />
-        <span className="text-text-primary text-xl font-semibold">Centavo</span>
+        <span className="text-text-primary text-lg font-semibold tracking-tight">
+          Centavo
+        </span>
+      </Link>
+
+      {/* Primary action */}
+      <div className="px-4 pb-5">
+        <Link
+          href="/expenses/new"
+          className="bg-accent-primary hover:bg-accent-hover shadow-fab flex h-11 items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white transition-colors"
+        >
+          <Plus className="h-[18px] w-[18px]" strokeWidth={2.5} />
+          {t("nav.addExpense")}
+        </Link>
       </div>
 
       {/* Nav items */}
-      <nav className="flex flex-1 flex-col gap-1 px-3 pt-2">
-        {desktopNavItems.map((item) => {
-          const active = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                active
-                  ? "bg-accent-primary text-white"
-                  : "text-text-secondary hover:bg-bg-muted hover:text-text-primary"
-              }`}
-            >
-              <item.icon className="h-5 w-5" />
-              {t(item.labelKey)}
-            </Link>
-          );
-        })}
+      <nav className="flex flex-1 flex-col gap-0.5 px-3">
+        {desktopNavItems.map((item) => (
+          <SidebarLink
+            key={item.href}
+            item={item}
+            label={t(item.labelKey)}
+            active={isActive(pathname, item.href)}
+          />
+        ))}
       </nav>
 
       {/* Bottom section */}
-      <div className="px-3 pb-4">
-        {desktopBottomNavItems.map((item) => {
-          const active = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                active
-                  ? "bg-accent-primary text-white"
-                  : "text-text-secondary hover:bg-bg-muted hover:text-text-primary"
-              }`}
-            >
-              <item.icon className="h-5 w-5" />
-              {t(item.labelKey)}
-            </Link>
-          );
-        })}
-
-        <Separator className="bg-border-subtle my-3" />
+      <div className="flex flex-col gap-0.5 px-3 pb-4">
+        {desktopBottomNavItems.map((item) => (
+          <SidebarLink
+            key={item.href}
+            item={item}
+            label={t(item.labelKey)}
+            active={isActive(pathname, item.href)}
+          />
+        ))}
 
         {/* User row */}
-        <div className="flex items-center gap-3 px-3">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-accent-light text-accent-primary text-sm font-medium">
+        <div className="border-border-subtle mt-3 flex items-center gap-3 border-t px-3 pt-4">
+          <Avatar className="h-9 w-9">
+            <AvatarFallback className="bg-accent-light text-accent-primary text-sm font-semibold">
               {initial}
             </AvatarFallback>
           </Avatar>
-          <span className="text-text-primary text-sm font-medium">
-            {displayName}
-          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-text-primary truncate text-sm font-medium">
+              {displayName}
+            </p>
+            {user?.email && (
+              <p className="text-text-tertiary truncate text-xs">
+                {user.email}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </aside>

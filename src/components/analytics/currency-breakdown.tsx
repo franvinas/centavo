@@ -25,34 +25,36 @@ export function CurrencyBreakdown({
   const maxTotal = data[0]?.baseTotal || 1;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-5">
       {data.map((item) => (
-        <div key={item.currency}>
-          <div className="mb-1 flex items-center justify-between">
-            <span className="text-text-primary text-sm font-medium">
-              {item.currency}
-            </span>
-            <span className="text-text-secondary text-sm">
-              {formatCurrency(item.originalTotal, item.currency)}
-              {item.currency !== baseCurrency && (
-                <span className="text-text-tertiary ml-1">
-                  ({formatCurrency(item.baseTotal, baseCurrency)})
-                </span>
-              )}
-            </span>
+        <div key={item.currency} className="flex items-start gap-3">
+          <span className="bg-bg-muted text-text-secondary flex h-9 w-12 shrink-0 items-center justify-center rounded-[10px] text-xs font-semibold tracking-wide">
+            {item.currency}
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="text-text-primary text-sm font-semibold tabular-nums">
+                {formatCurrency(item.originalTotal, item.currency)}
+              </span>
+              <span className="text-text-tertiary shrink-0 text-xs">
+                {t("transactionCount", { count: item.count })}
+              </span>
+            </div>
+            {item.currency !== baseCurrency && (
+              <p className="text-text-tertiary mt-0.5 text-xs tabular-nums">
+                ≈ {formatCurrency(item.baseTotal, baseCurrency)}
+              </p>
+            )}
+            <div className="bg-bg-muted mt-2 h-1.5 overflow-hidden rounded-full">
+              <div
+                className="bg-accent-primary h-full rounded-full transition-[width] duration-500"
+                style={{
+                  width: `${(item.baseTotal / maxTotal) * 100}%`,
+                }}
+              />
+            </div>
+            <ConversionNotice count={item.pendingConversionCount ?? 0} />
           </div>
-          <div className="bg-bg-muted h-2 overflow-hidden rounded-full">
-            <div
-              className="bg-accent-primary h-full rounded-full transition-all"
-              style={{
-                width: `${(item.baseTotal / maxTotal) * 100}%`,
-              }}
-            />
-          </div>
-          <ConversionNotice count={item.pendingConversionCount ?? 0} />
-          <p className="text-text-tertiary mt-0.5 text-xs">
-            {t("transactionCount", { count: item.count })}
-          </p>
         </div>
       ))}
     </div>

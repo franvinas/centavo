@@ -22,6 +22,9 @@ interface DatePickerProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  /** Hide the leading calendar icon when the caller already shows one. */
+  showIcon?: boolean;
+  ariaLabel?: string;
 }
 
 export function DatePicker({
@@ -29,6 +32,8 @@ export function DatePicker({
   onChange,
   placeholder,
   className,
+  showIcon = true,
+  ariaLabel,
 }: DatePickerProps) {
   const locale = useLocale();
   const t = useTranslations("common");
@@ -55,17 +60,22 @@ export function DatePicker({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
+          aria-label={ariaLabel}
           className={cn(
-            "w-full justify-start text-left font-normal",
+            "w-full min-w-0 shrink justify-start text-left font-normal",
             !value && "text-muted-foreground",
             className,
           )}
         >
-          <CalendarIcon className="mr-2 size-4" />
+          {showIcon && <CalendarIcon className="mr-2 size-4" />}
           {formatted ?? <span>{placeholder ?? t("pickDate")}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent
+        className="w-auto rounded-2xl p-0"
+        align="start"
+        collisionPadding={16}
+      >
         <Calendar
           mode="single"
           selected={selected}

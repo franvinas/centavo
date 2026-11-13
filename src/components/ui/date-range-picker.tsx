@@ -63,6 +63,8 @@ export function DateRangePicker({
   const locale = useLocale();
   const t = useTranslations("common");
   const [open, setOpen] = React.useState(false);
+  // Two months side by side only when there is room for them.
+  const [numberOfMonths, setNumberOfMonths] = React.useState(2);
   const [hoveredDay, setHoveredDay] = React.useState<Date | undefined>();
 
   const selected: DateRange | undefined = React.useMemo(() => {
@@ -97,7 +99,17 @@ export function DateRangePicker({
   }, [from, to, locale]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(next) => {
+        if (next) {
+          setNumberOfMonths(
+            window.matchMedia("(min-width: 640px)").matches ? 2 : 1,
+          );
+        }
+        setOpen(next);
+      }}
+    >
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -111,7 +123,11 @@ export function DateRangePicker({
           {formatted ?? <span>{placeholder ?? t("pickDates")}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent
+        className="w-auto rounded-2xl p-0"
+        align="start"
+        collisionPadding={16}
+      >
         <Calendar
           mode="range"
           selected={selected}
@@ -133,7 +149,7 @@ export function DateRangePicker({
           }}
           locale={rdpLocales[locale]}
           defaultMonth={parseIso(from)}
-          numberOfMonths={2}
+          numberOfMonths={numberOfMonths}
         />
       </PopoverContent>
     </Popover>

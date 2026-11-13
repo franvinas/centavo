@@ -10,6 +10,7 @@ import { ConversionNotice } from "@/components/expenses/conversion-notice";
 import { SummaryCards } from "@/components/analytics/summary-cards";
 import { CurrencyBreakdown } from "@/components/analytics/currency-breakdown";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageHeader } from "@/components/layout/page-header";
 
 const CategoryPieChart = dynamic(
   () =>
@@ -88,17 +89,12 @@ export function AnalyticsClient({
   );
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-text-primary text-2xl font-semibold">
-          {t("title")}
-        </h1>
-        <p className="text-text-secondary mt-1 text-sm">{t("subtitle")}</p>
-      </div>
+    <div className="animate-page-in space-y-5 md:space-y-6">
+      <PageHeader title={t("title")} subtitle={t("subtitle")} />
 
-      <div className="bg-bg-surface shadow-card rounded-lg p-5">
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-text-primary text-base font-semibold">
+      <div className={cardClass}>
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-text-primary text-[15px] font-semibold">
             {t("spendingOverTime")}
           </h2>
           <PeriodSelector
@@ -134,8 +130,10 @@ export function AnalyticsClient({
         )}
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <p className="text-text-secondary text-sm">{data.periodLabel}</p>
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+        <h2 className="text-text-primary text-lg font-semibold tracking-tight first-letter:uppercase">
+          {data.periodLabel}
+        </h2>
         <PeriodSelector
           period={currentPeriod}
           customFrom={currentFrom}
@@ -155,9 +153,9 @@ export function AnalyticsClient({
       )}
 
       <ConversionNotice count={data.summary.pendingConversionCount ?? 0} />
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="bg-bg-surface shadow-card rounded-lg p-5">
-          <h2 className="text-text-primary mb-4 text-base font-semibold">
+      <div className="grid grid-cols-1 items-start gap-5 md:gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        <div className={cardClass}>
+          <h2 className="text-text-primary mb-5 text-[15px] font-semibold">
             {t("byCategory")}
           </h2>
           {isPending ? (
@@ -170,8 +168,8 @@ export function AnalyticsClient({
           )}
         </div>
 
-        <div className="bg-bg-surface shadow-card rounded-lg p-5">
-          <h2 className="text-text-primary mb-4 text-base font-semibold">
+        <div className={cardClass}>
+          <h2 className="text-text-primary mb-5 text-[15px] font-semibold">
             {t("byCurrency")}
           </h2>
           {isPending ? (
@@ -188,13 +186,20 @@ export function AnalyticsClient({
   );
 }
 
+const cardClass =
+  "bg-bg-surface shadow-card border-border-subtle/60 rounded-2xl border p-5 md:p-6";
+
 const skeletonHeights = [58, 42, 75, 33, 67, 50, 83, 39];
 
 function ChartSkeleton() {
   return (
-    <div className="flex h-[300px] items-end gap-2 px-8 pb-6">
+    <div className="flex h-[280px] items-end gap-3 pb-6 pl-12">
       {skeletonHeights.map((h, i) => (
-        <Skeleton key={i} className="flex-1" style={{ height: `${h}%` }} />
+        <Skeleton
+          key={i}
+          className="flex-1 rounded-t-md rounded-b-sm"
+          style={{ height: `${h}%` }}
+        />
       ))}
     </div>
   );
@@ -202,9 +207,14 @@ function ChartSkeleton() {
 
 function SummaryCardsSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-3">
       {Array.from({ length: 3 }, (_, i) => (
-        <div key={i} className="bg-bg-surface shadow-card rounded-lg p-5">
+        <div
+          key={i}
+          className={`bg-bg-surface shadow-card border-border-subtle/60 rounded-2xl border p-4 md:p-5 ${
+            i === 0 ? "col-span-2 lg:col-span-1" : ""
+          }`}
+        >
           <Skeleton className="h-4 w-24" />
           <Skeleton className="mt-2 h-8 w-32" />
         </div>
@@ -215,11 +225,11 @@ function SummaryCardsSkeleton() {
 
 function PieChartSkeleton() {
   return (
-    <div className="flex flex-col items-center gap-4 py-4">
-      <Skeleton className="h-[200px] w-[200px] rounded-full" />
-      <div className="flex gap-3">
-        {Array.from({ length: 3 }, (_, i) => (
-          <Skeleton key={i} className="h-4 w-16" />
+    <div className="flex flex-col items-center gap-6 xl:flex-row">
+      <Skeleton className="h-[200px] w-[200px] shrink-0 rounded-full" />
+      <div className="w-full flex-1 space-y-3">
+        {Array.from({ length: 5 }, (_, i) => (
+          <Skeleton key={i} className="h-4 w-full" />
         ))}
       </div>
     </div>

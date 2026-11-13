@@ -98,16 +98,19 @@ export function SwipeableExpenseCard({ expense }: SwipeableExpenseCardProps) {
   }
 
   return (
-    <div className="relative overflow-hidden md:hidden">
+    <div className="relative overflow-hidden rounded-xl md:hidden">
       {/* Delete action background */}
-      <div className="bg-status-negative absolute inset-y-0 right-0 flex w-[100px] items-center justify-center">
+      <div
+        className="bg-status-negative absolute inset-y-0 right-0 flex w-[100px] items-center justify-center rounded-r-xl transition-opacity"
+        style={{ opacity: translateX === 0 ? 0 : 1 }}
+      >
         <button
           onClick={handleDeleteClick}
           disabled={isPending}
           className="flex h-full w-full items-center justify-center"
           aria-label={t("deleteExpense")}
         >
-          <Trash2 className="h-6 w-6 text-white" />
+          <Trash2 className="h-5 w-5 text-white" />
         </button>
       </div>
 

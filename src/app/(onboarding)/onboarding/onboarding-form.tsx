@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Wallet } from "lucide-react";
+import Image from "next/image";
 import { completeOnboarding } from "@/lib/actions/onboarding";
 import { CURRENCIES } from "@/lib/constants";
 import { locales, type Locale } from "@/i18n/config";
@@ -47,20 +47,24 @@ export function OnboardingForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-sm">
+    <form onSubmit={handleSubmit} className="animate-page-in w-full max-w-sm">
       <div className="flex flex-col items-center">
-        <div className="bg-accent-light flex h-[72px] w-[72px] items-center justify-center rounded-full">
-          <Wallet className="text-accent-primary h-8 w-8" />
-        </div>
+        <Image
+          src="/icons/centavo-logo.svg"
+          alt="Centavo"
+          width={56}
+          height={56}
+          className="rounded-xl"
+        />
 
-        <h1 className="text-text-primary mt-4 text-center text-[28px] leading-tight font-bold">
+        <h1 className="text-text-primary mt-5 text-center text-[26px] leading-tight font-semibold tracking-tight">
           {copy.title}
         </h1>
         <p className="text-text-secondary mt-1 text-center text-base">
           {copy.subtitle}
         </p>
 
-        <div className="bg-bg-surface shadow-card mt-6 w-full rounded-lg p-5">
+        <div className="bg-bg-surface shadow-card border-border-subtle/60 mt-7 w-full rounded-3xl border p-6">
           <div className="space-y-6">
             <div className="space-y-2">
               <label
@@ -77,7 +81,7 @@ export function OnboardingForm({
                 onChange={(e) => setName(e.target.value)}
                 placeholder={copy.namePlaceholder}
                 autoComplete="name"
-                className="border-border-subtle bg-bg-primary text-text-primary placeholder:text-text-tertiary focus:border-accent-primary h-12 w-full rounded-xl border px-4 text-base focus:outline-none"
+                className="border-border-subtle bg-bg-primary text-text-primary placeholder:text-text-tertiary focus:border-accent-primary focus:ring-ring/30 h-12 w-full rounded-xl border px-4 text-base transition-shadow focus:ring-[3px] focus:outline-none"
               />
             </div>
 
@@ -88,16 +92,17 @@ export function OnboardingForm({
               <p className="text-text-tertiary text-[13px]">
                 {copy.languageHint}
               </p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="bg-bg-muted grid grid-cols-2 gap-1 rounded-xl p-1">
                 {locales.map((loc) => (
                   <button
                     key={loc}
                     type="button"
                     onClick={() => setLocale(loc)}
-                    className={`h-10 rounded-full text-sm font-medium transition-colors ${
+                    aria-pressed={locale === loc}
+                    className={`h-9 rounded-[10px] text-sm font-semibold transition-all ${
                       locale === loc
-                        ? "bg-accent-primary font-semibold text-white"
-                        : "border-border-subtle bg-bg-primary text-text-primary border"
+                        ? "bg-bg-surface text-text-primary shadow-subtle"
+                        : "text-text-tertiary hover:text-text-secondary"
                     }`}
                   >
                     {LOCALE_LABELS[loc]}
@@ -113,16 +118,17 @@ export function OnboardingForm({
               <p className="text-text-tertiary text-[13px]">
                 {copy.currencyHint}
               </p>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="bg-bg-muted grid grid-cols-3 gap-1 rounded-xl p-1">
                 {CURRENCIES.map((code) => (
                   <button
                     key={code}
                     type="button"
                     onClick={() => setCurrency(code)}
-                    className={`h-10 rounded-full text-sm font-medium transition-colors ${
+                    aria-pressed={currency === code}
+                    className={`h-9 rounded-[10px] text-sm font-semibold transition-all ${
                       currency === code
-                        ? "bg-accent-primary font-semibold text-white"
-                        : "border-border-subtle bg-bg-primary text-text-primary border"
+                        ? "bg-bg-surface text-text-primary shadow-subtle"
+                        : "text-text-tertiary hover:text-text-secondary"
                     }`}
                   >
                     {code}
@@ -136,7 +142,7 @@ export function OnboardingForm({
         <button
           type="submit"
           disabled={isPending || !name.trim()}
-          className="bg-accent-primary shadow-fab mt-6 h-[52px] w-full rounded-[14px] text-base font-semibold text-white transition-opacity disabled:opacity-50"
+          className="bg-accent-primary hover:bg-accent-hover shadow-fab mt-6 h-[52px] w-full rounded-xl text-base font-semibold text-white transition-all active:scale-[0.99] disabled:opacity-40 disabled:shadow-none"
         >
           {isPending ? copy.submitting : copy.submit}
         </button>

@@ -29,6 +29,16 @@ function formatMonth(period: string, locale: string): string {
   });
 }
 
+function formatMonthLong(period: string, locale: string): string {
+  const [year, month] = period.split("-");
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, 1));
+  return date.toLocaleDateString(locale, {
+    timeZone: "UTC",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 function CustomTooltip({
   active,
   payload,
@@ -42,11 +52,11 @@ function CustomTooltip({
   if (!active || !payload?.length) return null;
   const item = payload[0].payload;
   return (
-    <div className="bg-bg-surface shadow-card rounded-lg border px-3 py-2 text-sm">
-      <p className="text-text-primary font-medium">
-        {formatMonth(item.period, locale)}
+    <div className="bg-bg-surface shadow-elevated border-border-subtle rounded-xl border px-3.5 py-2.5 text-sm">
+      <p className="text-text-tertiary text-xs font-medium first-letter:uppercase">
+        {formatMonthLong(item.period, locale)}
       </p>
-      <p className="text-text-secondary">
+      <p className="text-text-primary mt-0.5 font-semibold tabular-nums">
         {formatCurrency(item.total, baseCurrency)}
       </p>
     </div>
@@ -74,34 +84,41 @@ export function SpendingOverTimeChart({
     label: formatMonth(d.period, locale),
   }));
 
+  const compact = new Intl.NumberFormat(locale, {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  });
+
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={chartData}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+    <ResponsiveContainer width="100%" height={280}>
+      <BarChart data={chartData} margin={{ top: 8, right: 0, left: 0 }}>
+        <CartesianGrid vertical={false} stroke="#e5e4e1" strokeDasharray="0" />
         <XAxis
           dataKey="label"
-          tick={{ fontSize: 12 }}
+          tick={{ fontSize: 11, fill: "#9c9b99" }}
           tickLine={false}
           axisLine={false}
+          tickMargin={8}
+          interval="preserveStartEnd"
+          minTickGap={4}
         />
         <YAxis
-          tick={{ fontSize: 12 }}
+          tick={{ fontSize: 11, fill: "#9c9b99" }}
           tickLine={false}
           axisLine={false}
-          width={50}
-          tickFormatter={(value: number) =>
-            value >= 1_000_000
-              ? `${(value / 1_000_000).toFixed(0)}M`
-              : value >= 1000
-                ? `${(value / 1000).toFixed(0)}k`
-                : String(value)
-          }
+          width={44}
+          tickCount={5}
+          tickFormatter={(value: number) => compact.format(value)}
         />
-        <Tooltip content={<CustomTooltip baseCurrency={baseCurrency} />} />
+        <Tooltip
+          content={<CustomTooltip baseCurrency={baseCurrency} />}
+          cursor={{ fill: "#edecea", radius: 8 }}
+        />
         <Bar
           dataKey="total"
-          fill="#3D8A5A"
-          radius={[4, 4, 0, 0]}
+          fill="#3d8a5a"
+          radius={[6, 6, 2, 2]}
+          maxBarSize={44}
           cursor={onBarClick ? "pointer" : undefined}
           onClick={(barData) => {
             const period = (barData as unknown as { period?: string })?.period;
