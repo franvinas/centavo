@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build --webpack",
+    "vercel-build": "bash scripts/vercel-build.sh",
     "start": "next start",
     "sandbox:up": "docker compose up -d --wait postgres mailpit",
     "sandbox:down": "docker compose down",

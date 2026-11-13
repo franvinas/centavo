@@ -32,6 +32,7 @@ Set these in Vercel for production. Use `.env.example` as the local template.
 | Variable                  | Purpose                                       |
 | ------------------------- | --------------------------------------------- |
 | `DATABASE_URL`            | PostgreSQL connection string used by Prisma   |
+| `DIRECT_DATABASE_URL`     | Neon direct (non-pooled) URL for migrations   |
 | `AUTH_SECRET`             | NextAuth v5 secret                            |
 | `NEXTAUTH_SECRET`         | Backward-compatible auth secret               |
 | `NEXTAUTH_URL`            | Canonical app URL                             |
@@ -80,21 +81,37 @@ credentials if you want to test those integrations locally.
 
 ## Database Migrations
 
-Migrations are currently run manually. There is no checked-in GitHub Actions
-workflow that applies production migrations.
+Production migrations run automatically during the Vercel production build.
+Vercel runs the `vercel-build` package script (`scripts/vercel-build.sh`)
+instead of `build`:
 
-Before a production release with schema changes:
+- `VERCEL_ENV=production`: `prisma migrate deploy` runs first, using
+  `DIRECT_DATABASE_URL` (Neon's non-pooled host) and falling back to
+  `DATABASE_URL`. Then `pnpm build` runs.
+- Preview and other environments skip migrations.
+- If a migration fails, the build fails and Vercel keeps the current production
+  deployment live. Fix the migration and redeploy.
 
-1. Create a Neon backup or snapshot.
+Migrations must be backward compatible. The schema is migrated while the
+previous deployment is still serving traffic, and it keeps running against the
+new schema until the new build is promoted (or indefinitely if the build fails
+after migrating). Prefer additive changes; split destructive ones (dropping or
+renaming columns, adding `NOT NULL` without a default) into an expand release
+and a later contract release.
+
+Before merging a release with risky schema changes:
+
+1. Rely on Neon point-in-time restore or create a Neon branch/snapshot.
 2. Prefer rehearsing the migration on a Neon branch cloned from production.
-3. Run migrations against the production database:
+
+CI already applies every migration to a fresh PostgreSQL database
+(`pnpm db:deploy`) before running the test suite.
+
+To run migrations manually (for example, a one-off data backfill workflow):
 
 ```bash
-DATABASE_URL="<PRODUCTION_DATABASE_URL>" pnpm prisma migrate deploy
+DATABASE_URL="<PRODUCTION_DIRECT_DATABASE_URL>" pnpm prisma migrate deploy
 ```
-
-Use a direct database connection for migrations if your Neon setup provides one.
-The current Prisma config reads `DATABASE_URL`.
 
 ## Standard Release Flow
 
@@ -108,8 +125,7 @@ pnpm build
 ```
 
 2. Merge changes to `main`.
-3. If the release includes migrations, run `prisma migrate deploy` as described
-   above.
+3. Pending migrations are applied by the Vercel production build.
 4. Wait for the Vercel production deployment from `main` to complete.
 5. Run production smoke checks.
 6. Watch Vercel and provider logs for runtime or migration errors.
@@ -140,8 +156,6 @@ For database-breaking regressions:
 
 ## Not Automated Today
 
-- Production migrations are not automated in this repository.
-- GitHub Actions workflows are not checked in.
 - End-to-end tests are not configured in `package.json`.
 - Vercel project settings are not represented as code.
 
