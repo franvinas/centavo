@@ -96,6 +96,7 @@ describe("completeOnboarding", () => {
           name: "Comida y Restaurantes",
           color: "#E67E22",
           icon: "UtensilsCrossed",
+          position: 0,
         },
       ],
     });

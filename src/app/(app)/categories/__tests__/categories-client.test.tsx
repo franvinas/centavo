@@ -6,6 +6,7 @@ vi.mock("@/lib/actions/categories", () => ({
   createCategory: vi.fn(),
   updateCategory: vi.fn(),
   deleteCategory: vi.fn(),
+  reorderCategories: vi.fn(),
 }));
 beforeEach(() => vi.clearAllMocks());
 afterEach(() => cleanup());
@@ -140,5 +141,29 @@ describe("custom emoji and color", () => {
       color: "#777777",
       icon: "MoreHorizontal",
     });
+  });
+});
+
+describe("reordering", () => {
+  it("shows categories in the given order, each with a reorder handle", () => {
+    render(
+      <CategoriesClient
+        initialCategories={[
+          { id: "c2", name: "Transport", icon: "Car", color: "#3498DB" },
+          { id: "c1", name: "Food", icon: "🍕", color: "#E67E22" },
+        ]}
+      />,
+    );
+    const cards = screen.getAllByTestId("category-card");
+    expect(cards.map((card) => card.textContent)).toEqual([
+      "Transport",
+      "🍕Food",
+    ]);
+    expect(
+      screen.getByRole("button", { name: "Reorder Transport" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Reorder Food" }),
+    ).toBeInTheDocument();
   });
 });

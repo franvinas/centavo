@@ -2,7 +2,12 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { prismaMock, resetPrismaMock } from "@/test-utils/prisma-mock";
 import { mockAuth, mockUnauthenticated } from "@/test-utils/auth-mock";
 import { createPrismaCategory } from "@/test-utils/factories";
-import { createCategory, updateCategory, deleteCategory } from "../categories";
+import {
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  reorderCategories,
+} from "../categories";
 import { revalidatePath } from "next/cache";
 
 beforeEach(() => {
@@ -27,6 +32,9 @@ describe("createCategory", () => {
   it("creates a category", async () => {
     mockAuth();
     prismaMock.category.findUnique.mockResolvedValue(null as never);
+    prismaMock.category.aggregate.mockResolvedValue({
+      _max: { position: null },
+    } as never);
     prismaMock.category.create.mockResolvedValue(
       createPrismaCategory() as never,
     );
@@ -38,6 +46,7 @@ describe("createCategory", () => {
         userId: "user-1",
         name: "Food",
         color: "#E8855B",
+        position: 0,
       }),
     });
     expect(revalidatePath).toHaveBeenCalledWith("/categories");
@@ -138,5 +147,74 @@ describe("deleteCategory", () => {
     await expect(deleteCategory("nonexistent")).rejects.toThrow(
       "Category not found",
     );
+  });
+});
+
+describe("reorderCategories", () => {
+  it("throws when unauthenticated", async () => {
+    mockUnauthenticated();
+    await expect(reorderCategories(["cat-1"])).rejects.toThrow(
+      "Not authenticated",
+    );
+  });
+
+  it("stores each category's new position", async () => {
+    mockAuth();
+    prismaMock.category.findMany.mockResolvedValue([
+      { id: "cat-1" },
+      { id: "cat-2" },
+      { id: "cat-3" },
+    ] as never);
+    prismaMock.$transaction.mockResolvedValue([] as never);
+
+    await reorderCategories(["cat-3", "cat-1", "cat-2"]);
+
+    expect(prismaMock.category.update).toHaveBeenNthCalledWith(1, {
+      where: { id: "cat-3", userId: "user-1" },
+      data: { position: 0 },
+    });
+    expect(prismaMock.category.update).toHaveBeenNthCalledWith(2, {
+      where: { id: "cat-1", userId: "user-1" },
+      data: { position: 1 },
+    });
+    expect(prismaMock.category.update).toHaveBeenNthCalledWith(3, {
+      where: { id: "cat-2", userId: "user-1" },
+      data: { position: 2 },
+    });
+    expect(prismaMock.$transaction).toHaveBeenCalledTimes(1);
+    expect(revalidatePath).toHaveBeenCalledWith("/categories");
+    expect(revalidatePath).toHaveBeenCalledWith("/expenses");
+  });
+
+  it("rejects an order that does not list every category", async () => {
+    mockAuth();
+    prismaMock.category.findMany.mockResolvedValue([
+      { id: "cat-1" },
+      { id: "cat-2" },
+    ] as never);
+
+    await expect(reorderCategories(["cat-2"])).rejects.toThrow(
+      "Category list changed",
+    );
+    expect(prismaMock.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("rejects ids that belong to someone else", async () => {
+    mockAuth();
+    prismaMock.category.findMany.mockResolvedValue([
+      { id: "cat-1" },
+      { id: "cat-2" },
+    ] as never);
+
+    await expect(reorderCategories(["cat-1", "other"])).rejects.toThrow(
+      "Category list changed",
+    );
+    expect(prismaMock.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("rejects duplicated ids", async () => {
+    mockAuth();
+    await expect(reorderCategories(["cat-1", "cat-1"])).rejects.toThrow();
+    expect(prismaMock.category.findMany).not.toHaveBeenCalled();
   });
 });

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorized, badRequest } from "@/lib/api-utils";
 import { createCategorySchema } from "@/lib/validations/category";
+import { categoryOrderBy } from "@/lib/data/categories";
+import { nextCategoryPosition } from "@/lib/services/categories";
 
 export async function GET(request: NextRequest) {
   const user = await getAuthUser(request);
@@ -14,7 +16,7 @@ export async function GET(request: NextRequest) {
         select: { expenses: true },
       },
     },
-    orderBy: { createdAt: "asc" },
+    orderBy: categoryOrderBy,
   });
 
   return NextResponse.json({ categories });
@@ -42,7 +44,13 @@ export async function POST(request: NextRequest) {
   }
 
   const category = await prisma.category.create({
-    data: { userId: user.id, name, color, icon },
+    data: {
+      userId: user.id,
+      name,
+      color,
+      icon,
+      position: await nextCategoryPosition(user.id),
+    },
   });
 
   return NextResponse.json({ category }, { status: 201 });

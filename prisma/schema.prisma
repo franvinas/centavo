@@ -82,13 +82,14 @@ model Category {
   name      String
   color     String
   icon      String?
+  position  Int      @default(0)
   createdAt DateTime @default(now()) @map("created_at")
 
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   expenses Expense[]
 
   @@unique([userId, name])
-  @@index([userId])
+  @@index([userId, position])
   @@map("categories")
 }
 

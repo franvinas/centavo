@@ -30,11 +30,12 @@ export async function completeSetupForUser(
     if (categoryCount === 0) {
       await tx.category.createMany({
         skipDuplicates: true,
-        data: categories.map((category) => ({
+        data: categories.map((category, position) => ({
           userId,
           name: category.name,
           color: category.color,
           icon: category.icon,
+          position,
         })),
       });
     }

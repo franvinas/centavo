@@ -8,7 +8,7 @@ beforeEach(() => {
 });
 
 describe("getCategories", () => {
-  it("returns categories for a user ordered by createdAt", async () => {
+  it("returns categories in the user's chosen order", async () => {
     const categories = [
       createPrismaCategory({ name: "Food" }),
       createPrismaCategory({ name: "Transport" }),
@@ -20,7 +20,7 @@ describe("getCategories", () => {
     expect(result).toHaveLength(2);
     expect(prismaMock.category.findMany).toHaveBeenCalledWith({
       where: { userId: "user-1" },
-      orderBy: { createdAt: "asc" },
+      orderBy: [{ position: "asc" }, { createdAt: "asc" }],
     });
   });
 

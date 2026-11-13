@@ -64,6 +64,7 @@ describe("executeTool", () => {
         color: "#E8855B",
         icon: "UtensilsCrossed",
         userId: "user-1",
+        position: 0,
         createdAt: new Date(),
       },
     });
@@ -112,6 +113,7 @@ describe("executeTool", () => {
             color: "#E8855B",
             icon: "UtensilsCrossed",
             userId: "user-1",
+            position: 0,
             createdAt: new Date(),
           },
         },
@@ -161,6 +163,7 @@ describe("executeTool", () => {
           color: "#E8855B",
           icon: "UtensilsCrossed",
           userId: "user-1",
+          position: 0,
           createdAt: new Date(),
         },
       });
@@ -189,6 +192,7 @@ describe("executeTool", () => {
         icon: "UtensilsCrossed",
         color: "#E8855B",
         userId: "user-1",
+        position: 0,
         createdAt: new Date(),
       },
     ]);
