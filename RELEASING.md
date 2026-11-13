@@ -15,11 +15,9 @@ pnpm build
 ```
 
 2. Merge to `main`.
-3. Run production migrations manually if the release includes schema changes:
-
-```bash
-DATABASE_URL="<PRODUCTION_DATABASE_URL>" pnpm prisma migrate deploy
-```
+3. Pending migrations are applied automatically by the Vercel production build
+   (`scripts/vercel-build.sh`). Make sure they are backward compatible; see
+   `DEPLOYMENT.md`.
 
 4. Wait for the Vercel production deploy from `main`.
 5. Run the smoke checks listed in `DEPLOYMENT.md`.

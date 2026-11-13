@@ -7,8 +7,6 @@ improve reliability, deployability, local development, or product quality.
 
 - Rotate secrets that were present in `.env.local` and verify providers use the
   new values.
-- Decide and document the production migration policy: keep manual migrations or
-  add an explicitly triggered GitHub Action.
 - Update Vercel project settings documentation with production URL, project
   name, region, and required environment variable scopes. All env vars are
   currently scoped to Production only, so PR previews build but cannot sign in
@@ -49,5 +47,7 @@ improve reliability, deployability, local development, or product quality.
 - Verified Prisma migrations match `prisma/schema.prisma` (empty
   `prisma migrate diff` from a fresh database); CI applies migrations with
   `db:deploy` before the test suite.
+- Production migrations run automatically in the Vercel production build
+  (`scripts/vercel-build.sh`) over Neon's direct connection.
 - CI audit fails only on high/critical runtime advisories; Dependabot raises
   update PRs and alerts for the rest.
