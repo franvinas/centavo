@@ -87,6 +87,7 @@ export function createPrismaCategory(overrides: Record<string, unknown> = {}) {
     name: "Food",
     color: "#E8855B",
     icon: "UtensilsCrossed",
+    position: 0,
     createdAt: new Date(),
     ...overrides,
   };

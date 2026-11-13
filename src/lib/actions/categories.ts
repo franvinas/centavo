@@ -7,6 +7,10 @@ import {
   createCategorySchema,
   updateCategorySchema,
 } from "@/lib/validations/category";
+import {
+  nextCategoryPosition,
+  reorderCategoriesForUser,
+} from "@/lib/services/categories";
 
 async function requireAuth() {
   const session = await auth();
@@ -28,7 +32,7 @@ export async function createCategory(formData: {
   if (existing) throw new Error("Category already exists");
 
   await prisma.category.create({
-    data: { userId, ...parsed },
+    data: { userId, ...parsed, position: await nextCategoryPosition(userId) },
   });
 
   revalidatePath("/categories");
@@ -83,5 +87,15 @@ export async function deleteCategory(id: string) {
   await prisma.category.delete({ where: { id } });
 
   revalidatePath("/categories");
+  revalidatePath("/dashboard");
+}
+
+export async function reorderCategories(ids: string[]) {
+  const userId = await requireAuth();
+
+  await reorderCategoriesForUser(userId, { ids });
+
+  revalidatePath("/categories");
+  revalidatePath("/expenses");
   revalidatePath("/dashboard");
 }

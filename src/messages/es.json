@@ -93,7 +93,7 @@
   },
   "categories": {
     "title": "Categorías",
-    "subtitle": "Administra tus categorías de gastos",
+    "subtitle": "Administra tus categorías de gastos. Arrastralas para cambiar el orden.",
     "add": "Agregar",
     "newCategory": "Nueva categoría",
     "editCategory": "Editar categoría",
@@ -119,6 +119,13 @@
     "saturationBrightness": "Saturación y brillo",
     "hue": "Tono",
     "hexCode": "Código hex",
+    "reorderNamed": "Reordenar {name}",
+    "reorderError": "No se pudo guardar el nuevo orden. Intentá de nuevo.",
+    "reorderInstructions": "Para tomar una categoría, presioná espacio o enter. Movela con las flechas y presioná espacio o enter de nuevo para soltarla, o escape para cancelar.",
+    "reorderPickedUp": "Tomaste {name}.",
+    "reorderMovedOver": "{name} se movió a la posición {position} de {total}.",
+    "reorderDropped": "{name} quedó en la posición {position} de {total}.",
+    "reorderCancelled": "Reordenamiento cancelado. {name} volvió a su lugar.",
     "icons": {
       "UtensilsCrossed": "Comida",
       "Car": "Transporte",

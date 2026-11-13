@@ -57,9 +57,12 @@ describe("POST /api/categories", () => {
     expect(res.status).toBe(401);
   });
 
-  it("creates a category", async () => {
+  it("creates a category at the end of the list", async () => {
     mockAuth();
     prismaMock.category.findUnique.mockResolvedValue(null as never);
+    prismaMock.category.aggregate.mockResolvedValue({
+      _max: { position: 4 },
+    } as never);
     prismaMock.category.create.mockResolvedValue(
       createPrismaCategory() as never,
     );
@@ -74,6 +77,9 @@ describe("POST /api/categories", () => {
 
     expect(res.status).toBe(201);
     expect(body.category).toBeDefined();
+    expect(prismaMock.category.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ userId: "user-1", position: 5 }),
+    });
   });
 
   it("returns 400 for duplicate name", async () => {

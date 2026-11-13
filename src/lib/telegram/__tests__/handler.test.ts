@@ -147,6 +147,7 @@ describe("handleMessage", () => {
         icon: "UtensilsCrossed",
         color: "#E8855B",
         userId: "user-1",
+        position: 0,
         createdAt: new Date(),
       },
     ]);

@@ -1,8 +1,27 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { GripVertical, Plus, Pencil, Trash2 } from "lucide-react";
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type Announcements,
+  type DragEndEvent,
+  type UniqueIdentifier,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  rectSortingStrategy,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +45,7 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
+  reorderCategories,
 } from "@/lib/actions/categories";
 import type { Category } from "@/types";
 
@@ -46,7 +66,74 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(
     null,
   );
+  const [categories, setCategories] = useState(initialCategories);
+  const [syncedCategories, setSyncedCategories] = useState(initialCategories);
+  const [, startReorder] = useTransition();
   const t = useTranslations("categories");
+
+  // Adopt fresh server data (after create/edit/delete or a refresh).
+  if (initialCategories !== syncedCategories) {
+    setSyncedCategories(initialCategories);
+    setCategories(initialCategories);
+  }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const nameOf = (id: UniqueIdentifier) =>
+    categories.find((category) => category.id === id)?.name ?? "";
+  const positionOf = (id: UniqueIdentifier) =>
+    categories.findIndex((category) => category.id === id) + 1;
+  const announcements: Announcements = {
+    onDragStart: ({ active }) =>
+      t("reorderPickedUp", { name: nameOf(active.id) }),
+    onDragOver: ({ active, over }) =>
+      over
+        ? t("reorderMovedOver", {
+            name: nameOf(active.id),
+            position: positionOf(over.id),
+            total: categories.length,
+          })
+        : undefined,
+    onDragEnd: ({ active, over }) =>
+      over
+        ? t("reorderDropped", {
+            name: nameOf(active.id),
+            position: positionOf(over.id),
+            total: categories.length,
+          })
+        : undefined,
+    onDragCancel: ({ active }) =>
+      t("reorderCancelled", { name: nameOf(active.id) }),
+  };
+
+  function handleDragEnd({ active, over }: DragEndEvent) {
+    if (!over || active.id === over.id) return;
+
+    const previous = categories;
+    const next = arrayMove(
+      previous,
+      previous.findIndex((category) => category.id === active.id),
+      previous.findIndex((category) => category.id === over.id),
+    );
+
+    setError("");
+    setCategories(next);
+    startReorder(async () => {
+      try {
+        await reorderCategories(next.map((category) => category.id));
+        router.refresh();
+      } catch {
+        setCategories(previous);
+        setError(t("reorderError"));
+        router.refresh();
+      }
+    });
+  }
 
   function openCreate() {
     setError("");
@@ -192,41 +279,35 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
         </p>
       )}
 
-      <div className="grid gap-2.5 sm:grid-cols-2 md:gap-3 xl:grid-cols-3">
-        {initialCategories.map((cat) => {
-          return (
-            <div
-              key={cat.id}
-              className="group bg-bg-surface shadow-card border-border-subtle/60 flex items-center gap-3 rounded-2xl border py-3 pr-2 pl-3.5 transition-shadow hover:shadow-[0_1px_2px_#1a19180a,0_8px_24px_#1a19180f]"
-            >
-              <div
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                style={categoryTileStyle(cat.icon, cat.color)}
-              >
-                <CategoryIcon icon={cat.icon} color={cat.color} />
-              </div>
-              <span className="text-text-primary min-w-0 flex-1 truncate text-[15px] font-medium">
-                {cat.name}
-              </span>
-              <button
-                onClick={() => openEdit(cat)}
-                className="text-text-tertiary hover:text-text-primary hover:bg-bg-muted flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
-                aria-label={t("editNamed", { name: cat.name })}
-              >
-                <Pencil className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => openDeleteDrawer(cat.id)}
-                disabled={isPending}
-                className="text-text-tertiary hover:text-status-negative hover:bg-status-negative/10 flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
-                aria-label={t("deleteNamed", { name: cat.name })}
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          );
-        })}
-      </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+        accessibility={{
+          announcements,
+          screenReaderInstructions: { draggable: t("reorderInstructions") },
+        }}
+      >
+        <SortableContext
+          items={categories.map((category) => category.id)}
+          strategy={rectSortingStrategy}
+        >
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 md:gap-3 xl:grid-cols-3">
+            {categories.map((cat) => (
+              <SortableCategoryCard
+                key={cat.id}
+                category={cat}
+                reorderLabel={t("reorderNamed", { name: cat.name })}
+                editLabel={t("editNamed", { name: cat.name })}
+                deleteLabel={t("deleteNamed", { name: cat.name })}
+                deleteDisabled={isPending}
+                onEdit={() => openEdit(cat)}
+                onDelete={() => openDeleteDrawer(cat.id)}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
 
       <DeleteConfirmDrawer
         open={deleteDrawerOpen}
@@ -235,6 +316,86 @@ export function CategoriesClient({ initialCategories }: CategoriesClientProps) {
         title={t("confirmDelete")}
         isDeleting={isPending}
       />
+    </div>
+  );
+}
+
+interface SortableCategoryCardProps {
+  category: Category;
+  reorderLabel: string;
+  editLabel: string;
+  deleteLabel: string;
+  deleteDisabled: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+}
+
+function SortableCategoryCard({
+  category,
+  reorderLabel,
+  editLabel,
+  deleteLabel,
+  deleteDisabled,
+  onEdit,
+  onDelete,
+}: SortableCategoryCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: category.id });
+
+  const style: CSSProperties = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      data-testid="category-card"
+      data-dragging={isDragging || undefined}
+      className="group bg-bg-surface shadow-card border-border-subtle/60 relative flex items-center gap-2 rounded-2xl border py-3 pr-2 pl-1 transition-shadow hover:shadow-[0_1px_2px_#1a19180a,0_8px_24px_#1a19180f] data-[dragging]:z-10 data-[dragging]:shadow-[0_2px_4px_#1a19180f,0_12px_32px_#1a19181f]"
+    >
+      <button
+        ref={setActivatorNodeRef}
+        type="button"
+        aria-label={reorderLabel}
+        className="text-text-tertiary hover:text-text-primary hover:bg-bg-muted flex h-9 w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-lg transition-colors active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+      <div
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+        style={categoryTileStyle(category.icon, category.color)}
+      >
+        <CategoryIcon icon={category.icon} color={category.color} />
+      </div>
+      <span className="text-text-primary ml-1 min-w-0 flex-1 truncate text-[15px] font-medium">
+        {category.name}
+      </span>
+      <button
+        onClick={onEdit}
+        className="text-text-tertiary hover:text-text-primary hover:bg-bg-muted flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
+        aria-label={editLabel}
+      >
+        <Pencil className="h-4 w-4" />
+      </button>
+      <button
+        onClick={onDelete}
+        disabled={deleteDisabled}
+        className="text-text-tertiary hover:text-status-negative hover:bg-status-negative/10 flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
+        aria-label={deleteLabel}
+      >
+        <Trash2 className="h-4 w-4" />
+      </button>
     </div>
   );
 }
