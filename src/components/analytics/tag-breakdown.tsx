@@ -44,8 +44,9 @@ export function TagBreakdown({
                 aria-label={t("viewTagExpenses", { tag: item.name })}
                 className="hover:bg-bg-muted/60 block rounded-xl px-2 py-2"
               >
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-text-primary min-w-0 truncate text-sm font-medium">
+                {/* The name keeps a minimum width; a long amount wraps below it. */}
+                <div className="flex flex-wrap items-baseline justify-end gap-x-3">
+                  <span className="text-text-primary min-w-0 flex-[1_1_4.5rem] truncate text-sm font-medium">
                     <span className="text-text-tertiary">#</span>
                     {item.name}
                   </span>
