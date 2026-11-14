@@ -29,12 +29,24 @@ export interface CurrencySpending {
   pendingConversionCount?: number;
 }
 
+export interface TagSpending {
+  tagId: string;
+  name: string;
+  total: number;
+  count: number;
+  pendingConversionCount?: number;
+}
+
 export interface AnalyticsData {
   summary: AnalyticsSummary;
   byCategory: CategorySpending[];
   overTime: TimeSeriesPoint[];
   byCurrency: CurrencySpending[];
+  byTag: TagSpending[];
   baseCurrency: string;
   periodLabel: string;
+  /** Selected period as YYYY-MM-DD, used to link to the filtered list. */
+  periodFrom: string;
+  periodTo: string;
   timePeriodLabel: string;
 }

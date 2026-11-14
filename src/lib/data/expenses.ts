@@ -6,12 +6,21 @@ import {
 import { cache } from "react";
 import { prisma } from "@/lib/db";
 import { presentExpense, sumDisplayAmounts } from "@/lib/expense-valuation";
+import {
+  anyTagWhere,
+  expenseTagsInclude,
+  flattenExpenseTags,
+} from "@/lib/services/tags";
+
+const expenseInclude = { category: true, tags: expenseTagsInclude } as const;
 
 interface GetExpensesOptions {
   userId: string;
   from?: string;
   to?: string;
   categoryId?: string;
+  /** Normalized tag names; matches expenses carrying any of them. */
+  tags?: string[];
   search?: string;
   page?: number;
   limit?: number;
@@ -22,6 +31,7 @@ export async function getExpenses({
   from,
   to,
   categoryId,
+  tags,
   search,
   page = 1,
   limit = 50,
@@ -39,37 +49,55 @@ export async function getExpenses({
     };
   }
   if (categoryId) where.categoryId = categoryId;
+  if (tags?.length) where.tags = anyTagWhere(tags);
   if (search) where.description = { contains: search, mode: "insensitive" };
 
-  const [expenses, total] = await Promise.all([
+  const [expenses, total, valuations, user] = await Promise.all([
     prisma.expense.findMany({
       where,
-      include: { category: true },
+      include: expenseInclude,
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       skip: (page - 1) * limit,
       take: limit,
     }),
     prisma.expense.count({ where }),
+    // Every matching row (not just this page) so filtered totals are exact.
+    prisma.expense.findMany({
+      where,
+      select: {
+        amount: true,
+        currency: true,
+        usdAmount: true,
+        usdExchangeRate: true,
+        conversionRates: true,
+      },
+    }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { baseCurrency: true, timezone: true },
+    }),
   ]);
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { baseCurrency: true, timezone: true },
-  });
   const baseCurrency = user?.baseCurrency ?? "USD";
+  const sum = sumDisplayAmounts(valuations, baseCurrency);
   return {
-    expenses: expenses.map((expense) => presentExpense(expense, baseCurrency)),
+    expenses: expenses.map((expense) =>
+      presentExpense(flattenExpenseTags(expense), baseCurrency),
+    ),
     total,
+    totalAmount: sum.total,
+    pendingConversionCount: sum.pendingConversionCount,
     page,
     totalPages: Math.ceil(total / limit),
   };
 }
 
 export async function getExpenseById(id: string, userId: string) {
-  return prisma.expense.findFirst({
+  const expense = await prisma.expense.findFirst({
     where: { id, userId },
-    include: { category: true },
+    include: expenseInclude,
   });
+  return expense ? flattenExpenseTags(expense) : null;
 }
 
 export const getExpenseSummary = cache(async function getExpenseSummary(
@@ -94,7 +122,7 @@ export const getExpenseSummary = cache(async function getExpenseSummary(
   const [currentMonthExpenses, lastMonthExpenses] = await Promise.all([
     prisma.expense.findMany({
       where: { userId, date: { gte: startOfMonth, lt: startOfNextMonth } },
-      include: { category: true },
+      include: expenseInclude,
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
     }),
     prisma.expense.findMany({
@@ -116,7 +144,7 @@ export const getExpenseSummary = cache(async function getExpenseSummary(
     lastMonthPendingConversionCount: last.pendingConversionCount,
     lastMonthCount: lastMonthExpenses.length,
     recentExpenses: currentMonthExpenses.map((expense) =>
-      presentExpense(expense, baseCurrency),
+      presentExpense(flattenExpenseTags(expense), baseCurrency),
     ),
   };
 });

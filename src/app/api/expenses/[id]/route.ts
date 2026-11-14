@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { presentExpense } from "@/lib/expense-valuation";
+import { expenseTagsInclude, flattenExpenseTags } from "@/lib/services/tags";
 import {
   getAuthUser,
   unauthorized,
@@ -22,7 +23,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
   const expense = await prisma.expense.findFirst({
     where: { id, userId: user.id },
-    include: { category: true },
+    include: { category: true, tags: expenseTagsInclude },
   });
 
   if (!expense) return notFound("Expense not found");
@@ -32,7 +33,10 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     select: { baseCurrency: true },
   });
   return NextResponse.json({
-    expense: presentExpense(expense, dbUser?.baseCurrency ?? "USD"),
+    expense: presentExpense(
+      flattenExpenseTags(expense),
+      dbUser?.baseCurrency ?? "USD",
+    ),
   });
 }
 

@@ -2,6 +2,7 @@ import { positiveInteger } from "@/lib/date-only";
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser, unauthorized, badRequest } from "@/lib/api-utils";
 import { createExpenseSchema } from "@/lib/validations/expense";
+import { parseTagFilter } from "@/lib/validations/tag";
 import { getExpenses } from "@/lib/data/expenses";
 import { createExpenseForUser } from "@/lib/services/expenses";
 
@@ -14,24 +15,33 @@ export async function GET(request: NextRequest) {
   const to = searchParams.get("to");
   const categoryId = searchParams.get("categoryId");
   const search = searchParams.get("search");
+  // ?tags=a,b or repeated ?tag=a&tag=b; matches any of them.
+  const tags = parseTagFilter([
+    ...searchParams.getAll("tags"),
+    ...searchParams.getAll("tag"),
+  ]);
   const page = positiveInteger(searchParams.get("page"), 1, 1_000_000);
   const limit = positiveInteger(searchParams.get("limit"), 50, 100);
 
-  const { expenses, total, totalPages } = await getExpenses({
-    userId: user.id,
-    from: from ?? undefined,
-    to: to ?? undefined,
-    categoryId: categoryId ?? undefined,
-    search: search ?? undefined,
-    page,
-    limit,
-  });
+  const { expenses, total, totalPages, totalAmount, pendingConversionCount } =
+    await getExpenses({
+      userId: user.id,
+      from: from ?? undefined,
+      to: to ?? undefined,
+      categoryId: categoryId ?? undefined,
+      tags,
+      search: search ?? undefined,
+      page,
+      limit,
+    });
 
   return NextResponse.json({
     expenses,
     total,
     page,
     totalPages,
+    totalAmount,
+    pendingConversionCount,
   });
 }
 

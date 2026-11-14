@@ -128,3 +128,62 @@ it("ignores invalid date parameters instead of crashing the filter UI", () => {
   });
   expect(container.textContent).toContain("Date range");
 });
+
+describe("ExpenseFilters tag filter", () => {
+  it("shows 'All tags' and lists the user's tags in the popover", async () => {
+    const user = userEvent.setup();
+    const onTagsChange = vi.fn();
+    const { container } = renderFilters({
+      tagNames: ["food", "work"],
+      onTagsChange,
+    });
+    const trigger = container.querySelector<HTMLButtonElement>(
+      '[data-slot="tag-filter"]',
+    )!;
+    expect(trigger.textContent).toBe("All tags");
+
+    await user.click(trigger);
+    const options = Array.from(
+      document.querySelectorAll('[role="option"] button'),
+    );
+    expect(options.map((o) => o.textContent)).toEqual(["#food", "#work"]);
+    await user.click(options[1]);
+    expect(onTagsChange).toHaveBeenCalledWith(["work"]);
+  });
+
+  it("toggles off a selected tag, labels multiple selections and clears them", async () => {
+    const user = userEvent.setup();
+    const onTagsChange = vi.fn();
+    const { container } = renderFilters({
+      tagNames: ["food", "work"],
+      selectedTags: ["food", "work"],
+      onTagsChange,
+    });
+    const trigger = container.querySelector<HTMLButtonElement>(
+      '[data-slot="tag-filter"]',
+    )!;
+    expect(trigger.textContent).toBe("2 tags");
+    // Selected tags count as active filters.
+    expect(container.textContent).toContain("Clear filters");
+
+    await user.click(trigger);
+    const food = Array.from(
+      document.querySelectorAll('[role="option"] button'),
+    ).find((o) => o.textContent === "#food")!;
+    await user.click(food);
+    expect(onTagsChange).toHaveBeenLastCalledWith(["work"]);
+
+    const clear = Array.from(document.querySelectorAll("button")).find(
+      (b) => b.textContent === "Clear tags",
+    )!;
+    await user.click(clear);
+    expect(onTagsChange).toHaveBeenLastCalledWith([]);
+  });
+
+  it("shows a hint when the user has no tags", async () => {
+    const user = userEvent.setup();
+    const { container } = renderFilters();
+    await user.click(container.querySelector('[data-slot="tag-filter"]')!);
+    expect(document.body.textContent).toContain("No tags yet");
+  });
+});

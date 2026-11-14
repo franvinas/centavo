@@ -21,12 +21,14 @@ export async function createExpense(formData: {
   categoryId: string;
   date: string;
   notes?: string;
+  tags?: string[];
 }) {
   const userId = await requireAuth();
   await createExpenseForUser(userId, formData);
 
   revalidatePath("/dashboard");
   revalidatePath("/expenses");
+  revalidatePath("/settings");
 }
 
 export async function updateExpense(
@@ -38,6 +40,7 @@ export async function updateExpense(
     categoryId?: string;
     date?: string;
     notes?: string;
+    tags?: string[];
   },
 ) {
   const userId = await requireAuth();
@@ -45,6 +48,7 @@ export async function updateExpense(
 
   revalidatePath("/dashboard");
   revalidatePath("/expenses");
+  revalidatePath("/settings");
   revalidatePath(`/expenses/${id}`);
 }
 
@@ -54,4 +58,5 @@ export async function deleteExpense(id: string) {
 
   revalidatePath("/dashboard");
   revalidatePath("/expenses");
+  revalidatePath("/settings");
 }

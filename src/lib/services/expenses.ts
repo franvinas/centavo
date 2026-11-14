@@ -8,6 +8,12 @@ import {
   type UpdateExpenseInput,
 } from "@/lib/validations/expense";
 import { buildValuation } from "./valuation";
+import {
+  anyTagWhere,
+  expenseTagsInclude,
+  flattenExpenseTags,
+  resolveTagIds,
+} from "./tags";
 import { presentExpense } from "@/lib/expense-valuation";
 import {
   type ExpenseSelectorInput,
@@ -17,6 +23,15 @@ import {
 } from "@/lib/validations/expense-bulk";
 
 type DbClient = typeof prisma | Prisma.TransactionClient;
+
+const expenseInclude = { category: true, tags: expenseTagsInclude } as const;
+
+function present<T extends Parameters<typeof flattenExpenseTags>[0]>(
+  expense: T & Parameters<typeof presentExpense>[0],
+  baseCurrency: string,
+) {
+  return presentExpense(flattenExpenseTags(expense), baseCurrency);
+}
 
 function buildExpenseWhere(
   userId: string,
@@ -37,6 +52,10 @@ function buildExpenseWhere(
 
   if (selectors.categoryId) {
     where.categoryId = selectors.categoryId;
+  }
+
+  if (selectors.tags?.length) {
+    where.tags = anyTagWhere(selectors.tags);
   }
 
   const date: Record<string, Date> = {};
@@ -84,6 +103,7 @@ async function createExpenseWithClient(
   const valuation =
     preparedValuation ??
     (await buildValuation(input.amount, input.currency, input.date));
+  const tagIds = await resolveTagIds(db, userId, input.tags ?? []);
 
   return db.expense.create({
     data: {
@@ -95,8 +115,9 @@ async function createExpenseWithClient(
       categoryId: input.categoryId,
       date: new Date(input.date),
       notes: input.notes || null,
+      tags: { create: tagIds.map((tagId) => ({ tagId })) },
     },
-    include: { category: true },
+    include: expenseInclude,
   });
 }
 
@@ -120,6 +141,14 @@ async function buildExpenseUpdateData(
   if (input.categoryId !== undefined) {
     await ensureCategoryBelongsToUser(db, userId, input.categoryId);
     updateData.categoryId = input.categoryId;
+  }
+
+  if (input.tags !== undefined) {
+    const tagIds = await resolveTagIds(db, userId, input.tags);
+    updateData.tags = {
+      deleteMany: {},
+      create: tagIds.map((tagId) => ({ tagId })),
+    };
   }
 
   const amount = input.amount ?? Number(existing.amount);
@@ -154,10 +183,7 @@ export async function createExpenseForUser(
 ) {
   const parsed = createExpenseSchema.parse(input);
   const expense = await createExpenseWithClient(getExpenseDb(), userId, parsed);
-  return presentExpense(
-    expense,
-    await getUserBaseCurrency(getExpenseDb(), userId),
-  );
+  return present(expense, await getUserBaseCurrency(getExpenseDb(), userId));
 }
 
 export async function updateExpenseForUser(
@@ -176,12 +202,9 @@ export async function updateExpenseForUser(
   const expense = await getExpenseDb().expense.update({
     where: { id: expenseId, userId, updatedAt },
     data: updateData,
-    include: { category: true },
+    include: expenseInclude,
   });
-  return presentExpense(
-    expense,
-    await getUserBaseCurrency(getExpenseDb(), userId),
-  );
+  return present(expense, await getUserBaseCurrency(getExpenseDb(), userId));
 }
 
 export async function deleteExpenseForUser(userId: string, expenseId: string) {
@@ -200,11 +223,11 @@ export async function listExpensesForUser(
 ) {
   const expenses = await prisma.expense.findMany({
     where: buildExpenseWhere(userId, selectors),
-    include: { category: true },
+    include: expenseInclude,
     orderBy: [{ date: "desc" }, { createdAt: "desc" }],
   });
   const currency = await getUserBaseCurrency(getExpenseDb(), userId);
-  return expenses.map((expense) => presentExpense(expense, currency));
+  return expenses.map((expense) => present(expense, currency));
 }
 
 export async function bulkUpdateExpensesForUser(
@@ -212,7 +235,11 @@ export async function bulkUpdateExpensesForUser(
   input: {
     selectors: ExpenseSelectorInput;
     preview?: boolean;
-    data: UpdateExpenseInput & { clearNotes?: boolean };
+    data: UpdateExpenseInput & {
+      clearNotes?: boolean;
+      addTags?: string[];
+      removeTags?: string[];
+    };
   },
 ) {
   const parsed = bulkExpenseUpdateSchema.parse(input);
@@ -249,14 +276,42 @@ export async function bulkUpdateExpensesForUser(
     if (parsed.data.clearNotes) updateData.notes = null;
     updates.push({ expense, updateData });
   }
+  const { addTags = [], removeTags = [] } = parsed.data;
   const updatedExpenses = await prisma.$transaction(async (tx) => {
+    const addTagIds = await resolveTagIds(tx, userId, addTags);
+    // Nested deleteMany only takes scalar filters, so resolve ids first.
+    const removeTagIds = removeTags.length
+      ? (
+          await tx.tag.findMany({
+            where: { userId, name: { in: removeTags } },
+            select: { id: true },
+          })
+        ).map((tag) => tag.id)
+      : [];
+    if (addTagIds.length || removeTagIds.length) {
+      for (const update of updates) {
+        update.updateData.tags = {
+          ...(removeTagIds.length
+            ? { deleteMany: { tagId: { in: removeTagIds } } }
+            : {}),
+          ...(addTagIds.length
+            ? {
+                createMany: {
+                  data: addTagIds.map((tagId) => ({ tagId })),
+                  skipDuplicates: true,
+                },
+              }
+            : {}),
+        };
+      }
+    }
     const results = [];
     for (const { expense, updateData } of updates) {
       results.push(
         await tx.expense.update({
           where: { id: expense.id, userId, updatedAt: expense.updatedAt },
           data: updateData,
-          include: { category: true },
+          include: expenseInclude,
         }),
       );
     }
@@ -268,7 +323,7 @@ export async function bulkUpdateExpensesForUser(
     matched: expenses.length,
     changed: updatedExpenses.length,
     items: updatedExpenses.map((expense) =>
-      presentExpense(expense, expenses[0]?.baseCurrency ?? "USD"),
+      present(expense, expenses[0]?.baseCurrency ?? "USD"),
     ),
   };
 }
@@ -379,7 +434,7 @@ export async function importExpensesForUser(
       preview: false,
       created: createdExpenses.length,
       items: createdExpenses.map((expense) =>
-        presentExpense(expense, displayCurrency),
+        present(expense, displayCurrency),
       ),
       errors: [],
     };

@@ -143,6 +143,10 @@ export function buildSelectorPayload(
     if (value) selectors[key] = value;
   }
 
+  // Repeatable --tag; matches expenses carrying any of them.
+  const tags = getStringArrayOption(options, "tag");
+  if (tags.length) selectors.tags = tags;
+
   return selectors;
 }
 

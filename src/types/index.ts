@@ -32,4 +32,6 @@ export interface Expense {
   date: string;
   categoryId: string;
   category: Category;
+  /** Normalized tag names, sorted. */
+  tags?: string[];
 }

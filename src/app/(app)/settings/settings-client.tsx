@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, Send, Check, Coins, Languages } from "lucide-react";
+import { LogOut, Send, Check, Coins, Hash, Languages } from "lucide-react";
+import { TagManager, type TagSummary } from "@/components/settings/tag-manager";
 import { PageHeader } from "@/components/layout/page-header";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -28,9 +29,10 @@ interface SettingsClientProps {
     locale: string;
     telegramChatId: string | null;
   };
+  tags?: TagSummary[];
 }
 
-export function SettingsClient({ user }: SettingsClientProps) {
+export function SettingsClient({ user, tags = [] }: SettingsClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [name, setName] = useState(user.name);
@@ -193,6 +195,13 @@ export function SettingsClient({ user }: SettingsClientProps) {
             </button>
           ))}
         </div>
+      </section>
+
+      {/* Tags */}
+      <section className={card} data-slot="tags-section">
+        <SectionTitle icon={Hash}>{t("tags")}</SectionTitle>
+        <p className="text-text-secondary mb-3 text-sm">{t("tagsHint")}</p>
+        <TagManager tags={tags} />
       </section>
 
       {/* Telegram */}

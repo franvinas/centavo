@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/data/user";
 import { getExpenseById } from "@/lib/data/expenses";
 import { getCategories } from "@/lib/data/categories";
+import { getTagNames } from "@/lib/data/tags";
 import { ExpenseForm } from "@/components/expenses/expense-form";
 import type { Category } from "@/types";
 
@@ -17,7 +18,10 @@ export default async function ExpenseDetailPage({
   const expense = await getExpenseById(id, user.id);
   if (!expense) notFound();
 
-  const categories = await getCategories(user.id);
+  const [categories, tagNames] = await Promise.all([
+    getCategories(user.id),
+    getTagNames(user.id),
+  ]);
   const mapped: Category[] = categories.map((c) => ({
     id: c.id,
     name: c.name,
@@ -35,8 +39,10 @@ export default async function ExpenseDetailPage({
         date: expense.date.toISOString(),
         notes: expense.notes ?? undefined,
         categoryId: expense.categoryId,
+        tags: expense.tags.map((tag) => tag.name),
       }}
       categories={mapped}
+      tagSuggestions={tagNames}
       defaultCurrency={user.baseCurrency}
     />
   );

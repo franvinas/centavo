@@ -5,6 +5,7 @@ import type {
   CategorySpending,
   TimeSeriesPoint,
   CurrencySpending,
+  TagSpending,
 } from "@/types/analytics";
 
 interface AnalyticsParams {
@@ -136,4 +137,52 @@ export async function getSpendingByCurrency(
     groups.set(expense.currency, group);
   }
   return [...groups.values()].sort((a, b) => b.baseTotal - a.baseTotal);
+}
+
+/**
+ * Spending per tag in the period. An expense with several tags counts toward
+ * each of them, so these totals don't add up to the period total.
+ */
+export async function getSpendingByTag({
+  userId,
+  from,
+  to,
+  baseCurrency,
+}: AnalyticsParams): Promise<TagSpending[]> {
+  const [user, expenses] = await Promise.all([
+    baseCurrency
+      ? null
+      : prisma.user.findUnique({
+          where: { id: userId },
+          select: { baseCurrency: true },
+        }),
+    prisma.expense.findMany({
+      where: { userId, date: { gte: from, lte: to }, tags: { some: {} } },
+      include: {
+        tags: { include: { tag: { select: { id: true, name: true } } } },
+      },
+    }),
+  ]);
+  const currency = baseCurrency ?? user?.baseCurrency ?? "USD";
+  const groups = new Map<string, TagSpending>();
+  for (const expense of expenses) {
+    const value = getDisplayAmount(expense, currency);
+    for (const { tag } of expense.tags) {
+      const group = groups.get(tag.id) ?? {
+        tagId: tag.id,
+        name: tag.name,
+        total: 0,
+        count: 0,
+        pendingConversionCount: 0,
+      };
+      group.count++;
+      if (value === null)
+        group.pendingConversionCount = (group.pendingConversionCount ?? 0) + 1;
+      else group.total = Math.round((group.total + value) * 100) / 100;
+      groups.set(tag.id, group);
+    }
+  }
+  return [...groups.values()].sort(
+    (a, b) => b.total - a.total || a.name.localeCompare(b.name),
+  );
 }

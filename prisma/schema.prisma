@@ -67,6 +67,7 @@ model User {
   sessions         Session[]
   expenses         Expense[]
   categories       Category[]
+  tags             Tag[]
   telegramChatId   String?            @unique @map("telegram_chat_id")
   telegramMessages TelegramMessage[]
   telegramLinkTokens TelegramLinkToken[]
@@ -113,12 +114,39 @@ model Expense {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [categoryId], references: [id])
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category     @relation(fields: [categoryId], references: [id])
+  tags     ExpenseTag[]
 
   @@index([userId, date])
   @@index([userId, categoryId])
   @@map("expenses")
+}
+
+// Free-form labels. Names are stored normalized (trimmed, lowercase).
+model Tag {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expenses ExpenseTag[]
+
+  @@unique([userId, name])
+  @@map("tags")
+}
+
+model ExpenseTag {
+  expenseId String @map("expense_id")
+  tagId     String @map("tag_id")
+
+  expense Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([expenseId, tagId])
+  @@index([tagId])
+  @@map("expense_tags")
 }
 
 model TelegramMessage {

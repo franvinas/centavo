@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { X, Calendar, FileText, StickyNote, Trash2 } from "lucide-react";
+import { X, Calendar, FileText, Hash, StickyNote, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { DeleteConfirmDrawer } from "@/components/ui/delete-confirm-drawer";
 import { CategoryPicker } from "./category-picker";
+import { TagInput } from "./tag-input";
 import {
   createExpense,
   updateExpense,
@@ -27,14 +28,17 @@ interface ExpenseFormProps {
     date: string;
     notes?: string;
     categoryId: string;
+    tags?: string[];
   };
   categories: Category[];
+  tagSuggestions?: string[];
   defaultCurrency?: string;
 }
 
 export function ExpenseForm({
   expense,
   categories,
+  tagSuggestions = [],
   defaultCurrency = "USD",
 }: ExpenseFormProps) {
   const router = useRouter();
@@ -62,6 +66,7 @@ export function ExpenseForm({
   });
   const [notes, setNotes] = useState(expense?.notes ?? "");
   const [categoryId, setCategoryId] = useState(expense?.categoryId ?? "");
+  const [tags, setTags] = useState<string[]>(expense?.tags ?? []);
   const [error, setError] = useState("");
   const [deleteDrawerOpen, setDeleteDrawerOpen] = useState(false);
   const t = useTranslations("expenses");
@@ -73,6 +78,7 @@ export function ExpenseForm({
     date,
     notes,
     categoryId,
+    tags,
   });
   const isDirty =
     JSON.stringify({
@@ -82,6 +88,7 @@ export function ExpenseForm({
       date,
       notes,
       categoryId,
+      tags,
     }) !== JSON.stringify(initial);
 
   const currencySymbol = CURRENCY_SYMBOLS[currency] ?? "$";
@@ -137,6 +144,7 @@ export function ExpenseForm({
           categoryId,
           date,
           notes,
+          tags,
         };
 
         if (expense) {
@@ -151,6 +159,7 @@ export function ExpenseForm({
           date,
           notes,
           categoryId,
+          tags,
         });
         router.push("/dashboard");
       } catch {
@@ -307,6 +316,14 @@ export function ExpenseForm({
                 categories={categories}
                 selectedId={categoryId}
                 onSelect={setCategoryId}
+              />
+            </div>
+            <div className={fieldRow}>
+              <Hash className="text-text-tertiary h-5 w-5 shrink-0" />
+              <TagInput
+                value={tags}
+                onChange={setTags}
+                suggestions={tagSuggestions}
               />
             </div>
             <div className={fieldRow}>

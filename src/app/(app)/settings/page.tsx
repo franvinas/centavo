@@ -1,10 +1,13 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/data/user";
+import { getTagsWithTotals } from "@/lib/data/tags";
 import { SettingsClient } from "./settings-client";
 
 export default async function SettingsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/signin");
+
+  const tags = await getTagsWithTotals(user.id);
 
   return (
     <SettingsClient
@@ -15,6 +18,7 @@ export default async function SettingsPage() {
         locale: user.locale,
         telegramChatId: user.telegramChatId ?? null,
       }}
+      tags={tags}
     />
   );
 }
