@@ -9,6 +9,7 @@ import { PeriodSelector } from "@/components/analytics/period-selector";
 import { ConversionNotice } from "@/components/expenses/conversion-notice";
 import { SummaryCards } from "@/components/analytics/summary-cards";
 import { CurrencyBreakdown } from "@/components/analytics/currency-breakdown";
+import { TagBreakdown } from "@/components/analytics/tag-breakdown";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/layout/page-header";
 
@@ -168,18 +169,36 @@ export function AnalyticsClient({
           )}
         </div>
 
-        <div className={cardClass}>
-          <h2 className="text-text-primary mb-5 text-[15px] font-semibold">
-            {t("byCurrency")}
-          </h2>
-          {isPending ? (
-            <ListSkeleton rows={3} />
-          ) : (
-            <CurrencyBreakdown
-              data={data.byCurrency}
-              baseCurrency={data.baseCurrency}
-            />
-          )}
+        <div className="space-y-5 md:space-y-6">
+          <div className={cardClass} data-slot="tag-breakdown-card">
+            <h2 className="text-text-primary mb-5 text-[15px] font-semibold">
+              {t("byTag")}
+            </h2>
+            {isPending ? (
+              <ListSkeleton rows={3} />
+            ) : (
+              <TagBreakdown
+                data={data.byTag}
+                baseCurrency={data.baseCurrency}
+                from={data.periodFrom}
+                to={data.periodTo}
+              />
+            )}
+          </div>
+
+          <div className={cardClass}>
+            <h2 className="text-text-primary mb-5 text-[15px] font-semibold">
+              {t("byCurrency")}
+            </h2>
+            {isPending ? (
+              <ListSkeleton rows={3} />
+            ) : (
+              <CurrencyBreakdown
+                data={data.byCurrency}
+                baseCurrency={data.baseCurrency}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

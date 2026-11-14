@@ -6,6 +6,7 @@ import {
   getSpendingByCategory,
   getSpendingOverTime,
   getSpendingByCurrency,
+  getSpendingByTag,
 } from "../analytics";
 
 const rates = {
@@ -106,5 +107,48 @@ describe("historical totals", () => {
     expect(
       (await getSpendingOverTime(params)).every((p) => p.total === 0),
     ).toBe(true);
+  });
+});
+
+describe("getSpendingByTag", () => {
+  const tag = (id: string, name: string) => ({ tag: { id, name } });
+
+  it("totals each tag in the display currency, counting shared expenses in each", async () => {
+    prismaMock.expense.findMany.mockResolvedValue([
+      { ...expenses[0], tags: [tag("t-trip", "trip"), tag("t-food", "food")] },
+      { ...expenses[1], tags: [tag("t-food", "food")] },
+      { ...expenses[2], tags: [tag("t-trip", "trip")] },
+    ] as never);
+
+    expect(await getSpendingByTag(params)).toEqual([
+      {
+        tagId: "t-food",
+        name: "food",
+        total: 12000,
+        count: 2,
+        pendingConversionCount: 0,
+      },
+      {
+        tagId: "t-trip",
+        name: "trip",
+        total: 10000,
+        count: 2,
+        pendingConversionCount: 1,
+      },
+    ]);
+    expect(prismaMock.expense.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          userId: "user-1",
+          date: { gte: params.from, lte: params.to },
+          tags: { some: {} },
+        },
+      }),
+    );
+  });
+
+  it("returns an empty list when nothing in the period is tagged", async () => {
+    prismaMock.expense.findMany.mockResolvedValue([]);
+    expect(await getSpendingByTag(params)).toEqual([]);
   });
 });

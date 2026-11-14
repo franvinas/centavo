@@ -9,6 +9,7 @@ import {
   getSpendingByCategory,
   getSpendingOverTime,
   getSpendingByCurrency,
+  getSpendingByTag,
 } from "@/lib/data/analytics";
 import { AnalyticsClient } from "./analytics-client";
 import AnalyticsLoading from "./loading";
@@ -108,7 +109,7 @@ async function AnalyticsContent({
     label: timePeriodLabel,
   } = getDateRange(timePeriod, timeFrom, timeTo, timezone, locale);
 
-  const [summary, byCategory, overTime, byCurrency] = await Promise.all([
+  const [summary, byCategory, overTime, byCurrency, byTag] = await Promise.all([
     getAnalyticsSummary({ userId, from, to, baseCurrency }),
     getSpendingByCategory({ userId, from, to, baseCurrency }),
     getSpendingOverTime({
@@ -118,6 +119,7 @@ async function AnalyticsContent({
       to: timeChartTo,
     }),
     getSpendingByCurrency({ userId, from, to, baseCurrency }),
+    getSpendingByTag({ userId, from, to, baseCurrency }),
   ]);
 
   return (
@@ -127,8 +129,11 @@ async function AnalyticsContent({
         byCategory,
         overTime,
         byCurrency,
+        byTag,
         baseCurrency,
         periodLabel: label,
+        periodFrom: from.toISOString().slice(0, 10),
+        periodTo: to.toISOString().slice(0, 10),
         timePeriodLabel,
       }}
       currentPeriod={period}

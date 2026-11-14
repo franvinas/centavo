@@ -18,6 +18,7 @@ import {
   renameTagForUser,
 } from "@/lib/services/tags";
 import { getExpenses } from "@/lib/data/expenses";
+import { getSpendingByTag } from "@/lib/data/analytics";
 
 const url = process.env.AUDIT_TEST_DATABASE_URL;
 const userId = `tags-${randomUUID()}`;
@@ -166,6 +167,35 @@ describe.skipIf(!url)("expense tags (database)", () => {
       where: { id: userId },
       data: { baseCurrency: "USD" },
     });
+  });
+
+  it("totals tags per month for analytics", async () => {
+    const january = {
+      userId,
+      from: new Date("2026-01-01"),
+      to: new Date("2026-01-31"),
+    };
+    expect(
+      (await getSpendingByTag(january)).map(({ name, total, count }) => ({
+        name,
+        total,
+        count,
+      })),
+    ).toEqual([
+      { name: "japan trip", total: 130, count: 2 },
+      { name: "reimbursable", total: 100, count: 1 },
+      { name: "food-out", total: 30, count: 1 },
+    ]);
+    expect(
+      await getSpendingByTag({
+        userId,
+        from: new Date("2026-02-01"),
+        to: new Date("2026-02-28"),
+      }),
+    ).toEqual([]);
+    expect(
+      (await getSpendingByTag({ ...january, baseCurrency: "ARS" }))[0].total,
+    ).toBe(130000);
   });
 
   it("replaces tags on update, leaves them alone when omitted, clears with []", async () => {
