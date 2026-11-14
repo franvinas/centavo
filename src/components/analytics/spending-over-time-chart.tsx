@@ -106,7 +106,7 @@ export function SpendingOverTimeChart({
           tick={{ fontSize: 11, fill: "#9c9b99" }}
           tickLine={false}
           axisLine={false}
-          width={44}
+          width="auto"
           tickCount={5}
           tickFormatter={(value: number) => compact.format(value)}
         />

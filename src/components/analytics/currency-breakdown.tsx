@@ -32,7 +32,7 @@ export function CurrencyBreakdown({
             {item.currency}
           </span>
           <div className="min-w-0 flex-1">
-            <div className="flex items-baseline justify-between gap-3">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3">
               <span className="text-text-primary text-sm font-semibold tabular-nums">
                 {formatCurrency(item.originalTotal, item.currency)}
               </span>

@@ -69,8 +69,9 @@ export function CategoryBreakdown({ expenses }: CategoryBreakdownProps) {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="mb-1.5 flex items-baseline justify-between gap-3">
-                <span className="text-text-primary truncate text-sm font-medium">
+              {/* The name keeps a minimum width; a long amount wraps below it. */}
+              <div className="mb-1.5 flex flex-wrap items-baseline justify-end gap-x-3">
+                <span className="text-text-primary min-w-0 flex-[1_1_4.5rem] truncate text-sm font-medium">
                   {cat.name}
                 </span>
                 <span className="text-text-secondary shrink-0 text-sm tabular-nums">

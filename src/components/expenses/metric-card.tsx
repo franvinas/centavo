@@ -1,4 +1,5 @@
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { FitAmount } from "@/components/ui/fit-amount";
 
 interface MetricCardProps {
   label: string;
@@ -15,11 +16,11 @@ export function MetricCard({ label, value, trend, aside }: MetricCardProps) {
   return (
     <div className="bg-bg-surface shadow-card border-border-subtle/60 rounded-2xl border p-5 md:p-7">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-        <div className="min-w-0">
+        <div className="min-w-0 lg:flex-1">
           <p className="text-text-secondary text-sm font-medium">{label}</p>
-          <p className="text-text-primary mt-1.5 text-[32px] leading-none font-bold tracking-tight tabular-nums md:text-[40px]">
+          <FitAmount className="text-text-primary mt-1.5 text-[32px] leading-none font-bold tracking-tight tabular-nums md:text-[40px]">
             {value}
-          </p>
+          </FitAmount>
           {trend && (
             <div
               className={`mt-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 ${

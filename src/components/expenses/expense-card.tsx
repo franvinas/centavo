@@ -70,30 +70,33 @@ export function ExpenseCard({ expense }: ExpenseCardProps) {
         color={expense.category.color}
       />
 
-      {/* Description + meta */}
-      <div className="min-w-0 flex-1">
-        <p className="text-text-primary truncate text-[15px] leading-snug font-medium">
-          {expense.description}
-        </p>
-        <p className="text-text-tertiary mt-0.5 truncate text-xs">
-          {expense.category.name}
-        </p>
-      </div>
+      {/* Description keeps a minimum width; a very long amount wraps below. */}
+      <div className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-3 gap-y-1">
+        {/* Description + meta */}
+        <div className="min-w-0 flex-[1_1_7rem]">
+          <p className="text-text-primary truncate text-[15px] leading-snug font-medium">
+            {expense.description}
+          </p>
+          <p className="text-text-tertiary mt-0.5 truncate text-xs">
+            {expense.category.name}
+          </p>
+        </div>
 
-      {/* Amount */}
-      <div className="shrink-0 text-right tabular-nums">
-        <p className="text-text-primary text-[15px] leading-snug font-semibold">
-          {formatCurrency(expense.amount, expense.currency)}
-        </p>
-        {expense.conversionPending ? (
-          <p className="text-status-negative mt-0.5 text-xs">
-            {te("conversionPending")}
+        {/* Amount */}
+        <div className="shrink-0 text-right tabular-nums">
+          <p className="text-text-primary text-[15px] leading-snug font-semibold">
+            {formatCurrency(expense.amount, expense.currency)}
           </p>
-        ) : showConverted ? (
-          <p className="text-text-tertiary mt-0.5 text-xs">
-            ≈ {formatCurrency(expense.baseAmount!, expense.baseCurrency)}
-          </p>
-        ) : null}
+          {expense.conversionPending ? (
+            <p className="text-status-negative mt-0.5 text-xs">
+              {te("conversionPending")}
+            </p>
+          ) : showConverted ? (
+            <p className="text-text-tertiary mt-0.5 text-xs">
+              ≈ {formatCurrency(expense.baseAmount!, expense.baseCurrency)}
+            </p>
+          ) : null}
+        </div>
       </div>
     </Link>
   );
