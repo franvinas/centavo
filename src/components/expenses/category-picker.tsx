@@ -124,6 +124,18 @@ export function CategoryPicker({
       )
     : categories;
 
+  // iOS Safari doesn't move focus to a tapped <button>, so a field the user was
+  // typing in (amount, description…) stays focused and the keyboard stays open
+  // behind the drawer. With the keyboard up, vaul repositions the drawer and iOS
+  // misplaces taps on fixed elements, so picking a category selects nothing or
+  // the wrong row. Blurring first closes the keyboard before the list is shown.
+  const handleDrawerOpenChange = (open: boolean) => {
+    if (open && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    setDrawerOpen(open);
+  };
+
   const handleSelect = (id: string) => {
     onSelect(id);
     setDrawerOpen(false);
@@ -148,7 +160,7 @@ export function CategoryPicker({
     <>
       {/* Mobile: Drawer */}
       <div className="min-w-0 flex-1 md:hidden">
-        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <Drawer open={drawerOpen} onOpenChange={handleDrawerOpenChange}>
           <DrawerTrigger asChild>
             <button
               type="button"
