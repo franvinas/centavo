@@ -219,6 +219,17 @@ describe("ExpenseForm", () => {
     expect((amountInput as HTMLInputElement).value).toBe("12.34");
   });
 
+  it("caps the amount at 10 integer digits, like the server", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<ExpenseForm categories={mockCategories} />);
+
+    const amountInput = container.querySelector(
+      'input[id="expense-amount"]',
+    ) as HTMLInputElement;
+    await user.type(amountInput, "123456789012.345");
+    expect(amountInput.value).toBe("1,234,567,890.34");
+  });
+
   it("save button is disabled when form is incomplete", () => {
     const { container } = render(<ExpenseForm categories={mockCategories} />);
 

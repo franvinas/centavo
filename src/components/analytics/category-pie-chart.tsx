@@ -4,6 +4,7 @@ import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import { useTranslations } from "next-intl";
 import type { CategorySpending } from "@/types/analytics";
 import { formatCurrency } from "@/lib/format";
+import { FitAmount } from "@/components/ui/fit-amount";
 
 interface CategoryPieChartProps {
   data: CategorySpending[];
@@ -78,9 +79,9 @@ export function CategoryPieChart({
           <span className="text-text-tertiary text-xs font-medium">
             {t("totalSpent")}
           </span>
-          <span className="text-text-primary mt-0.5 max-w-[120px] truncate text-sm font-semibold tabular-nums">
+          <FitAmount className="text-text-primary mt-0.5 max-w-[124px] text-sm font-semibold tabular-nums">
             {formatCurrency(total, baseCurrency)}
-          </span>
+          </FitAmount>
         </div>
       </div>
 
@@ -88,17 +89,20 @@ export function CategoryPieChart({
         {data.map((entry) => (
           <li
             key={entry.categoryId}
-            className="flex items-center gap-2.5 text-sm"
+            className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-0.5 text-sm"
           >
-            <span
-              className="h-2.5 w-2.5 shrink-0 rounded-[3px]"
-              style={{ backgroundColor: entry.color }}
-            />
-            <span className="text-text-primary min-w-0 flex-1 truncate">
-              {entry.name}
-            </span>
-            <span className="text-text-tertiary w-9 shrink-0 text-right text-xs tabular-nums">
-              {Math.round((entry.total / total) * 100)}%
+            {/* Name and share keep a minimum width; a long amount wraps below. */}
+            <span className="flex min-w-[9rem] flex-[1_1_9rem] items-center gap-2.5">
+              <span
+                className="h-2.5 w-2.5 shrink-0 rounded-[3px]"
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className="text-text-primary min-w-0 flex-1 truncate">
+                {entry.name}
+              </span>
+              <span className="text-text-tertiary w-9 shrink-0 text-right text-xs tabular-nums">
+                {Math.round((entry.total / total) * 100)}%
+              </span>
             </span>
             <span className="text-text-secondary shrink-0 text-right tabular-nums">
               {formatCurrency(entry.total, baseCurrency)}

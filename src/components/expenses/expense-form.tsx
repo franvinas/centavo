@@ -244,7 +244,8 @@ export function ExpenseForm({
                   value={displayAmount}
                   onChange={(e) => {
                     const val = e.target.value.replace(/,/g, "");
-                    if (/^\d*\.?\d{0,2}$/.test(val)) setAmount(val);
+                    // Up to 10 integer digits, matching the server's 9,999,999,999.99 cap.
+                    if (/^\d{0,10}(\.\d{0,2})?$/.test(val)) setAmount(val);
                   }}
                   autoComplete="off"
                   className="absolute inset-0 caret-transparent opacity-0"

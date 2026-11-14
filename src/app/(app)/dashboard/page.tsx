@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { formatCurrency } from "@/lib/format";
 import { ConversionNotice } from "@/components/expenses/conversion-notice";
 import { MetricCard } from "@/components/expenses/metric-card";
+import { FitAmount } from "@/components/ui/fit-amount";
 import { ExpenseList } from "@/components/expenses/expense-list";
 import { CategoryBreakdown } from "@/components/expenses/category-breakdown";
 import { EmptyStateDashboard } from "@/components/dashboard/empty-state";
@@ -89,7 +90,7 @@ async function DashboardMetric({
         label={`${t("totalSpent")} · ${monthLabel}`}
         value={formatCurrency(totalSpent, baseCurrency)}
         aside={
-          <dl className="border-border-subtle grid shrink-0 grid-cols-2 gap-x-8 gap-y-1 border-t pt-4 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8">
+          <dl className="border-border-subtle grid min-w-0 shrink-0 grid-cols-[auto_minmax(0,1fr)] gap-x-8 gap-y-1 border-t pt-4 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8">
             <div>
               <dt className="text-text-tertiary text-xs font-medium">
                 {t("expenseCount")}
@@ -98,12 +99,14 @@ async function DashboardMetric({
                 {summary.expenseCount}
               </dd>
             </div>
-            <div>
+            <div className="min-w-0">
               <dt className="text-text-tertiary text-xs font-medium">
                 {t("lastMonth")}
               </dt>
-              <dd className="text-text-primary mt-1 text-lg font-semibold whitespace-nowrap tabular-nums">
-                {formatCurrency(lastMonthTotal, baseCurrency)}
+              <dd className="mt-1">
+                <FitAmount className="text-text-primary text-lg font-semibold tabular-nums">
+                  {formatCurrency(lastMonthTotal, baseCurrency)}
+                </FitAmount>
               </dd>
             </div>
           </dl>

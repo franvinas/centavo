@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import type { AnalyticsSummary } from "@/types/analytics";
 import { formatCurrency, formatNumber } from "@/lib/format";
+import { FitAmount } from "@/components/ui/fit-amount";
 
 interface SummaryCardsProps {
   summary: AnalyticsSummary;
@@ -39,13 +40,13 @@ export function SummaryCards({ summary, baseCurrency }: SummaryCardsProps) {
           <p className="text-text-secondary truncate text-[13px] font-medium">
             {card.label}
           </p>
-          <p
-            className={`text-text-primary mt-1.5 truncate font-bold tracking-tight tabular-nums ${
+          <FitAmount
+            className={`text-text-primary mt-1.5 font-bold tracking-tight tabular-nums ${
               i === 0 ? "text-[26px] md:text-2xl" : "text-xl md:text-2xl"
             }`}
           >
             {card.value}
-          </p>
+          </FitAmount>
         </div>
       ))}
     </div>
