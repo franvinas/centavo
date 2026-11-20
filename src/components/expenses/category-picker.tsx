@@ -160,7 +160,19 @@ export function CategoryPicker({
     <>
       {/* Mobile: Drawer */}
       <div className="min-w-0 flex-1 md:hidden">
-        <Drawer open={drawerOpen} onOpenChange={handleDrawerOpenChange}>
+        <Drawer
+          open={drawerOpen}
+          onOpenChange={handleDrawerOpenChange}
+          // vaul's iOS scroll lock (usePreventScroll) saves window.scrollY on
+          // open and forces it to 0. Pressing a row sets isDragging, which turns
+          // the lock off and restores the saved offset, so when the page was
+          // scrolled (e.g. iOS scrolled it to show a focused field) the list
+          // jumps under the finger and iOS drops the click or delivers it to a
+          // neighbouring row. Despite the name, disablePreventScroll={false}
+          // turns that lock off; repositionInputs (needed on Android so the
+          // drawer rises above the keyboard) keeps working.
+          disablePreventScroll={false}
+        >
           <DrawerTrigger asChild>
             <button
               type="button"
@@ -180,7 +192,18 @@ export function CategoryPicker({
 
             <div className="px-4 pb-2">{searchInput}</div>
 
-            <div className="max-h-[60vh] overflow-y-auto px-4 pt-1 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+            {/*
+              The drawer's scroll lock (react-remove-scroll, via Radix Dialog)
+              calls preventDefault() on any touchmove that can't scroll this
+              list: a tap that drifts down or sideways by even 1-2px. iOS then
+              drops the click, so the tapped category isn't selected. Keep
+              touchmoves from reaching that document listener; overscroll-contain
+              stops the scroll from chaining to the page behind.
+            */}
+            <div
+              className="max-h-[60vh] overflow-y-auto overscroll-contain px-4 pt-1 pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
+              onTouchMove={(e) => e.stopPropagation()}
+            >
               <CategoryList
                 categories={filtered}
                 selectedId={selectedId}
